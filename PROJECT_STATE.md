@@ -14,8 +14,8 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 
 **Stage 01 — Technical audit: complete at source/repository level.**
 **Technical direction: approved.**
-**Creative direction: preferred concept recorded; full specification approval pending.**
-**UX and information architecture: pending.**
+**Stage 02 — Creative direction: complete; full creative specification approved by user.**
+**Stage 03 — UX and information architecture: next; not yet started.**
 **Implementation: not authorized.**
 
 ## Verified baseline
@@ -38,17 +38,24 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 | Deployment approach | **Approved preference** — static hosting, preferably Cloudflare Pages | Actual Pages project and build/output configuration must be verified before deployment changes. |
 | Migration timing | **Approved** — only after creative and UX decisions are approved; preserve the existing live site until the new version passes QA | Build and test separately; do not prematurely replace production. |
 
-## Creative direction — preferences, not final approval
+## Approved creative direction — Chat 02
 
-Chat 02 presented four concepts: Nexus, Obsidian, Signal, and Monolith.
+**Approval status: the user approved the complete creative specification, including the final hero-object proposal, in the Chat 02 Final Creative Handoff dated 2026-10-11.**
 
-- **User-preferred concept:** Nexus × Obsidian hybrid.
-- **User-preferred palette:** dark graphite + lavender.
-- **Working title:** Spatial Precision — Nexus × Obsidian.
-- **Proposed design language:** restrained architectural interface, distinctive cinematic 3D hero object, dark graphite surfaces, crisp white typography, selective lavender accents, controlled lighting, and deliberate depth.
-- **Status:** preferences recorded only. The complete creative specification has not received explicit final approval.
-- **Open creative decisions:** typography and final color tokens; hero object's form and interaction boundaries; static fallback; motion principles; accessibility and performance constraints.
-- **Creative chat reported:** no repository or deployment changes; read-only source inspection only; no new visual, accessibility, or performance tests.
+- **Creative direction:** Nexus × Obsidian.
+- **Working title:** Spatial Precision.
+- **Palette:** dark graphite + lavender, restrained white highlights, and optional rare cyan details.
+- **Typography:** Space Grotesk for display, Inter for body, and optional IBM Plex Mono for technical metadata.
+- **Hero object — “The Spatial Signature”:** an abstract S-inspired monolithic sculpture combining angular architectural planes with fluid folded curves and a central void.
+- **Materials and lighting:** matte graphite, selective polished-metal edges, controlled white highlights, and subtle lavender illumination.
+- **Interactions:** subtle, bounded desktop pointer response; optional restrained scroll response; static or minimally animated mobile presentation.
+- **Fallback:** optimized static render of the same hero composition. Core content must remain independent of WebGL.
+- **Motion:** one restrained signature motion and useful micro-interactions; no scroll hijacking or excessive decorative animation.
+- **Accessibility:** semantic structure, keyboard usability, visible focus, verified contrast, touch usability, reduced-motion support, and a functional non-WebGL experience.
+- **Performance:** core content before 3D, lazy loading where practical, no unnecessary continuous rendering, and Core Web Vitals targets to be verified during QA.
+- **Content philosophy:** communicate identity and introduction clearly, demonstrate technical capabilities with authentic project evidence, and make contact information easy to find.
+- **Technical constraints retained:** React + TypeScript + Vite; CSS-first effects and selective Three.js/WebGL only where justified; static hosting preferred, with Cloudflare Pages configuration verification still required; preserve the current production site until the replacement passes QA.
+- **Chat 02 reported:** no repository changes, no dependencies installed, no deployment settings changed. Verification was read-only inspection of the shared project record and recorded source files; no new implementation, visual, accessibility, or performance tests were performed.
 
 ## Open verification items and risks
 
@@ -57,15 +64,15 @@ Chat 02 presented four concepts: Nexus, Obsidian, Signal, and Monolith.
 - Verify the live site and production domain behavior independently when access permits; do not treat reported terminal output as a new live check.
 - Confirm build command, output directory, domain/redirect behavior, and deployment workflow before deployment changes.
 - Avoid unnecessary framework/dependency complexity, migration regression, oversized 3D payloads, and accessibility/mobile-performance degradation.
-- Preserve the current working state. Do not modify application code, install dependencies, migrate the framework, change DNS/Cloudflare settings, or deploy before approved creative and UX specifications and an explicit implementation authorization.
+- Preserve the current working state. Do not modify application code, install dependencies, migrate the framework, change DNS/Cloudflare settings, or deploy before the UX specification is approved and explicit implementation authorization is given.
 
 ## Roadmap
 
 1. **Technical audit — complete at source/repository level.** Audit handoff received; technical direction approved. Deployment and fresh live-site verification remain open.
-2. **Creative direction — in progress.** Nexus × Obsidian and dark graphite + lavender are user preferences. Chat 02 must complete the creative specification and obtain explicit approval.
-3. **UX and information architecture — pending.** Begin after the creative specification is approved. Define page structure, section order, navigation, responsive behavior, content priorities, and interactions.
+2. **Creative direction — complete.** Full creative specification approved by user; see the approved creative direction above.
+3. **UX and information architecture — next, pending.** Chat 03 should define page structure, section order, navigation, responsive behavior, content priorities, and interactions using the approved technical and creative decisions. No implementation.
 4. **Detailed technical architecture — pending.** Resolve component structure, whether Three.js or React Three Fiber is warranted, dependencies, build/deployment assumptions, and performance budgets in light of approved creative/UX decisions.
-5. **Implementation — blocked pending approvals.** No application code, dependencies, migration, or deployment changes authorized yet.
+5. **Implementation — blocked pending approvals.** The creative specification is approved, but this handoff does not authorize implementation. No application code, dependencies, migration, or deployment changes authorized yet.
 6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers.
 7. **Deployment and handover — pending.** Verify Cloudflare Pages configuration, production behavior, HTTPS, and domain/redirects before release.
 
@@ -75,4 +82,4 @@ Each specialist chat must report: scope completed, evidence, exact files changed
 
 ## Next action
 
-Return to **Chat 02 — Creative Direction** to complete the specification, resolve the open creative decisions, and request explicit final approval. After the creative direction is approved, proceed to **Chat 03 — UX & Information Architecture**. No implementation work should begin yet.
+Proceed to **Chat 03 — UX & Information Architecture** with the approved technical direction and creative specification. Chat 03 must design and present the UX for approval before implementation. Keep detailed technical architecture, implementation, QA, and deployment as separate stages. Do not modify application code, install dependencies, or change deployment settings at this stage.
