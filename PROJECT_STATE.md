@@ -15,7 +15,8 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 **Stage 01 — Technical audit: complete at source/repository level.**
 **Technical direction: approved.**
 **Stage 02 — Creative direction: complete; full creative specification approved by user.**
-**Stage 03 — UX and information architecture: next; not yet started.**
+**Stage 03 — UX and information architecture: complete; UX proposal v1.0 approved by user.**
+**Stage 04 — Detailed technical architecture: next; pending.**
 **Implementation: not authorized.**
 
 ## Verified baseline
@@ -57,6 +58,26 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 - **Technical constraints retained:** React + TypeScript + Vite; CSS-first effects and selective Three.js/WebGL only where justified; static hosting preferred, with Cloudflare Pages configuration verification still required; preserve the current production site until the replacement passes QA.
 - **Chat 02 reported:** no repository changes, no dependencies installed, no deployment settings changed. Verification was read-only inspection of the shared project record and recorded source files; no new implementation, visual, accessibility, or performance tests were performed.
 
+## Approved UX — Chat 03
+
+**Approval status: UX proposal v1.0 explicitly approved by the user as written, with no additional feedback, in the Chat 03 Final Handoff dated 2026-10-11.** This approves the UX specification only; it does not authorize implementation.
+
+- **Information architecture:** single-page homepage for the initial release.
+- **Section order:** Navigation → Hero → Featured Projects → About → Technical Capabilities → Learning Journey & Experience → Contact → Footer.
+- **Navigation:** persistent desktop navigation and an accessible mobile menu.
+- **Hero:** The Spatial Signature sculpture, with restrained desktop interaction and a static or minimally animated mobile fallback.
+- **Projects:** curated, evidence-led project cards using authentic project information and verified links.
+- **Capabilities:** grouped technical domains supported by demonstrable skills and project evidence.
+- **Journey:** verified experience and learning milestones, with completed, ongoing, and planned work clearly distinguished.
+- **Contact:** direct email and approved professional profile links; résumé optional.
+- **Additional routes:** detailed project pages may be introduced when content justifies them.
+- **Responsive design:** adaptive desktop, tablet, and mobile layouts without unintended horizontal scrolling.
+- **Accessibility:** semantic structure, keyboard operation, visible focus, verified contrast, touch usability, and reduced-motion support.
+- **Performance:** prioritize core content, avoid unnecessary continuous WebGL rendering, and provide a static hero fallback.
+- **Content integrity:** no invented achievements, projects, proficiency claims, metrics, or experience.
+- **Open content items:** primary audience and final copy; verified project inventory and supporting artifacts; public biography, skills, and learning milestones; approved contact details, profile links, and optional résumé. These do not revoke UX approval.
+- **Chat 03 reported:** no repository modifications, application code, dependency installation, or deployment changes. UX approval was confirmed in conversation; implementation, accessibility, responsive, and performance tests were not performed.
+
 ## Open verification items and risks
 
 - The actual Cloudflare Pages project, build/output settings, production branch, custom-domain association, and latest successful deployment remain unverified.
@@ -64,15 +85,15 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 - Verify the live site and production domain behavior independently when access permits; do not treat reported terminal output as a new live check.
 - Confirm build command, output directory, domain/redirect behavior, and deployment workflow before deployment changes.
 - Avoid unnecessary framework/dependency complexity, migration regression, oversized 3D payloads, and accessibility/mobile-performance degradation.
-- Preserve the current working state. Do not modify application code, install dependencies, migrate the framework, change DNS/Cloudflare settings, or deploy before the UX specification is approved and explicit implementation authorization is given.
+- Preserve the current working state. Do not modify application code, install dependencies, migrate the framework, change DNS/Cloudflare settings, or deploy before detailed technical architecture is resolved and explicit implementation authorization is given.
 
 ## Roadmap
 
 1. **Technical audit — complete at source/repository level.** Audit handoff received; technical direction approved. Deployment and fresh live-site verification remain open.
 2. **Creative direction — complete.** Full creative specification approved by user; see the approved creative direction above.
-3. **UX and information architecture — next, pending.** Chat 03 should define page structure, section order, navigation, responsive behavior, content priorities, and interactions using the approved technical and creative decisions. No implementation.
-4. **Detailed technical architecture — pending.** Resolve component structure, whether Three.js or React Three Fiber is warranted, dependencies, build/deployment assumptions, and performance budgets in light of approved creative/UX decisions.
-5. **Implementation — blocked pending approvals.** The creative specification is approved, but this handoff does not authorize implementation. No application code, dependencies, migration, or deployment changes authorized yet.
+3. **UX and information architecture — complete.** UX proposal v1.0 approved by user; see the approved UX section above.
+4. **Detailed technical architecture — next, pending.** Resolve component structure, rendering approach (including whether Three.js or React Three Fiber is warranted), dependencies, build/deployment assumptions, content/data model, fallback strategy, and performance budgets using the approved creative and UX specifications. Keep actual deployment configuration verification open.
+5. **Implementation — blocked pending explicit authorization.** Creative and UX specifications are approved, but no application code, dependencies, migration, or deployment changes are authorized yet.
 6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers.
 7. **Deployment and handover — pending.** Verify Cloudflare Pages configuration, production behavior, HTTPS, and domain/redirects before release.
 
@@ -82,4 +103,4 @@ Each specialist chat must report: scope completed, evidence, exact files changed
 
 ## Next action
 
-Proceed to **Chat 03 — UX & Information Architecture** with the approved technical direction and creative specification. Chat 03 must design and present the UX for approval before implementation. Keep detailed technical architecture, implementation, QA, and deployment as separate stages. Do not modify application code, install dependencies, or change deployment settings at this stage.
+Proceed to **Chat 05 — Detailed Technical Architecture** before Chat 04 implementation. Ask Chat 05 to read this record, turn the approved creative and UX specifications into a concrete architecture proposal, identify decisions requiring approval, and report its handoff to Chat 00. No implementation code, dependency installation, or deployment changes should occur until the architecture is reviewed and explicit implementation authorization is given.
