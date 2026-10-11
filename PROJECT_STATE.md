@@ -14,7 +14,8 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 
 **Stage 01 — Technical audit: complete at source/repository level.**
 **Technical direction: approved.**
-**Creative direction and UX: pending.**
+**Creative direction: preferred concept recorded; full specification approval pending.**
+**UX and information architecture: pending.**
 **Implementation: not authorized.**
 
 ## Verified baseline
@@ -37,6 +38,18 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 | Deployment approach | **Approved preference** — static hosting, preferably Cloudflare Pages | Actual Pages project and build/output configuration must be verified before deployment changes. |
 | Migration timing | **Approved** — only after creative and UX decisions are approved; preserve the existing live site until the new version passes QA | Build and test separately; do not prematurely replace production. |
 
+## Creative direction — preferences, not final approval
+
+Chat 02 presented four concepts: Nexus, Obsidian, Signal, and Monolith.
+
+- **User-preferred concept:** Nexus × Obsidian hybrid.
+- **User-preferred palette:** dark graphite + lavender.
+- **Working title:** Spatial Precision — Nexus × Obsidian.
+- **Proposed design language:** restrained architectural interface, distinctive cinematic 3D hero object, dark graphite surfaces, crisp white typography, selective lavender accents, controlled lighting, and deliberate depth.
+- **Status:** preferences recorded only. The complete creative specification has not received explicit final approval.
+- **Open creative decisions:** typography and final color tokens; hero object's form and interaction boundaries; static fallback; motion principles; accessibility and performance constraints.
+- **Creative chat reported:** no repository or deployment changes; read-only source inspection only; no new visual, accessibility, or performance tests.
+
 ## Open verification items and risks
 
 - The actual Cloudflare Pages project, build/output settings, production branch, custom-domain association, and latest successful deployment remain unverified.
@@ -49,8 +62,8 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 ## Roadmap
 
 1. **Technical audit — complete at source/repository level.** Audit handoff received; technical direction approved. Deployment and fresh live-site verification remain open.
-2. **Creative direction — next.** Establish and approve visual concept, design language, typography, palette, depth/3D philosophy, motion principles, and references.
-3. **UX and information architecture — pending.** Define page structure, section order, navigation, responsive behavior, content priorities, and interactions. Use approved creative direction.
+2. **Creative direction — in progress.** Nexus × Obsidian and dark graphite + lavender are user preferences. Chat 02 must complete the creative specification and obtain explicit approval.
+3. **UX and information architecture — pending.** Begin after the creative specification is approved. Define page structure, section order, navigation, responsive behavior, content priorities, and interactions.
 4. **Detailed technical architecture — pending.** Resolve component structure, whether Three.js or React Three Fiber is warranted, dependencies, build/deployment assumptions, and performance budgets in light of approved creative/UX decisions.
 5. **Implementation — blocked pending approvals.** No application code, dependencies, migration, or deployment changes authorized yet.
 6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers.
@@ -62,4 +75,4 @@ Each specialist chat must report: scope completed, evidence, exact files changed
 
 ## Next action
 
-Open **Chat 02 — Creative Direction**. Ask it to use this project state and the approved technical direction, develop creative options with trade-offs, and wait for approval. No implementation work should begin in that chat.
+Return to **Chat 02 — Creative Direction** to complete the specification, resolve the open creative decisions, and request explicit final approval. After the creative direction is approved, proceed to **Chat 03 — UX & Information Architecture**. No implementation work should begin yet.
