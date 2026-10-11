@@ -15,8 +15,8 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 - **Stage 01 — Technical audit:** complete at source/repository level. Live hosting configuration and fresh live-site verification remain open.
 - **Technical direction:** React + TypeScript + Vite approved as the broad frontend direction; static hosting preferred, subject to configuration verification.
 - **Stage 02 — Creative direction:** **COMPLETE — Structured Surrealism explicitly approved by the user** (Chat 02 final handoff, 2026-10-12). The prior creative specification has been superseded.
-- **Stage 03 — UX and information architecture:** **NEXT / AUTHORIZED.** Chat 03 should develop and review information architecture, page hierarchy, section order, navigation, responsive behavior, project discovery, and interaction model against Structured Surrealism. Previous UX v1.0 is a reference, not a binding design.
-- **Stage 04 — Detailed technical architecture:** **BLOCKED** until Chat 03's relevant UX decisions are reviewed and approved. Existing Chat 05 architecture research is retained as reference, not automatically binding.
+- **Stage 03 — UX and information architecture:** **COMPLETE — UX Proposal v2.0 explicitly approved by the user** (2026-10-12). The approved baseline is single-page first with dedicated project pages when justified; hybrid conventional labelled navigation plus contextual spatial cues; hybrid continuous environmental changes plus a small number of triggered cinematic reveals; balanced audiences of recruiters, internship evaluators, potential clients, and technical collaborators.
+- **Stage 04 — Detailed technical architecture:** **AUTHORIZED / NEXT.** Chat 05 may assess architecture and propose a detailed technical plan against the approved creative direction and UX. This authorization is for analysis/design only; no implementation, dependency changes, repository code edits, commits, deployment, or DNS changes.
 - **Stage 05 — Frontend implementation:** **NOT AUTHORIZED; previous local/preview implementation authorization is revoked/suspended by the creative reset.**
 - **QA, production deployment, and migration:** pending and separately gated. Production must remain unchanged.
 
@@ -89,12 +89,15 @@ The approved direction does **not** approve a specific hero scene, final palette
 
 The following prior Chat 02 choices are superseded and must not constrain the new direction: Nexus × Obsidian / “Spatial Precision”; dark graphite + lavender palette; Space Grotesk / Inter / IBM Plex Mono selection; “The Spatial Signature” S-inspired sculpture, materials, and lighting; and prior hero interactions, static poster composition, and motion details. They may be reconsidered only if independently supported by the new direction; their former approval does not carry forward.
 
-## Prior UX approval — Chat 03, to be reviewed under Structured Surrealism
+## Approved UX Proposal v2.0 — Chat 03 (2026-10-12)
 
-The user previously approved UX proposal v1.0 for the former creative direction. Preserve it as a useful starting point, not as an unchangeable visual specification. Chat 03 is now authorized to review and revise it against the approved Structured Surrealism direction.
+**Status: explicitly approved by the user as written.** This is the UX baseline for architecture planning. Repository changes by Chat 03: none. No implementation, accessibility, or performance tests were performed as part of the UX stage.
 
-- **Initial information architecture:** single-page homepage.
-- **Previous section order:** Navigation → Hero → Featured Projects → About → Technical Capabilities → Learning Journey & Experience → Contact → Footer.
+- **Structure:** single-page first, with dedicated project pages when justified by authentic content.
+- **Navigation model:** hybrid — conventional labelled navigation supported by contextual spatial cues.
+- **Motion model:** hybrid — continuous environmental changes during scrolling, plus a small number of triggered cinematic transformations at meaningful reveals.
+- **Primary audience:** balanced personal portfolio for recruiters, internship evaluators, potential clients, and technical collaborators.
+- **Approved proposed section order:** Global navigation → Hero / Identity → Selected Projects → About → Technical Capabilities → Journey & Experience → Contact → Footer.
 - Persistent desktop navigation and accessible mobile menu.
 - Curated, evidence-led project cards with authentic project information and verified links.
 - Technical capability groups supported by demonstrable skills and project evidence.
@@ -103,7 +106,7 @@ The user previously approved UX proposal v1.0 for the former creative direction.
 - Detailed project pages only if content justifies them.
 - Adaptive desktop, tablet, and mobile layouts without unintended horizontal scrolling.
 - Semantic structure, keyboard usability, visible focus, contrast verification, touch usability, reduced-motion support, and content integrity remain requirements.
-- **Must be revisited after the new creative direction is approved:** hero role and scale, the “tiny opening into an enormous world” transition, section transitions, spatial navigation, motion/interaction behavior, mobile simplification, and any layout choices coupled to the previous hero concept.
+- **Still intentionally open:** exact hero scene, final palette, exact transition choreography, project-specific page decisions based on authentic content, and detailed 3D implementation. These are not approved by UX v2.0.
 - **Open content inputs:** primary audience and final copy; verified project inventory and artifacts; biography, skills and learning milestones; approved contact details/profile links; optional résumé. Never invent achievements, project details, metrics, proficiency claims, or experience.
 
 ## Prior Chat 05 architecture research — retained, not automatically binding
@@ -124,12 +127,12 @@ The new concept may justify keeping, changing, or reducing the prior rendering a
 
 ## Risks and verification requirements
 
-- The “Reality Engine” concept is not yet approved; multiple distinct alternatives and visual reference boards are required first.
-- Do not copy reference websites. Translate their relevant qualities into original design proposals.
+- Structured Surrealism and UX Proposal v2.0 are approved, but the exact hero scene, final palette, transition choreography, and detailed 3D implementation remain open.
+- Do not copy reference websites. Translate their relevant qualities into original design decisions.
 - Avoid visual spectacle that obscures identity, projects, navigation, or contact.
-- The tiny-opening/huge-world transition must be evaluated for usability, performance, mobile behavior, keyboard access, and reduced-motion alternatives.
+- Any cinematic transition must be evaluated for usability, performance, mobile behavior, keyboard access, and reduced-motion alternatives.
 - Photorealistic project reveals must use authentic project material and must not delay essential content.
-- Reassess the rendering approach and architecture only after the new creative direction and relevant UX are approved.
+- Stage 04 must reassess the rendering approach and retained Chat 05 research against the approved UX; do not assume Three.js/WebGL is necessary merely because it was proposed earlier.
 - Establish measurable performance budgets and verify them through actual tests; do not claim unmeasured results.
 - Verify actual Cloudflare Pages build/output settings, production branch, custom domain, redirects, and latest deployment before any deployment changes.
 - Keep the current production site intact.
@@ -137,19 +140,19 @@ The new concept may justify keeping, changing, or reducing the prior rendering a
 ## Roadmap
 
 1. **Technical audit — complete at source/repository level.** Preserve audit findings and open deployment verification items.
-2. **Creative direction — complete.** Structured Surrealism is explicitly approved. No exact hero scene, final palette, transition choreography, or detailed 3D implementation has been approved.
-3. **UX and information architecture — next / authorized.** Chat 03 should review and revise the prior UX proposal against Structured Surrealism and present relevant UX decisions for user review/approval.
-4. **Detailed technical architecture — blocked.** Reassess retained Chat 05 research only after relevant UX decisions are approved.
+2. **Creative direction — complete.** Structured Surrealism is explicitly approved; exact hero scene, final palette, transition choreography, and detailed 3D implementation remain open.
+3. **UX and information architecture — complete.** UX Proposal v2.0 is explicitly approved by the user as written.
+4. **Detailed technical architecture — authorized / next.** Chat 05 should reassess retained architecture research against the approved creative direction and UX, document trade-offs and measurable budgets, and present the proposed architecture for review. This is planning only.
 5. **Frontend implementation — not authorized.** No application code, dependency changes, implementation commits, or deployment changes are authorized by this handoff.
-6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers after implementation is separately authorized.
+6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers only after implementation is separately authorized and exists.
 7. **Deployment and handover — pending and separately gated.** Verify hosting configuration and obtain explicit production migration authorization only after QA passes.
 
 ## Handoff protocol
 
 Each specialist chat must report scope completed, evidence, exact files changed (if any), verification results, proposed versus approved decisions, risks/open questions, and a concise next handoff. The coordinator reconciles the report here before changing stage status. A working hypothesis is not approval; creative approval is not implementation authorization; implementation is not verification.
 
-## Next action — Chat 03 UX & Information Architecture
+## Next action — Chat 05 Detailed Technical Architecture
 
-Use the approved Structured Surrealism creative brief above to develop the information architecture, page hierarchy, section order, navigation, responsive behavior, project discovery, and interaction model. Revisit the prior UX proposal where it depends on the former visual direction. Do not assume a specific hero scene, final palette, exact transition choreography, or detailed 3D implementation. Keep recruiter clarity, authentic project evidence, accessibility, mobile usability, reduced motion, and performance central. Present material UX choices and trade-offs for user approval before treating them as final.
+Develop a detailed architecture proposal against the approved Structured Surrealism creative direction and UX Proposal v2.0. Reassess retained Chat 05 v1.0 research rather than assuming its hero-specific recommendations are binding. Cover the rendering approach and whether selective WebGL/Three.js is justified; component boundaries; progressive enhancement and non-WebGL fallbacks; desktop/mobile behavior; reduced-motion support; content/data structure; asset strategy; dependency minimization; measurable performance budgets and verification plan; and hosting/deployment assumptions, including the still-unverified Cloudflare Pages configuration.
 
-Do not begin implementation as part of this handoff. Keep Chat 05 detailed architecture blocked until the relevant UX decisions are approved; keep Chat 04 implementation unauthorized; preserve production and deployment safeguards.
+This is an architecture planning authorization only. Do not implement code, change dependencies, modify application files, commit implementation, or change deployment/DNS. Present trade-offs, unresolved inputs, and the proposed architecture for user review. Stage 05 frontend implementation remains unauthorized, and production must remain unchanged.
