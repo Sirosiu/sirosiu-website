@@ -16,7 +16,7 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 - **Technical direction:** React + TypeScript + Vite approved as the broad frontend direction; static hosting preferred, subject to configuration verification.
 - **Stage 02 — Creative direction:** **COMPLETE — Structured Surrealism explicitly approved by the user** (Chat 02 final handoff, 2026-10-12). The prior creative specification has been superseded.
 - **Stage 03 — UX and information architecture:** **COMPLETE — UX Proposal v2.0 explicitly approved by the user** (2026-10-12). The approved baseline is single-page first with dedicated project pages when justified; hybrid conventional labelled navigation plus contextual spatial cues; hybrid continuous environmental changes plus a small number of triggered cinematic reveals; balanced audiences of recruiters, internship evaluators, potential clients, and technical collaborators.
-- **Stage 04 — Detailed technical architecture:** **PROPOSAL v2.0 UNDER REVIEW; explicit final architecture approval still required.** The user has confirmed the CSS-first/selective-WebGL preference and that performance budgets remain provisional until a representative visual prototype is measured. Chat 05's recommendations align with the approved creative direction and UX. Stage 04 may be marked complete only after explicit approval of the consolidated architecture baseline. This stage is planning only; no implementation, dependency changes, application code edits, commits, deployment, or DNS changes.
+- **Stage 04 — Detailed technical architecture:** **COMPLETE — Architecture Proposal v2.0 explicitly approved by the user** (2026-10-12) as the planning baseline, with all open items, verification requirements, and production safeguards retained. The architecture approval authorizes planning only, not implementation. No application code edits, dependency changes, implementation commits, deployment, or DNS changes.
 - **Stage 05 — Frontend implementation:** **NOT AUTHORIZED; previous local/preview implementation authorization is revoked/suspended by the creative reset.**
 - **QA, production deployment, and migration:** pending and separately gated. Production must remain unchanged.
 
@@ -111,13 +111,13 @@ The following prior Chat 02 choices are superseded and must not constrain the ne
 
 ## Chat 05 architecture research and review — 2026-10-12
 
-Chat 05 re-read the current project record and re-fetched the root `index.html`, `style.css`, and repository contents. The handoff reports no application edits, dependency installation, commits, deployment/DNS changes, or implementation, responsive, accessibility, or performance tests. The user has reviewed Architecture Proposal v2.0 and confirmed these preferences:
+Chat 05 re-read the current project record and re-fetched the root `index.html`, `style.css`, and repository contents. The handoff reports no application edits, dependency installation, commits, deployment/DNS changes, or implementation, responsive, accessibility, or performance tests. The user explicitly approved Architecture Proposal v2.0 as the planning baseline, retaining the documented open items, verification requirements, and production safeguards. Confirmed preferences:
 
 - **Rendering:** CSS-first, with selective WebGL only when a specific experience justifies its cost.
 - **Performance budgets:** provisional until a representative visual prototype has been measured.
 - **Additional feedback:** none.
 
-The recommendations align with the approved Structured Surrealism direction and UX Proposal v2.0. This review handoff asks Chat 00 to record the review decisions, preserve open items, and determine whether architecture questions remain. It does **not explicitly state final approval of Architecture Proposal v2.0**; do not mark Stage 04 complete or authorize Stage 05 until the user explicitly approves the consolidated architecture baseline.
+The recommendations align with the approved Structured Surrealism direction and UX Proposal v2.0. This review handoff asks Chat 00 to record the review decisions, preserve open items, and determine whether architecture questions remain. The user’s explicit final approval has now been received. Stage 04 is complete as an approved planning baseline. The open items below remain open by design and do not imply final visual choices or measured performance results.
 
 ### Consolidated architecture baseline proposed for approval
 
@@ -172,7 +172,7 @@ The new concept may justify keeping, changing, or reducing the prior rendering a
 1. **Technical audit — complete at source/repository level.** Preserve audit findings and open deployment verification items.
 2. **Creative direction — complete.** Structured Surrealism is explicitly approved; exact hero scene, final palette, transition choreography, and detailed 3D implementation remain open.
 3. **UX and information architecture — complete.** UX Proposal v2.0 is explicitly approved by the user as written.
-4. **Detailed technical architecture — authorized / next.** Chat 05 should reassess retained architecture research against the approved creative direction and UX, document trade-offs and measurable budgets, and present the proposed architecture for review. This is planning only.
+4. **Detailed technical architecture — complete.** Architecture Proposal v2.0 is explicitly approved as the planning baseline. Its open visual, asset, performance measurement, content, and hosting verification items remain documented.
 5. **Frontend implementation — not authorized.** No application code, dependency changes, implementation commits, or deployment changes are authorized by this handoff.
 6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers only after implementation is separately authorized and exists.
 7. **Deployment and handover — pending and separately gated.** Verify hosting configuration and obtain explicit production migration authorization only after QA passes.
@@ -181,8 +181,10 @@ The new concept may justify keeping, changing, or reducing the prior rendering a
 
 Each specialist chat must report scope completed, evidence, exact files changed (if any), verification results, proposed versus approved decisions, risks/open questions, and a concise next handoff. The coordinator reconciles the report here before changing stage status. A working hypothesis is not approval; creative approval is not implementation authorization; implementation is not verification.
 
-## Next action — Chat 00 architecture approval gate
+## Next action — Chat 00 implementation authorization gate
 
-The Chat 05 Architecture Proposal v2.0 has been reviewed. The user confirmed CSS-first rendering with selective WebGL only when justified, provisional performance budgets pending representative prototype measurements, and no additional feedback. Reconcile these review decisions as recorded above and present the consolidated architecture baseline for explicit final user approval. Keep the remaining visual, asset, measurement, and Cloudflare configuration items open and clearly labeled.
+Stage 04 is complete: the user explicitly approved Chat 05 Architecture Proposal v2.0 as the planning baseline, including its documented open items and safeguards. The next possible stage is Stage 05 — Frontend Implementation, but it remains **NOT AUTHORIZED**. Chat 00 must obtain separate explicit user authorization before implementation begins.
 
-Stage 04 remains under review until explicit architecture approval is recorded. Stage 05 frontend implementation remains unauthorized. Do not implement code, change dependencies, modify application files, commit implementation, or change deployment/DNS. Preserve the current production site and all separate QA/migration gates.
+Before any implementation authorization, preserve these constraints: no invented project facts; no premature commitment to the exact hero scene, palette, transition choreography, or WebGL experiences; use CSS-first rendering and justify each selective WebGL use; keep content/navigation independent of graphics; defer unnecessary dependencies and services; retain provisional performance budgets until a representative prototype is measured; and keep Cloudflare Pages verification, QA, and production migration as separate gates.
+
+Until the user explicitly authorizes Stage 05, do not modify application code, install or change dependencies, create implementation commits, or change DNS/deployment settings. The existing production site must remain unchanged. No implementation, accessibility, responsive, or performance tests have been performed.
