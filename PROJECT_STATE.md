@@ -17,7 +17,7 @@ Initial scope is the personal portfolio only. Broader company/brand features are
 - **Stage 02 — Creative direction:** **COMPLETE — Structured Surrealism explicitly approved by the user** (Chat 02 final handoff, 2026-10-12). The prior creative specification has been superseded.
 - **Stage 03 — UX and information architecture:** **COMPLETE — UX Proposal v2.0 explicitly approved by the user** (2026-10-12). The approved baseline is single-page first with dedicated project pages when justified; hybrid conventional labelled navigation plus contextual spatial cues; hybrid continuous environmental changes plus a small number of triggered cinematic reveals; balanced audiences of recruiters, internship evaluators, potential clients, and technical collaborators.
 - **Stage 04 — Detailed technical architecture:** **COMPLETE — Architecture Proposal v2.0 explicitly approved by the user** (2026-10-12) as the planning baseline, with all open items, verification requirements, and production safeguards retained. The architecture approval authorizes planning only, not implementation. No application code edits, dependency changes, implementation commits, deployment, or DNS changes.
-- **Stage 05 — Frontend implementation:** **NOT AUTHORIZED; previous local/preview implementation authorization is revoked/suspended by the creative reset.**
+- **Stage 05 — Frontend implementation:** **LIMITED AUTHORIZATION GRANTED (2026-10-12) — isolated local prototype only.** User explicitly authorized Chat 04 to create and verify the prototype under `prototype/`, subject to the scope and safeguards in the Stage 05 authorization section below. This does not authorize production/root-app replacement, deployment, DNS/Cloudflare changes, or production migration.
 - **QA, production deployment, and migration:** pending and separately gated. Production must remain unchanged.
 
 ## Verified baseline and technical audit — Chat 01
@@ -173,7 +173,7 @@ The new concept may justify keeping, changing, or reducing the prior rendering a
 2. **Creative direction — complete.** Structured Surrealism is explicitly approved; exact hero scene, final palette, transition choreography, and detailed 3D implementation remain open.
 3. **UX and information architecture — complete.** UX Proposal v2.0 is explicitly approved by the user as written.
 4. **Detailed technical architecture — complete.** Architecture Proposal v2.0 is explicitly approved as the planning baseline. Its open visual, asset, performance measurement, content, and hosting verification items remain documented.
-5. **Frontend implementation — not authorized.** No application code, dependency changes, implementation commits, or deployment changes are authorized by this handoff.
+5. **Frontend implementation — limited authorization granted.** Chat 04 may create and verify the isolated local prototype under `prototype/` only, within the explicit scope below. Root production files, deployment settings, and DNS remain protected.
 6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers only after implementation is separately authorized and exists.
 7. **Deployment and handover — pending and separately gated.** Verify hosting configuration and obtain explicit production migration authorization only after QA passes.
 
@@ -181,10 +181,31 @@ The new concept may justify keeping, changing, or reducing the prior rendering a
 
 Each specialist chat must report scope completed, evidence, exact files changed (if any), verification results, proposed versus approved decisions, risks/open questions, and a concise next handoff. The coordinator reconciles the report here before changing stage status. A working hypothesis is not approval; creative approval is not implementation authorization; implementation is not verification.
 
-## Next action — Chat 00 implementation authorization gate
+## Stage 05 authorization — isolated local prototype only (2026-10-12)
 
-Stage 04 is complete: the user explicitly approved Chat 05 Architecture Proposal v2.0 as the planning baseline, including its documented open items and safeguards. The next possible stage is Stage 05 — Frontend Implementation, but it remains **NOT AUTHORIZED**. Chat 00 must obtain separate explicit user authorization before implementation begins.
+**Decision: the user explicitly authorized Stage 05 for the isolated local prototype only.** This authorization was given in the conversation on 2026-10-12. It authorizes Chat 04 to perform the following limited work; it does not authorize production replacement or deployment.
 
-Before any implementation authorization, preserve these constraints: no invented project facts; no premature commitment to the exact hero scene, palette, transition choreography, or WebGL experiences; use CSS-first rendering and justify each selective WebGL use; keep content/navigation independent of graphics; defer unnecessary dependencies and services; retain provisional performance budgets until a representative prototype is measured; and keep Cloudflare Pages verification, QA, and production migration as separate gates.
+### Authorized scope
 
-Until the user explicitly authorizes Stage 05, do not modify application code, install or change dependencies, create implementation commits, or change DNS/deployment settings. The existing production site must remain unchanged. No implementation, accessibility, responsive, or performance tests have been performed.
+1. Inspect the current repository state before making changes. The current main root files were re-fetched during the authorization gate: `index.html` (blob `eac5c728a548d682b624d2c098d65407839ec5bf`), `style.css` (blob `c36081035ddae6ae2798429b7f65bdec7705bbeb`), and `.gitignore` (blob `bc0ecbf9cb767ebe3ab60ca97e46b92889806e45`). The latest project-record commit at the time of authorization was `b76c01bee6eae91ef97d5865dafa9c77de5d6512`.
+2. Build the first minimal React + TypeScript + Vite prototype under a separate `prototype/` directory, using local prototype configuration and dependencies rather than modifying the root website's entry files or root dependency configuration.
+3. Create the initial portfolio skeleton following the approved UX order: navigation, hero/identity, selected projects, About, technical capabilities, journey/experience, contact, and footer. Use explicit placeholders for missing or unverified personal/project content.
+4. Use CSS-first visual effects. Do not add WebGL/Three.js unless a specific requirement is justified and separately discussed; the first prototype does not need to implement the final hero scene or final cinematic choreography.
+5. Run and report the local checks that are possible for the prototype, including build/startup, desktop/mobile layout inspection, keyboard/navigation, reduced-motion behavior, essential content without WebGL, and console errors. Distinguish checks actually performed from checks not performed.
+
+### Explicit exclusions and safeguards
+
+- Do not overwrite, rename, or remove root `index.html`, root `style.css`, or other existing production-site files.
+- Do not change root dependencies or root build/deployment configuration. Prototype-specific dependencies/configuration, if needed, must remain under `prototype/`.
+- Do not change DNS, Cloudflare Pages settings, custom-domain association, redirects, production branch, or any deployment settings.
+- Do not deploy the prototype or merge it into the production site.
+- Do not invent project details, achievements, metrics, skills, or experience. Keep unknown content visibly marked as placeholder content.
+- Do not treat the exact hero environment, palette, transition choreography, or WebGL usage as approved.
+- Performance budgets remain provisional until a representative prototype is measured.
+- QA, production migration, and handover remain separate future gates. Production migration requires passing QA and separate explicit user authorization.
+
+### Initial verification and handoff
+
+Before editing, Chat 04 must re-check the current branch/head and repository tree; do not rely only on the file snapshot above. Keep changes isolated to `prototype/` and report the exact changed files and dependency scope. Verify the prototype build and local behavior where tooling permits; do not claim tests that were not run. Show the user the first result and wait for feedback before expanding the prototype or adding complex effects.
+
+**Next chat: Chat 04 — Frontend Implementation.** Stage 05 is authorized only within the scope above. Chat 04 must not expand scope or perform deployment/migration work without a new explicit approval.
