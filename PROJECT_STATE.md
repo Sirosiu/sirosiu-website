@@ -1,152 +1,211 @@
 # SIROSIU — Project State
 
-Last updated: 2026-10-11
+Last updated: 2026-10-12
 Repository: https://github.com/Sirosiu/sirosiu-website
 Default branch: `main`
 
 ## Mission and success criteria
 
-Build a distinctive, premium, futuristic 3D-inspired personal portfolio for SIROSIU at https://sirosiu.com. Prioritize professional credibility, clear communication of skills and projects, responsive design, accessibility, reduced-motion support, performance, and maintainability. Visual effects must support the experience rather than obscure content.
+Build a distinctive, premium, futuristic personal portfolio for SIROSIU at https://sirosiu.com. Prioritize professional credibility, clear communication of identity, skills and authentic projects, responsive design, accessibility, reduced-motion support, performance, and maintainability. Visual effects must support the experience rather than obscure content.
 
 Initial scope is the personal portfolio only. Broader company/brand features are deferred.
 
-## Current stage
+## Current stage and gate status
 
-**Stage 01 — Technical audit: complete at source/repository level.**
-**Technical direction: approved.**
-**Stage 02 — Creative direction: complete; full creative specification approved by user.**
-**Stage 03 — UX and information architecture: complete; UX proposal v1.0 approved by user.**
-**Stage 04 — Detailed technical architecture: reviewed and approved for implementation planning; Chat 05 proposal v1.0 approved by user.**
-**Stage 05 — Frontend implementation: explicitly authorized for local/preview development under the limits below.**
-**Production deployment or migration: not authorized.**
+- **Stage 01 — Technical audit:** complete at source/repository level. Live hosting configuration and fresh live-site verification remain open.
+- **Technical direction:** React + TypeScript + Vite approved as the broad frontend direction; static hosting preferred, subject to configuration verification.
+- **Stage 02 — Creative direction:** **COMPLETE — Structured Surrealism explicitly approved by the user** (Chat 02 final handoff, 2026-10-12). The prior creative specification has been superseded.
+- **Stage 03 — UX and information architecture:** **COMPLETE — UX Proposal v2.0 explicitly approved by the user** (2026-10-12). The approved baseline is single-page first with dedicated project pages when justified; hybrid conventional labelled navigation plus contextual spatial cues; hybrid continuous environmental changes plus a small number of triggered cinematic reveals; balanced audiences of recruiters, internship evaluators, potential clients, and technical collaborators.
+- **Stage 04 — Detailed technical architecture:** **COMPLETE — Architecture Proposal v2.0 explicitly approved by the user** (2026-10-12) as the planning baseline, with all open items, verification requirements, and production safeguards retained. The architecture approval authorizes planning only, not implementation. No application code edits, dependency changes, implementation commits, deployment, or DNS changes.
+- **Stage 05 — Frontend implementation:** **LIMITED AUTHORIZATION GRANTED (2026-10-12) — isolated local prototype only.** User explicitly authorized Chat 04 to create and verify the prototype under `prototype/`, subject to the scope and safeguards in the Stage 05 authorization section below. This does not authorize production/root-app replacement, deployment, DNS/Cloudflare changes, or production migration.
+- **QA, production deployment, and migration:** pending and separately gated. Production must remain unchanged.
 
-## Verified baseline
+## Verified baseline and technical audit — Chat 01
 
 - Repository: `Sirosiu/sirosiu-website` (private).
 - Default branch: `main`.
 - Audited commit: `7a8c202b79b2e0faefad07b6f9276a3870d7c6e0`.
-- Inspected root files at the audited commit: `.gitignore`, `index.html`, `style.css`.
-- The current application is a minimal static HTML/CSS welcome page with a dark background, violet accent, responsive typography, a simple entrance animation, reduced-motion handling, and a Google Fonts import. It does not yet contain portfolio navigation, project sections, contact actions, or application JavaScript.
+- Inspected root files at that audited commit: `.gitignore`, `index.html`, `style.css`.
+- The application at that audited commit was a minimal static HTML/CSS welcome page with a dark background, violet accent, responsive typography, a simple entrance animation, reduced-motion handling, and a Google Fonts import. It did not contain portfolio navigation, project sections, contact actions, or application JavaScript.
 - No `package.json`, lockfile, Vite configuration, Wrangler configuration, workflow files, or `PROJECT_STATE.md` were present in the inspected tree at the audited commit.
-- The audit reported no application files or settings were changed.
-- According to the user-provided audit handoff, terminal output showed DNS resolution, HTTPS `HTTP/2 200`, Cloudflare response headers, and live HTML matching the supplied local HTML. The connected GitHub integration did not independently retrieve the live site; this is reported evidence, not a fresh independent live check.
+- According to the user-provided audit handoff, terminal output showed DNS resolution, HTTPS `HTTP/2 200`, Cloudflare response headers, and live HTML matching supplied local HTML. This was reported evidence; it was not a fresh independent live check.
+- Actual Cloudflare Pages project/build/output settings, production branch, custom-domain association, redirects, and latest deployment remain unverified.
 
-## Approved technical direction — Chat 01
+## Approved broad technical direction
 
-| Decision | Status | Rationale / constraints |
+| Decision | Status | Notes |
 |---|---|---|
-| Frontend | **Approved** — React + TypeScript + Vite | Component structure and a maintainable path for a growing interactive portfolio. |
-| Graphics and motion | **Approved** — CSS-first depth/motion; selective Three.js/WebGL where justified | Prefer lightweight CSS effects. Use 3D only where it materially improves the experience. The approved Chat 05 proposal selects direct Three.js isolated behind a React component boundary for the hero. |
-| Deployment approach | **Approved preference** — static hosting, preferably Cloudflare Pages | Actual Pages project and build/output configuration must be verified before deployment changes. |
-| Migration timing | **Approved** — preserve existing production until replacement passes QA and migration is explicitly authorized | Build and test separately; do not prematurely replace production. |
+| Frontend | **Approved** — React + TypeScript + Vite | Broad technology direction remains available after the creative reset. |
+| Graphics | **CSS-first effects with selective WebGL/3D where justified** | The new creative exploration must inform whether and how much 3D is needed. |
+| Hosting | **Preference** — static hosting, preferably Cloudflare Pages | Must verify the real configuration before deployment changes. |
+| Production protection | **Required** | Keep the existing live site unchanged until QA passes and a separate explicit migration authorization is given. |
 
-## Approved creative direction — Chat 02
+## Approved creative direction — Structured Surrealism (Chat 02, 2026-10-12)
 
-**Approval status: the user approved the complete creative specification, including the final hero-object proposal, in the Chat 02 Final Creative Handoff dated 2026-10-11.**
+**Status: explicitly approved by the user.** This creative direction replaces the earlier Nexus × Obsidian / Spatial Precision specification. Repository modifications by Chat 02: none. Implementation code, dependencies, deployment settings, and DNS: unchanged. Visual and performance QA: not performed.
 
-- **Creative direction:** Nexus × Obsidian.
-- **Working title:** Spatial Precision.
-- **Palette:** dark graphite + lavender, restrained white highlights, and optional rare cyan details.
-- **Typography:** Space Grotesk for display, Inter for body, and optional IBM Plex Mono for technical metadata.
-- **Hero object — “The Spatial Signature”:** an abstract S-inspired monolithic sculpture combining angular architectural planes with fluid folded curves and a central void.
-- **Materials and lighting:** matte graphite, selective polished-metal edges, controlled white highlights, and subtle lavender illumination.
-- **Interactions:** subtle, bounded desktop pointer response; optional restrained scroll response; static or minimally animated mobile presentation.
-- **Fallback:** optimized static render of the same hero composition. Core content must remain independent of WebGL.
-- **Motion:** one restrained signature motion and useful micro-interactions; no scroll hijacking or excessive decorative animation.
-- **Accessibility:** semantic structure, keyboard usability, visible focus, verified contrast, touch usability, reduced-motion support, and a functional non-WebGL experience.
-- **Performance:** core content before 3D, lazy loading where practical, no unnecessary continuous rendering, and Core Web Vitals targets to be verified during QA.
-- **Content philosophy:** communicate identity and introduction clearly, demonstrate technical capabilities with authentic project evidence, and make contact information easy to find.
-- **Chat 02 reported:** no repository changes, no dependencies installed, no deployment settings changed. No new implementation, visual, accessibility, or performance tests were performed.
+### Concept and creative priority
 
-## Approved UX — Chat 03
+**Structured Surrealism** combines three complementary approaches:
+- **Reality Engine:** surreal environments, impossible architecture, unexpected scale, and continuous environmental transformation.
+- **Instrumented World:** engineered spatial logic, layered structures, material changes, and meaningful geometric relationships.
+- **Editorial Atlas:** cinematic project showcases, readable typography, authentic project evidence, and clear navigation.
 
-**Approval status: UX proposal v1.0 explicitly approved by the user as written, with no additional feedback, in the Chat 03 Final Handoff dated 2026-10-11.** This approves the UX specification; implementation scope remains governed by the authorization below.
+The priority is to balance an immersive, distinctive identity with recruiter usability and professional credibility.
 
-- **Information architecture:** single-page homepage for the initial release.
-- **Section order:** Navigation → Hero → Featured Projects → About → Technical Capabilities → Learning Journey & Experience → Contact → Footer.
-- **Navigation:** persistent desktop navigation and an accessible mobile menu.
-- **Hero:** The Spatial Signature sculpture, with restrained desktop interaction and a static or minimally animated mobile fallback.
-- **Projects:** curated, evidence-led project cards using authentic project information and verified links.
-- **Capabilities:** grouped technical domains supported by demonstrable skills and project evidence.
-- **Journey:** verified experience and learning milestones, with completed, ongoing, and planned work clearly distinguished.
-- **Contact:** direct email and approved professional profile links; résumé optional.
-- **Additional routes:** detailed project pages may be introduced when content justifies them.
-- **Responsive design:** adaptive desktop, tablet, and mobile layouts without unintended horizontal scrolling.
-- **Accessibility:** semantic structure, keyboard operation, visible focus, verified contrast, touch usability, and reduced-motion support.
-- **Performance:** prioritize core content, avoid unnecessary continuous WebGL rendering, and provide a static hero fallback.
-- **Content integrity:** no invented achievements, projects, proficiency claims, metrics, or experience.
-- **Open content items:** primary audience and final copy; verified project inventory and supporting artifacts; public biography, skills, and learning milestones; approved contact details, profile links, and optional résumé. These do not revoke UX approval.
-- **Chat 03 reported:** no repository modifications, application code, dependency installation, or deployment changes. Implementation, accessibility, responsive, and performance tests were not performed.
+### Approved visual principles
 
-## Approved detailed technical architecture — Chat 05
+- Combine photorealistic environments with stylized geometry.
+- Explore architectural forms, surreal spatial relationships, material transformations, dramatic lighting, reflections, and controlled atmospheric depth.
+- Use expressive editorial typography while keeping essential content legible.
+- Explore palettes appropriate to the chosen environment; no earlier palette is automatically binding.
+- Reserve photorealism for important environments, featured projects, and meaningful reveals.
+- Avoid generic futuristic decoration, gratuitous effects, and environments that distract from the work.
 
-**Review outcome:** The user explicitly approved Chat 05's Detailed Technical Architecture proposal v1.0. Chat 00 reviewed the supplied final recommendations and constraints and authorizes implementation in a local/preview environment only, subject to the boundaries below. This is not production deployment authorization.
+### Transition philosophy
 
-- **Application foundation:** React + TypeScript + Vite.
-- **3D rendering:** use direct Three.js, isolated behind a React component boundary. Keep scene lifecycle, event handling, and rendering concerns contained; the rest of the page must not depend on WebGL.
-- **Hero fallback:** an optimized static poster of the approved Spatial Signature is available before WebGL initializes and remains the fallback if WebGL is unavailable or fails.
-- **Mobile:** use the static hero by default for the initial release. Do not enable an expensive interactive 3D scene on mobile by default.
-- **Content model:** typed local TypeScript modules for project cards, capability groups, and learning/experience entries. No backend or CMS in the initial release.
-- **Hosting:** static build and static hosting are preferred. Cloudflare Pages remains the preferred target, but its actual project/build/output settings, production branch, domain association, and latest deployment are unverified.
-- **Migration:** implement and test in a separate preview/development context first. Keep the existing production website unchanged until QA passes and a separate explicit production migration authorization is given.
+The tiny-opening-to-enormous-world transition is a **possible signature moment, not a mandatory centerpiece**. Other possibilities include continuous environmental material/form changes, architectural layers unfolding to reveal hidden structure, framed images expanding into cinematic panoramas, and surreal environments resolving into authentic project presentations. Transitions must preserve user control and must not hijack scrolling or block access to content.
 
-### Unresolved architecture decisions
+### Authentic project storytelling
 
-- **Hero geometry production:** determine and verify how the final S-inspired sculpture will be produced and optimized (for example, custom geometry versus a prepared asset). Preserve the approved design; do not invent a materially different hero.
-- **Performance budgets:** set concrete, measurable budgets during implementation planning/early QA for initial payload, 3D asset/scene cost, render behavior, and Core Web Vitals. Do not claim targets are met before measuring.
-- **Cloudflare configuration:** inspect and record the actual build command, output directory, production branch, custom-domain association, redirects, and deployment workflow before any deployment changes.
-- **Content inputs:** gather verified projects and artifacts, biography, capability evidence, milestones, email/profile URLs, and optional résumé. Keep missing content clearly marked for user input; never fabricate it.
-- **Exact component/file boundaries and dependency versions:** choose the minimum required implementation details without adding unnecessary packages. Record final choices and rationale in the implementation handoff.
+The imagined environment establishes atmosphere; real work establishes credibility. Use verified project screenshots, photographs, demonstrations, architecture diagrams, technical visualizations, source repositories, and relevant links where available. Describe contributions, implementation, results, and project status honestly. Never present speculative environmental artwork as completed engineering work or fabricate project achievements.
 
-### Architecture risks and mitigations
+### Accessibility and technical constraints
 
-- **Three.js lifecycle/resource leaks or rendering overhead:** isolate the scene, dispose resources correctly, avoid unnecessary continuous rendering, and test navigation/unmount and browser failures.
-- **WebGL delay/failure or inaccessible hero:** render the poster and meaningful text content independently of the 3D scene; support keyboard use and reduced motion.
-- **Mobile performance:** static hero by default on mobile, test real responsive layouts, and avoid downloading the interactive scene when it is not needed.
-- **Unverified hosting configuration:** do not infer Cloudflare build settings or trigger production deployment; verify configuration separately.
-- **Content accuracy:** use only user-provided or otherwise verified portfolio claims and links.
+- Preserve semantic, keyboard-accessible navigation; keep Projects, About, and Contact easy to reach.
+- Essential content must work without WebGL.
+- Support reduced motion with static compositions and simplified transitions.
+- Design deliberate mobile layouts rather than shrinking the desktop experience.
+- Prioritize efficient loading, optimized assets, and measured performance.
+- Prefer CSS-first effects and use Three.js/WebGL selectively where justified.
+- Retain the approved broad technical direction: React + TypeScript + Vite; static hosting preferred, with Cloudflare Pages configuration verification still required.
+- Preserve the existing production site until the replacement passes QA and a separate explicit migration authorization is given.
 
-## Implementation authorization and boundaries
+### Decisions intentionally left open
 
-**Chat 00 explicitly authorizes Chat 04 — Frontend Implementation to begin local/preview implementation** using the approved creative specification, approved UX proposal v1.0, and approved Chat 05 architecture v1.0.
+The approved direction does **not** approve a specific hero scene, final palette, exact transition choreography, or detailed 3D implementation. These remain for UX/design exploration and later architecture review. The reference sites previously provided are inspiration, not templates to copy.
 
-This authorization permits:
-- Creating the React + TypeScript + Vite application and necessary project configuration in a development branch or isolated preview.
-- Implementing the approved single-page structure, responsive styling, accessible navigation, typed local content modules, and Three.js hero with poster fallback.
-- Installing only dependencies justified by the approved architecture, explaining material dependency changes and preserving the original baseline.
-- Running local build and development checks and reporting actual results.
+### Superseded creative decisions — historical reference only
 
-This authorization does **not** permit:
-- Changing DNS, Cloudflare Pages settings, production branch settings, custom-domain configuration, or production deployment.
-- Replacing or deleting the existing production website.
-- Inventing portfolio content or publishing unverified personal claims/contact links.
-- Treating implementation as QA approval; responsive, accessibility, performance, and browser testing remain required before release.
+The following prior Chat 02 choices are superseded and must not constrain the new direction: Nexus × Obsidian / “Spatial Precision”; dark graphite + lavender palette; Space Grotesk / Inter / IBM Plex Mono selection; “The Spatial Signature” S-inspired sculpture, materials, and lighting; and prior hero interactions, static poster composition, and motion details. They may be reconsidered only if independently supported by the new direction; their former approval does not carry forward.
 
-Before substantial code changes, Chat 04 must inspect the current repository state and choose a safe development branch/preview workflow. Do not overwrite the current working site or make destructive changes without explaining the risk and obtaining approval. Report exact files changed, dependencies added and why, build/test results, remaining issues, and the next handoff to Chat 00.
+## Approved UX Proposal v2.0 — Chat 03 (2026-10-12)
 
-## Open verification items
+**Status: explicitly approved by the user as written.** This is the UX baseline for architecture planning. Repository changes by Chat 03: none. No implementation, accessibility, or performance tests were performed as part of the UX stage.
 
-- The actual Cloudflare Pages project, build/output settings, production branch, custom-domain association, redirects, and latest successful deployment remain unverified.
-- Fresh visual, responsive, accessibility, and performance tests are pending.
-- Verify production-domain behavior independently when access permits; reported terminal output from the earlier audit is not a fresh live check.
-- Confirm the build command, output directory, domain/redirect behavior, and deployment workflow before any deployment changes.
-- Establish measurable performance budgets and verify them with actual measurements during implementation and QA.
-- Keep the existing production site unchanged until replacement passes QA and production migration is separately authorized.
+- **Structure:** single-page first, with dedicated project pages when justified by authentic content.
+- **Navigation model:** hybrid — conventional labelled navigation supported by contextual spatial cues.
+- **Motion model:** hybrid — continuous environmental changes during scrolling, plus a small number of triggered cinematic transformations at meaningful reveals.
+- **Primary audience:** balanced personal portfolio for recruiters, internship evaluators, potential clients, and technical collaborators.
+- **Approved proposed section order:** Global navigation → Hero / Identity → Selected Projects → About → Technical Capabilities → Journey & Experience → Contact → Footer.
+- Persistent desktop navigation and accessible mobile menu.
+- Curated, evidence-led project cards with authentic project information and verified links.
+- Technical capability groups supported by demonstrable skills and project evidence.
+- Verified learning/experience milestones clearly distinguished as completed, ongoing, or planned.
+- Direct email and approved professional profile links; résumé optional.
+- Detailed project pages only if content justifies them.
+- Adaptive desktop, tablet, and mobile layouts without unintended horizontal scrolling.
+- Semantic structure, keyboard usability, visible focus, contrast verification, touch usability, reduced-motion support, and content integrity remain requirements.
+- **Still intentionally open:** exact hero scene, final palette, exact transition choreography, project-specific page decisions based on authentic content, and detailed 3D implementation. These are not approved by UX v2.0.
+- **Open content inputs:** primary audience and final copy; verified project inventory and artifacts; biography, skills and learning milestones; approved contact details/profile links; optional résumé. Never invent achievements, project details, metrics, proficiency claims, or experience.
+
+## Chat 05 architecture research and review — 2026-10-12
+
+Chat 05 re-read the current project record and re-fetched the root `index.html`, `style.css`, and repository contents. The handoff reports no application edits, dependency installation, commits, deployment/DNS changes, or implementation, responsive, accessibility, or performance tests. The user explicitly approved Architecture Proposal v2.0 as the planning baseline, retaining the documented open items, verification requirements, and production safeguards. Confirmed preferences:
+
+- **Rendering:** CSS-first, with selective WebGL only when a specific experience justifies its cost.
+- **Performance budgets:** provisional until a representative visual prototype has been measured.
+- **Additional feedback:** none.
+
+The recommendations align with the approved Structured Surrealism direction and UX Proposal v2.0. This review handoff asks Chat 00 to record the review decisions, preserve open items, and determine whether architecture questions remain. The user’s explicit final approval has now been received. Stage 04 is complete as an approved planning baseline. The open items below remain open by design and do not imply final visual choices or measured performance results.
+
+### Consolidated architecture baseline proposed for approval
+
+- Retain React + TypeScript + Vite.
+- Build environmental effects, layering, and transitions with CSS first; add Three.js/WebGL only for experiences whose benefits justify the added complexity and cost.
+- Keep content and navigation independent of optional graphics; essential content must work without WebGL.
+- Begin with a small single-page application and typed local content. Defer a CMS, backend, global state manager, router, and dedicated animation library until actual requirements justify them.
+- Preserve normal scrolling, keyboard accessibility, reduced-motion alternatives, and deliberate desktop/tablet/mobile layouts.
+- Keep environmental artwork distinct from authentic technical project evidence.
+- Use provisional, measurable performance budgets; validate and revise them against a representative visual prototype and actual builds/devices. No performance result is claimed yet.
+- Prefer static hosting, with Cloudflare Pages configuration verification required before deployment decisions.
+- Preserve production and keep implementation, QA, and migration separately gated.
+
+### Open items to preserve
+
+- Exact hero environment and final palette.
+- Signature transition design and choreography.
+- Which individual experiences, if any, justify real-time 3D.
+- Scene and asset authoring methods.
+- Final numeric performance budgets and test results, pending representative prototype measurements.
+- Authentic project inventory, evidence, and final copy.
+- Cloudflare Pages build/output settings, production branch, custom domain, redirects, latest deployment, and rollback process.
+
+These are not implied approvals. They do not all need to be resolved before the architecture baseline can be approved, provided the architecture documents them as constraints/open decisions and does not prematurely commit to them.
+
+Prior recommendations to re-evaluate:
+- React + TypeScript + Vite.
+- Direct Three.js isolated behind a React component boundary.
+- Static hero poster before WebGL initialization.
+- Static hero by default on mobile.
+- Typed local TypeScript modules for portfolio content; no backend/CMS initially.
+- Static hosting, preferably Cloudflare Pages after configuration verification.
+- Preview/QA before any production migration.
+- Unresolved research items: geometry/asset production, concrete performance budgets, minimum necessary dependencies and component boundaries, content inputs, and Cloudflare configuration.
+
+The new concept may justify keeping, changing, or reducing the prior rendering approach. Do not start implementation or assume the prior hero-specific decisions still apply.
+
+## Risks and verification requirements
+
+- Structured Surrealism and UX Proposal v2.0 are approved, but the exact hero scene, final palette, transition choreography, and detailed 3D implementation remain open.
+- Do not copy reference websites. Translate their relevant qualities into original design decisions.
+- Avoid visual spectacle that obscures identity, projects, navigation, or contact.
+- Any cinematic transition must be evaluated for usability, performance, mobile behavior, keyboard access, and reduced-motion alternatives.
+- Photorealistic project reveals must use authentic project material and must not delay essential content.
+- Stage 04 must reassess the rendering approach and retained Chat 05 research against the approved UX; do not assume Three.js/WebGL is necessary merely because it was proposed earlier.
+- Establish measurable performance budgets and verify them through actual tests; do not claim unmeasured results.
+- Verify actual Cloudflare Pages build/output settings, production branch, custom domain, redirects, and latest deployment before any deployment changes.
+- Keep the current production site intact.
 
 ## Roadmap
 
-1. **Technical audit — complete at source/repository level.** Deployment and fresh live-site verification remain open.
-2. **Creative direction — complete.** Full creative specification approved by user.
-3. **UX and information architecture — complete.** UX proposal v1.0 approved by user.
-4. **Detailed technical architecture — reviewed and approved.** Chat 05 proposal v1.0 approved by user; Chat 00 review complete. Known unresolved decisions and verification requirements are recorded above.
-5. **Frontend implementation — authorized for local/preview development only.** Chat 04 must follow the scope and safety boundaries above. Production deployment/migration is not authorized.
-6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers.
-7. **Deployment and handover — pending and separately gated.** Verify Cloudflare Pages configuration, production behavior, HTTPS, and domain/redirects. Obtain explicit production migration authorization after QA passes.
+1. **Technical audit — complete at source/repository level.** Preserve audit findings and open deployment verification items.
+2. **Creative direction — complete.** Structured Surrealism is explicitly approved; exact hero scene, final palette, transition choreography, and detailed 3D implementation remain open.
+3. **UX and information architecture — complete.** UX Proposal v2.0 is explicitly approved by the user as written.
+4. **Detailed technical architecture — complete.** Architecture Proposal v2.0 is explicitly approved as the planning baseline. Its open visual, asset, performance measurement, content, and hosting verification items remain documented.
+5. **Frontend implementation — limited authorization granted.** Chat 04 may create and verify the isolated local prototype under `prototype/` only, within the explicit scope below. Root production files, deployment settings, and DNS remain protected.
+6. **QA and refinement — pending.** Test links, interactions, responsive layouts, accessibility, reduced motion, performance, console/network errors, and browsers only after implementation is separately authorized and exists.
+7. **Deployment and handover — pending and separately gated.** Verify hosting configuration and obtain explicit production migration authorization only after QA passes.
 
 ## Handoff protocol
 
-Each specialist chat must report: scope completed, evidence, exact files changed (if any), verification results, decisions proposed versus approved, risks/open questions, and a concise next handoff. The coordinator reconciles the report here before changing stage status. A recommendation is not an approval; approval is not implementation; implementation is not verification.
+Each specialist chat must report scope completed, evidence, exact files changed (if any), verification results, proposed versus approved decisions, risks/open questions, and a concise next handoff. The coordinator reconciles the report here before changing stage status. A working hypothesis is not approval; creative approval is not implementation authorization; implementation is not verification.
 
-## Next action
+## Stage 05 authorization — isolated local prototype only (2026-10-12)
 
-Proceed to **Chat 04 — Frontend Implementation** using the authorization and boundaries above. Chat 04 must first inspect the current repository and establish a safe development/preview workflow, then implement in small verifiable steps. Do not change production deployment settings or migrate the live website. Report progress and evidence back to Chat 00 for ongoing coordination.
+**Decision: the user explicitly authorized Stage 05 for the isolated local prototype only.** This authorization was given in the conversation on 2026-10-12. It authorizes Chat 04 to perform the following limited work; it does not authorize production replacement or deployment.
+
+### Authorized scope
+
+1. Inspect the current repository state before making changes. The current main root files were re-fetched during the authorization gate: `index.html` (blob `eac5c728a548d682b624d2c098d65407839ec5bf`), `style.css` (blob `c36081035ddae6ae2798429b7f65bdec7705bbeb`), and `.gitignore` (blob `bc0ecbf9cb767ebe3ab60ca97e46b92889806e45`). The latest project-record commit at the time of authorization was `b76c01bee6eae91ef97d5865dafa9c77de5d6512`.
+2. Build the first minimal React + TypeScript + Vite prototype under a separate `prototype/` directory, using local prototype configuration and dependencies rather than modifying the root website's entry files or root dependency configuration.
+3. Create the initial portfolio skeleton following the approved UX order: navigation, hero/identity, selected projects, About, technical capabilities, journey/experience, contact, and footer. Use explicit placeholders for missing or unverified personal/project content.
+4. Use CSS-first visual effects. Do not add WebGL/Three.js unless a specific requirement is justified and separately discussed; the first prototype does not need to implement the final hero scene or final cinematic choreography.
+5. Run and report the local checks that are possible for the prototype, including build/startup, desktop/mobile layout inspection, keyboard/navigation, reduced-motion behavior, essential content without WebGL, and console errors. Distinguish checks actually performed from checks not performed.
+
+### Explicit exclusions and safeguards
+
+- Do not overwrite, rename, or remove root `index.html`, root `style.css`, or other existing production-site files.
+- Do not change root dependencies or root build/deployment configuration. Prototype-specific dependencies/configuration, if needed, must remain under `prototype/`.
+- Do not change DNS, Cloudflare Pages settings, custom-domain association, redirects, production branch, or any deployment settings.
+- Do not deploy the prototype or merge it into the production site.
+- Do not invent project details, achievements, metrics, skills, or experience. Keep unknown content visibly marked as placeholder content.
+- Do not treat the exact hero environment, palette, transition choreography, or WebGL usage as approved.
+- Performance budgets remain provisional until a representative prototype is measured.
+- QA, production migration, and handover remain separate future gates. Production migration requires passing QA and separate explicit user authorization.
+
+### Initial verification and handoff
+
+Before editing, Chat 04 must re-check the current branch/head and repository tree; do not rely only on the file snapshot above. Keep changes isolated to `prototype/` and report the exact changed files and dependency scope. Verify the prototype build and local behavior where tooling permits; do not claim tests that were not run. Show the user the first result and wait for feedback before expanding the prototype or adding complex effects.
+
+**Next chat: Chat 04 — Frontend Implementation.** Stage 05 is authorized only within the scope above. Chat 04 must not expand scope or perform deployment/migration work without a new explicit approval.
