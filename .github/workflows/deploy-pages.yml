@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy immersive prototype to GitHub Pages
 
 on:
   push:
@@ -26,19 +26,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: prototype/package-lock.json
 
-      - name: Install dependencies
+      - name: Install prototype dependencies
+        working-directory: prototype
         run: npm ci
 
-      - name: Build
-        env:
-          GITHUB_PAGES: 'true'
+      - name: Build immersive prototype
+        working-directory: prototype
         run: npm run build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./prototype/dist
 
   deploy:
     environment:
