@@ -547,9 +547,10 @@ html, body { background:var(--paper); color:var(--ink); transition:background-co
   .custom-cursor i { display:block; background:var(--ink); }
   body:has(a:hover) .custom-cursor, body:has(button:hover) .custom-cursor { width:34px; height:34px; border-color:var(--ink); }
 }
-:root[data-theme="light"] .custom-cursor { border-color:#16221f; }
-:root[data-theme="light"] .custom-cursor::before { border-color:#263b36; }
-:root[data-theme="light"] .custom-cursor::after { background:#16221f; }
+:root[data-theme="light"] .custom-cursor { border-color:#081713 !important; background:rgb(217 213 202 / 20%); box-shadow:0 0 0 1px rgb(255 255 255 / 82%),0 0 0 2px rgb(8 23 19 / 22%); }
+:root[data-theme="light"] .custom-cursor::before { border-color:#173b32 !important; }
+:root[data-theme="light"] .custom-cursor::after { background:#081713 !important; box-shadow:0 0 0 1px #f8f6ef,0 0 0 2px #081713; }
+:root[data-theme="light"] .custom-cursor i { background:#081713 !important; }
 
 
 /* Final wordmark and cursor overrides: keep the oval centered and the orbital cursor dark enough in light mode. */
