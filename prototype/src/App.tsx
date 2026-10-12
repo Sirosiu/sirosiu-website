@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { journeyChapters } from "./content/journey";
 import SceneExperience from "./scene/SceneExperience";
 
@@ -10,6 +10,29 @@ const socialLinks = [
   ["Instagram", "https://www.instagram.com/sirosiu.nyx/"],
 ];
 
+function CustomCursor() {
+  const cursor = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const move = (event: PointerEvent) => {
+      if (cursor.current) cursor.current.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+    };
+    const show = () => cursor.current?.classList.add("is-visible");
+    const hide = () => cursor.current?.classList.remove("is-visible");
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerenter", show);
+    window.addEventListener("pointerleave", hide);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerenter", show);
+      window.removeEventListener("pointerleave", hide);
+    };
+  }, []);
+
+  return <div className="custom-cursor" ref={cursor} aria-hidden="true"><i /></div>;
+}
+
 function App() {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("light");
@@ -17,7 +40,7 @@ function App() {
 
   useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
 
-  return <>
+  return <><CustomCursor />
     <a className="skip" href="#main">Skip to content</a>
     <header className="header">
       <a className="logo" href="#top" onClick={close}>SIROSIU</a>
