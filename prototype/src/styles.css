@@ -617,8 +617,8 @@ html.theme-transitioning body * {
 
 @media (min-width:681px) {
   /* Align the gateway action with the archive action across the two hero columns. */
-  .hero .scene-shell > .portal-enter { position:relative; top:-30px; margin-inline:0; }
-  .hero .scene-shell > .portal-status { position:relative; top:-30px; text-align:left; }
+  .hero .scene-shell > .portal-enter { position:relative; top:clamp(-96px, calc(10vw - 222px), -30px); margin-inline:0; }
+  .hero .scene-shell > .portal-status { position:relative; top:clamp(-96px, calc(10vw - 222px), -30px); text-align:left; }
 }
 
 @media (hover:hover) and (pointer:fine) {
