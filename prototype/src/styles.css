@@ -512,3 +512,12 @@ html, body { background:var(--paper); color:var(--ink); transition:background-co
   .about-signal-card-main h3 { margin-top:34px; max-width:210px; }
   .about-signal-card-main > p { max-width:225px; }
 }
+
+
+/* Reference cursor: a minimal dark pointer with a cool, soft halo. */
+@media (hover:hover) and (pointer:fine) {
+  .custom-cursor { width:15px; height:21px; border:0; border-radius:0; background:#101719; clip-path:polygon(0 0,100% 72%,58% 69%,43% 100%); box-shadow:0 0 0 1px rgb(240 247 246 / 75%),0 4px 10px rgb(74 144 255 / 48%); transform-origin:0 0; }
+  .custom-cursor::before { inset:-7px; border:0; border-radius:50%; background:rgb(79 150 255 / 34%); filter:blur(7px); transform:none; z-index:-1; }
+  .custom-cursor::after, .custom-cursor i { display:none; }
+  body:has(a:hover) .custom-cursor, body:has(button:hover) .custom-cursor { width:18px; height:25px; border-color:transparent; }
+}
