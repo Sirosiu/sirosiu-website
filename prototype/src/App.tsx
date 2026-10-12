@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { journeyChapters } from "./content/journey";
 import SceneExperience from "./scene/SceneExperience";
 
@@ -10,21 +10,59 @@ const socialLinks = [
   ["Instagram", "https://www.instagram.com/sirosiu.nyx/"],
 ];
 
+function CustomCursor() {
+  const cursor = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const move = (event: PointerEvent) => {
+      if (cursor.current) {
+        cursor.current.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+        cursor.current.classList.add("is-visible");
+      }
+    };
+    const show = () => cursor.current?.classList.add("is-visible");
+    const hide = () => cursor.current?.classList.remove("is-visible");
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerenter", show);
+    window.addEventListener("pointerleave", hide);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerenter", show);
+      window.removeEventListener("pointerleave", hide);
+    };
+  }, []);
+
+  return <div className="custom-cursor" ref={cursor} aria-hidden="true"><i /></div>;
+}
+
 function App() {
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const themeTransitionTimer = useRef<number | null>(null);
   const close = () => setOpen(false);
 
-  useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+  useLayoutEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
 
-  return <>
+  const switchTheme = () => {
+    const root = document.documentElement;
+    root.classList.add("theme-transitioning");
+    if (themeTransitionTimer.current !== null) window.clearTimeout(themeTransitionTimer.current);
+    setTheme((current) => current === "dark" ? "light" : "dark");
+    themeTransitionTimer.current = window.setTimeout(() => {
+      root.classList.remove("theme-transitioning");
+      themeTransitionTimer.current = null;
+    }, 520);
+  };
+
+  return <><CustomCursor />
     <a className="skip" href="#main">Skip to content</a>
     <header className="header">
-      <a className="logo" href="#top" onClick={close}>SIROSIU<span>.</span></a>
+      <a className="logo" href="#top" onClick={close}><img className="logo-mark" src="/sirosiu-threshold-mark.png" alt="" />SIROSIU</a>
       <button className="menu-toggle" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}>{open ? "Close" : "Menu"}</button>
       <nav id="nav" aria-label="Main navigation" className={open ? "nav open" : "nav"}>{nav.map(([label, href]) => <a key={href} href={href} onClick={close}>{label}</a>)}</nav>
       <small className="edition">PERSONAL PORTFOLIO / 2026</small>
-      <button className="theme-toggle" type="button" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} onClick={() => setTheme(theme === "dark" ? "light" : "dark")}><span aria-hidden="true">{theme === "dark" ? "☼" : "◐"}</span>{theme === "dark" ? "Light mode" : "Dark mode"}</button>
+      <button className="theme-toggle" type="button" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} onClick={switchTheme}><span aria-hidden="true">{theme === "dark" ? "☼" : "◐"}</span>{theme === "dark" ? "Light mode" : "Dark mode"}</button>
     </header>
 
     <main id="main">
@@ -56,7 +94,7 @@ function App() {
 
       <section className="contact shell" id="contact"><p className="eyebrow">05 / Contact</p><h2>Let’s build<br /><em>what’s next.</em></h2><p>For collaborations, conversations, and future opportunities, connect through the public profiles below. Email: <a href="mailto:sirosiusugi@gmail.com">sirosiusugi@gmail.com</a></p><p className="contact-state">Open to collaboration.</p><div className="social-links">{socialLinks.map(([label, href]) => <a key={href} href={href} target="_blank" rel="noreferrer">{label} ↗</a>)}<a href="#contact" className="disabled" aria-disabled="true" onClick={(event) => event.preventDefault()}>Résumé in progress ↗</a></div><p className="note">The résumé link will become active when the PDF is ready.</p></section>
     </main>
-    <footer className="footer"><a className="logo" href="#top">SIROSIU<span>.</span></a><p>Engineering, intelligence, and imagination.<small>Personal portfolio · 2026</small></p><a href="#top">Back to top ↑</a></footer>
+    <footer className="footer"><a className="logo" href="#top"><img className="logo-mark" src="/sirosiu-threshold-mark.png" alt="" />SIROSIU</a><p>Engineering, intelligence, and imagination.<small>Personal portfolio · 2026</small></p><a href="#top">Back to top ↑</a></footer>
   </>;
 }
 
