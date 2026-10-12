@@ -454,3 +454,19 @@ html, body { background:var(--paper); color:var(--ink); transition:background-co
 .direction-node { position:absolute; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:116px; padding:8px 10px; border:0; border-bottom:1px solid rgb(186 255 208 / 56%); background:transparent; color:#e9f4ec; font:.61rem var(--mono); letter-spacing:.08em; text-transform:uppercase; cursor:pointer; pointer-events:auto; transition:transform 180ms ease,color 180ms ease,border-color 180ms ease; }.direction-node:hover,.direction-node:focus-visible,.direction-node.is-selected { color:#d8f779; border-color:#d8f779; transform:scale(1.08); outline:none; }.direction-node i { font-size:.8rem; font-style:normal; }.direction-node-0 { left:12%; top:26%; }.direction-node-1 { right:10%; top:34%; }.direction-node-2 { left:9%; bottom:27%; }.direction-node-3 { right:12%; bottom:22%; }
 @keyframes direction-orbit-turn { to { transform:translate(-50%,-50%) rotate(378deg); } }
 @media(max-width:680px){.direction-orbit::before{width:72vw;}.direction-orbit::after{width:54vw;}.direction-orbit-label{top:calc(50% - 39vw);}.direction-orbit-instruction{top:calc(50% + 39vw);}.direction-node{min-width:102px;font-size:.53rem;padding:7px 8px;}.direction-node-0{left:5%;top:24%;}.direction-node-1{right:4%;top:33%;}.direction-node-2{left:4%;bottom:28%;}.direction-node-3{right:5%;bottom:23%;}}
+
+
+/* Cursor: a restrained orbital trace for precise pointer devices. */
+.custom-cursor { display:none; }
+@media (hover:hover) and (pointer:fine) {
+  html, body, a, button { cursor:none; }
+  .custom-cursor { display:block; position:fixed; left:0; top:0; z-index:100; width:26px; height:26px; border:1px solid color-mix(in srgb,var(--acid) 72%,transparent); border-radius:50%; opacity:0; pointer-events:none; transform:translate3d(-100px,-100px,0); transition:opacity 180ms ease, width 180ms ease, height 180ms ease, border-color 180ms ease; }
+  .custom-cursor::before { content:""; position:absolute; inset:-5px; border:1px solid color-mix(in srgb,var(--acid) 24%,transparent); border-radius:50%; transform:rotate(28deg) scaleX(.58); }
+  .custom-cursor::after { content:""; position:absolute; left:50%; top:50%; width:4px; height:4px; border-radius:50%; background:var(--acid); box-shadow:0 0 10px color-mix(in srgb,var(--acid) 75%,transparent); transform:translate(-50%,-50%); }
+  .custom-cursor i { position:absolute; left:50%; top:-4px; width:1px; height:5px; background:var(--acid); transform:translateX(-50%); }
+  .custom-cursor.is-visible { opacity:1; }
+  body:has(a:hover) .custom-cursor, body:has(button:hover) .custom-cursor { width:34px; height:34px; border-color:var(--acid); }
+}
+@media (prefers-reduced-motion:reduce) and (hover:hover) and (pointer:fine) {
+  .custom-cursor { transition:none; }
+}
