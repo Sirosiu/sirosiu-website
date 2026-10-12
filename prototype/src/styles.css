@@ -614,6 +614,7 @@ html.theme-transitioning body * {
 .logo:hover::after { transform:translate(-50%,-50%) rotate(26deg) scale(1.06); }
 :root[data-theme="light"] .logo::after { border-color:color-mix(in srgb,#16221f 78%,#71832d); }
 .nav a { pointer-events:auto; cursor:pointer; }
+.logo::before { display:none; }
 
 @media (min-width:681px) {
   /* Align the gateway action with the archive action across the two hero columns. */
