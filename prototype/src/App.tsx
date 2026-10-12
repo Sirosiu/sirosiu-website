@@ -12,7 +12,7 @@ const socialLinks = [
 
 function App() {
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const close = () => setOpen(false);
 
   useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
