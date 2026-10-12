@@ -531,3 +531,9 @@ html, body { background:var(--paper); color:var(--ink); transition:background-co
   .custom-cursor i { display:block; left:50%; top:-4px; width:1px; height:5px; background:var(--acid); transform:translateX(-50%); }
   body:has(a:hover) .custom-cursor, body:has(button:hover) .custom-cursor { width:34px; height:34px; border-color:var(--acid); }
 }
+
+
+/* Center the orbital oval across the SIROSIU wordmark and keep it legible in light mode. */
+.logo { position:relative; isolation:isolate; }
+.logo::after { position:absolute; left:50%; top:50%; z-index:2; width:58%; height:88%; margin:0; border-color:color-mix(in srgb,var(--ink) 46%,var(--acid)); opacity:.9; transform:translate(-50%,-50%) rotate(-32deg); pointer-events:none; }
+.logo:hover::after { transform:translate(-50%,-50%) rotate(28deg) scale(1.12); }
