@@ -149,7 +149,7 @@ function JourneyLandmark({ stop, active, onSelect, light, reducedMotion }: { sto
       group.current.position.y = 0.08 + Math.sin(clock.elapsedTime * 0.7 + Number(stop.number)) * 0.055;
     }
   });
-  return <group ref={group} position={stop.position} onClick={(event) => { event.stopPropagation(); onSelect(stop.id); }} onPointerOver={() => { document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
+  return <group ref={group} position={stop.position} onClick={(event) => { event.stopPropagation(); onSelect(stop.id); }}>
     <Text visible={active} position={[0, 2.15, 0]} fontSize={0.12} maxWidth={2.2} lineHeight={1.1} textAlign="center" anchorX="center" anchorY="bottom" color={light ? "#17332e" : "#e8f1e9"} outlineWidth={0.008} outlineColor={light ? "#b8d5d4" : "#07141a"}>{stop.number}</Text>
     <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><cylinderGeometry args={[active ? 0.9 : 0.72, active ? 0.9 : 0.72, 0.12, 8]} /><meshStandardMaterial color={active ? "#496a5d" : "#1a2828"} metalness={0.62} roughness={0.34} /></mesh>
     <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[active ? 0.82 : 0.65, active ? 0.025 : 0.016, 8, 48]} /><meshBasicMaterial color={stop.tint} toneMapped={false} /></mesh>
