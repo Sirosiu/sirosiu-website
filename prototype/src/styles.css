@@ -470,3 +470,45 @@ html, body { background:var(--paper); color:var(--ink); transition:background-co
 @media (prefers-reduced-motion:reduce) and (hover:hover) and (pointer:fine) {
   .custom-cursor { transition:none; }
 }
+
+
+/* Final interaction polish: keep the native pointer suppressed on every precise-pointer surface. */
+@media (hover:hover) and (pointer:fine) {
+  html, body, a, button, canvas,
+  .scene-experience canvas,
+  .scene-shell.is-hovered .scene-experience canvas,
+  .scene-shell.is-hovered .scene-experience canvas:active,
+  .scene-experience.is-entering canvas { cursor:none !important; }
+  .custom-cursor {
+    z-index:10000;
+    width:23px;
+    height:23px;
+    border-width:1.5px;
+    border-color:color-mix(in srgb,var(--ink) 82%,var(--acid));
+    background:color-mix(in srgb,var(--paper) 24%,transparent);
+    box-shadow:0 0 0 1px color-mix(in srgb,var(--paper) 72%,transparent),0 0 16px color-mix(in srgb,var(--acid) 50%,transparent);
+  }
+  .custom-cursor::before { border-color:color-mix(in srgb,var(--ink) 56%,var(--acid)); }
+  .custom-cursor::after { width:5px; height:5px; background:var(--acid); box-shadow:0 0 0 1px var(--ink),0 0 12px var(--acid); }
+  .custom-cursor i { background:var(--ink); }
+  body:has(a:hover) .custom-cursor, body:has(button:hover) .custom-cursor { width:32px; height:32px; border-color:var(--ink); }
+}
+.theme-light .direction-orbit { color:#17332e; }
+.theme-light .direction-orbit::before { border-color:rgb(23 51 46 / 42%); }
+.theme-light .direction-orbit::after { border-color:rgb(125 139 45 / 62%); }
+.theme-light .direction-orbit-core { color:#1f5e52; border-color:#1f5e52; box-shadow:0 0 24px rgb(31 94 82 / 28%); }
+.theme-light .direction-orbit-core i { background:linear-gradient(90deg,transparent,#1f5e52,transparent); }
+.theme-light .direction-orbit-label,
+.theme-light .direction-orbit-instruction { color:#17332e; text-shadow:0 1px 8px rgb(255 255 255 / 92%); }
+.theme-light .direction-node { color:#17332e; border-color:rgb(31 94 82 / 64%); text-shadow:0 1px 8px rgb(255 255 255 / 92%); }
+.theme-light .direction-node:hover,
+.theme-light .direction-node:focus-visible,
+.theme-light .direction-node.is-selected { color:#4a5d15; border-color:#7d8b2d; }
+@media(max-width:680px) {
+  .about-grid > div { min-width:0; }
+  .portrait-cutout { width:min(78vw,320px); max-height:360px; margin:22px auto 0; object-fit:contain; }
+  .about-grid > div:nth-child(2) { padding-top:18px; }
+  .about-portrait-frame { right:0; bottom:0; width:72%; height:58%; max-height:310px; }
+  .about-signal-card-main h3 { margin-top:34px; max-width:210px; }
+  .about-signal-card-main > p { max-width:225px; }
+}
