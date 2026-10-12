@@ -521,3 +521,13 @@ html, body { background:var(--paper); color:var(--ink); transition:background-co
   .custom-cursor::after, .custom-cursor i { display:none; }
   body:has(a:hover) .custom-cursor, body:has(button:hover) .custom-cursor { width:18px; height:25px; border-color:transparent; }
 }
+
+
+/* Restore the earlier orbital cursor treatment. */
+@media (hover:hover) and (pointer:fine) {
+  .custom-cursor { width:26px; height:26px; border:1px solid color-mix(in srgb,var(--acid) 72%,transparent); border-radius:50%; background:transparent; clip-path:none; box-shadow:none; transform-origin:center; }
+  .custom-cursor::before { inset:-5px; border:1px solid color-mix(in srgb,var(--acid) 24%,transparent); border-radius:50%; background:transparent; filter:none; transform:rotate(28deg) scaleX(.58); }
+  .custom-cursor::after { display:block; left:50%; top:50%; width:4px; height:4px; border-radius:50%; background:var(--acid); box-shadow:0 0 10px color-mix(in srgb,var(--acid) 75%,transparent); transform:translate(-50%,-50%); }
+  .custom-cursor i { display:block; left:50%; top:-4px; width:1px; height:5px; background:var(--acid); transform:translateX(-50%); }
+  body:has(a:hover) .custom-cursor, body:has(button:hover) .custom-cursor { width:34px; height:34px; border-color:var(--acid); }
+}
