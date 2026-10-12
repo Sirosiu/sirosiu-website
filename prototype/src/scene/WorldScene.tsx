@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { MeshReflectorMaterial, Text } from "@react-three/drei";
 import { CatmullRomCurve3, Vector3, type BufferAttribute, type Group, type Mesh } from "three";
@@ -89,8 +89,9 @@ function Monument({ position, size, rotation = 0, theme }: { position: [number, 
   </group>;
 }
 
-function Gateway({ theme, hovered, onEnter, onHoverChange }: { theme: "dark" | "light"; hovered: boolean; onEnter?: () => void; onHoverChange?: (value: boolean) => void }) {
+function Gateway({ theme, hovered, onHoverChange }: { theme: "dark" | "light"; hovered: boolean; onHoverChange?: (value: boolean) => void }) {
   const light = theme === "light";
+  const [activated, setActivated] = useState(false);
   const artifact = useRef<Group>(null);
   const targetRotation = useRef({ x: 0, z: 0 });
   const pointerDrag = useRef({ active: false, x: 0, y: 0 });
@@ -101,17 +102,17 @@ function Gateway({ theme, hovered, onEnter, onHoverChange }: { theme: "dark" | "
       artifact.current.rotation.x += (targetRotation.current.x - artifact.current.rotation.x) * 0.07;
       artifact.current.rotation.z += (targetRotation.current.z - artifact.current.rotation.z) * 0.07;
       artifact.current.position.y = Math.sin(clock.elapsedTime * 0.72) * 0.2;
-      const scale = hovered ? 1.62 : 1.48;
+      const scale = hovered || activated ? 1.62 : 1.48;
       artifact.current.scale.x += (scale - artifact.current.scale.x) * 0.08;
       artifact.current.scale.y = artifact.current.scale.x;
       artifact.current.scale.z = artifact.current.scale.x;
     }
   });
   return <group position={[0, 2.65, -5.7]}>
-    <group ref={artifact} onPointerOver={(event) => { event.stopPropagation(); onHoverChange?.(true); }} onPointerOut={() => { if (!pointerDrag.current.active) onHoverChange?.(false); }} onPointerDown={(event) => { event.stopPropagation(); pointerDrag.current = { active: true, x: event.clientX, y: event.clientY }; didDrag.current = false; const target = event.nativeEvent.target; if (target instanceof Element) target.setPointerCapture(event.pointerId); }} onPointerMove={(event) => { event.stopPropagation(); if (!pointerDrag.current.active || !artifact.current) return; const dx = event.clientX - pointerDrag.current.x; const dy = event.clientY - pointerDrag.current.y; if (Math.abs(dx) + Math.abs(dy) > 2) didDrag.current = true; artifact.current.rotation.y += dx * 0.012; artifact.current.rotation.x += dy * 0.012; targetRotation.current.x = artifact.current.rotation.x; targetRotation.current.z = artifact.current.rotation.z; pointerDrag.current.x = event.clientX; pointerDrag.current.y = event.clientY; }} onPointerUp={(event) => { event.stopPropagation(); pointerDrag.current.active = false; }} onPointerCancel={() => { pointerDrag.current.active = false; }} onClick={(event) => { event.stopPropagation(); if (didDrag.current) { didDrag.current = false; return; } onEnter?.(); }}>
+    <group ref={artifact} onPointerOver={(event) => { event.stopPropagation(); onHoverChange?.(true); }} onPointerOut={() => { if (!pointerDrag.current.active && !activated) onHoverChange?.(false); }} onPointerDown={(event) => { event.stopPropagation(); pointerDrag.current = { active: true, x: event.clientX, y: event.clientY }; didDrag.current = false; const target = event.nativeEvent.target; if (target instanceof Element) target.setPointerCapture(event.pointerId); }} onPointerMove={(event) => { event.stopPropagation(); if (!pointerDrag.current.active || !artifact.current) return; const dx = event.clientX - pointerDrag.current.x; const dy = event.clientY - pointerDrag.current.y; if (Math.abs(dx) + Math.abs(dy) > 2) didDrag.current = true; artifact.current.rotation.y += dx * 0.012; artifact.current.rotation.x += dy * 0.012; targetRotation.current.x = artifact.current.rotation.x; targetRotation.current.z = artifact.current.rotation.z; pointerDrag.current.x = event.clientX; pointerDrag.current.y = event.clientY; }} onPointerUp={(event) => { event.stopPropagation(); pointerDrag.current.active = false; }} onPointerCancel={() => { pointerDrag.current.active = false; }} onClick={(event) => { event.stopPropagation(); if (didDrag.current) { didDrag.current = false; return; } setActivated((value) => { const next = !value; onHoverChange?.(next); return next; }); }}>
       <mesh castShadow rotation={[0.15, 0.25, 0]}><dodecahedronGeometry args={[1.08, 0]} /><meshStandardMaterial color={light ? "#a98c79" : "#886653"} metalness={0.58} roughness={0.42} emissive={light ? "#4b2922" : "#321a25"} emissiveIntensity={0.26} /></mesh>
       <mesh rotation={[0.3, 0.8, 0.2]}><dodecahedronGeometry args={[0.74, 0]} /><meshStandardMaterial color={light ? "#c18b66" : "#b27a5a"} metalness={0.68} roughness={0.24} emissive={light ? "#8d5140" : "#6c3a37"} emissiveIntensity={0.48} /></mesh>
-      <mesh position={[0, 0, 0.76]}><icosahedronGeometry args={[0.38, 1]} /><meshPhysicalMaterial color={light ? "#e4fff1" : "#a8f5d2"} emissive={light ? "#4ebf99" : "#287f70"} emissiveIntensity={hovered ? 2.4 : 1.35} metalness={0.12} roughness={0.1} transmission={0.3} thickness={0.8} transparent opacity={0.92} /></mesh>
+      <mesh position={[0, 0, 0.76]}><icosahedronGeometry args={[0.38, 1]} /><meshPhysicalMaterial color={light ? "#e4fff1" : "#a8f5d2"} emissive={light ? "#4ebf99" : "#287f70"} emissiveIntensity={hovered || activated ? 2.4 : 1.35} metalness={0.12} roughness={0.1} transmission={0.3} thickness={0.8} transparent opacity={0.92} /></mesh>
       {[-1, 1].map((side) => <mesh key={side} position={[side * 0.9, side * 0.25, -0.28]} rotation={[0.4, side * 0.35, 0.2]}><octahedronGeometry args={[0.24, 0]} /><meshStandardMaterial color={light ? "#7e6256" : "#493441"} metalness={0.72} roughness={0.34} /></mesh>)}
       <mesh rotation={[0.4, 0.8, 0.2]}><torusGeometry args={[1.48, 0.025, 10, 72]} /><meshStandardMaterial color={light ? "#b77a5b" : "#9d6b54"} metalness={0.74} roughness={0.22} emissive={light ? "#6c342a" : "#5a2b34"} emissiveIntensity={0.38} /></mesh>
       <mesh rotation={[Math.PI / 2, 0.5, 0]}><torusGeometry args={[1.72, 0.012, 8, 72]} /><meshBasicMaterial color={light ? "#087f73" : "#baffd0"} toneMapped={false} /></mesh>
@@ -149,7 +150,7 @@ function JourneyLandmark({ stop, active, onSelect, light, reducedMotion }: { sto
       group.current.position.y = 0.08 + Math.sin(clock.elapsedTime * 0.7 + Number(stop.number)) * 0.055;
     }
   });
-  return <group ref={group} position={stop.position} onClick={(event) => { event.stopPropagation(); onSelect(stop.id); }} onPointerOver={() => { document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
+  return <group ref={group} position={stop.position} onClick={(event) => { event.stopPropagation(); onSelect(stop.id); }}>
     <Text visible={active} position={[0, 2.15, 0]} fontSize={0.12} maxWidth={2.2} lineHeight={1.1} textAlign="center" anchorX="center" anchorY="bottom" color={light ? "#17332e" : "#e8f1e9"} outlineWidth={0.008} outlineColor={light ? "#b8d5d4" : "#07141a"}>{stop.number}</Text>
     <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><cylinderGeometry args={[active ? 0.9 : 0.72, active ? 0.9 : 0.72, 0.12, 8]} /><meshStandardMaterial color={active ? "#496a5d" : "#1a2828"} metalness={0.62} roughness={0.34} /></mesh>
     <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[active ? 0.82 : 0.65, active ? 0.025 : 0.016, 8, 48]} /><meshBasicMaterial color={stop.tint} toneMapped={false} /></mesh>
@@ -217,8 +218,8 @@ function JourneyEnvironment({ theme, activeJourneyChapterId = journeyStops[0].id
 }
 
 function WorldGeometry(props: WorldSceneProps) {
-  const { mode = "gateway", theme = "dark", hovered = false, onEnter, onHoverChange, onDestinationSelect, selectedDestination } = props;
-  if (mode === "gateway") return <><ambientLight intensity={theme === "light" ? 0.72 : 0.55} /><hemisphereLight args={["#e9f5ee", "#17151d", 0.8]} /><directionalLight position={[-3, 5, 5]} intensity={theme === "light" ? 2.6 : 2.2} color={theme === "light" ? "#fff2d9" : "#dfd4c5"} /><pointLight position={[0, 2.7, -4.6]} intensity={theme === "light" ? 24 : 18} distance={9} color={theme === "light" ? "#a8ffe0" : "#79f4ca"} decay={2} /><pointLight position={[1.3, 3.6, -5.1]} intensity={8} distance={6} color="#e5bd83" decay={2} /><Gateway theme={theme} hovered={hovered} onEnter={onEnter} onHoverChange={onHoverChange} /></>;
+  const { mode = "gateway", theme = "dark", hovered = false, onHoverChange, onDestinationSelect, selectedDestination } = props;
+  if (mode === "gateway") return <><ambientLight intensity={theme === "light" ? 0.72 : 0.55} /><hemisphereLight args={["#e9f5ee", "#17151d", 0.8]} /><directionalLight position={[-3, 5, 5]} intensity={theme === "light" ? 2.6 : 2.2} color={theme === "light" ? "#fff2d9" : "#dfd4c5"} /><pointLight position={[0, 2.7, -4.6]} intensity={theme === "light" ? 24 : 18} distance={9} color={theme === "light" ? "#a8ffe0" : "#79f4ca"} decay={2} /><pointLight position={[1.3, 3.6, -5.1]} intensity={8} distance={6} color="#e5bd83" decay={2} /><Gateway theme={theme} hovered={hovered} onHoverChange={onHoverChange} /></>;
   if (mode === "journey") return <JourneyEnvironment {...props} />;
   return <><Atmosphere theme={theme} /><Water theme={theme} /><RippleLight />
     <Monument theme={theme} position={[-7.2, 2.6, -12]} size={[1.2, 5.2, 1.1]} rotation={0.12} /><Monument theme={theme} position={[7.4, 3.1, -15]} size={[1.45, 6.3, 1.2]} rotation={-0.14} />
