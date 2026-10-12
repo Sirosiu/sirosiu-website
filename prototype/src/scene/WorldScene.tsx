@@ -89,6 +89,7 @@ function Monument({ position, size, rotation = 0, theme }: { position: [number, 
   </group>;
 }
 
+// Gateway activation toggle: click the artifact to lock or release its active state.
 function Gateway({ theme, hovered, onHoverChange }: { theme: "dark" | "light"; hovered: boolean; onHoverChange?: (value: boolean) => void }) {
   const light = theme === "light";
   const [activated, setActivated] = useState(false);
