@@ -278,7 +278,7 @@
 /* Final theme system: dark is the default; light is an alternate art direction. */
 :root,
 :root[data-theme="dark"] { --paper:#0d0a11; --ink:#f3e9dd; --muted:#b7a8b0; --line:rgb(229 190 168 / 23%); --acid:#d9b36e; --surface:#1a111b; --surface-raised:#281722; --surface-deep:#08060b; color-scheme:dark; }
-:root[data-theme="light"] { --paper:#e7e1d7; --ink:#1d2825; --muted:#69736d; --line:rgb(29 40 37 / 19%); --acid:#b8cf67; --surface:#d7ddd5; --surface-raised:#c5d0c7; --surface-deep:#30443f; color-scheme:light; }
+:root[data-theme="light"] { --paper:#d9d5ca; --ink:#16221f; --muted:#4f5d56; --line:rgb(22 34 31 / 28%); --acid:#91a83d; --surface:#c3cec5; --surface-raised:#b3c0b6; --surface-deep:#263b36; color-scheme:light; }
 html, body { background:var(--paper); color:var(--ink); transition:background-color 320ms ease,color 320ms ease; }
 .header, .footer { background:var(--paper); border-color:var(--line); }
 .nav a, .edition, .intro, .section-head>p:last-child, .project-copy>p:not(.eyebrow), .capabilities p, .timeline article div>p:last-child, .contact>p:not(.eyebrow), .footer>a:last-child { color:var(--muted); }
@@ -294,7 +294,7 @@ html, body { background:var(--paper); color:var(--ink); transition:background-co
 .social-links { display:flex; flex-wrap:wrap; gap:10px; margin:28px 0; }
 .social-links a { padding:11px 13px; border:1px solid var(--line); color:var(--ink); font:.62rem var(--mono); letter-spacing:.06em; text-decoration:none; text-transform:uppercase; }
 .social-links a:hover { background:var(--ink); color:var(--paper); border-color:var(--ink); }
-.theme-dark .scene-experience { background:#110d15; } .theme-light .scene-experience { background:#dce6dd; }
+.theme-dark .scene-experience { background:#110d15; } .theme-light .scene-experience { background:#b9c9bf; }
 
 /* Project destination: red architecture, floating monoliths, and an optional archive index. */
 .project-world { position:absolute; inset:0; z-index:4; overflow:auto; overscroll-behavior:contain; color:#f3e9dd; background:radial-gradient(ellipse at 50% 12%,rgb(155 67 47 / 48%),transparent 44%),linear-gradient(155deg,#321b1d 0%,#170d12 58%,#070a0d 100%); animation:project-world-arrival 720ms cubic-bezier(.2,.8,.2,1) both; scrollbar-color:#b56a50 #180e12; }
