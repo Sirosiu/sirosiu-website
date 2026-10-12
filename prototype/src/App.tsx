@@ -16,7 +16,7 @@ function CustomCursor() {
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const move = (event: PointerEvent) => {
-      if (cursor.current) cursor.current.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+      if (cursor.current) { cursor.current.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`; cursor.current.classList.add("is-visible"); }
     };
     const show = () => cursor.current?.classList.add("is-visible");
     const hide = () => cursor.current?.classList.remove("is-visible");
