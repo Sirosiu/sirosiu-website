@@ -1,0 +1,40 @@
+import { useRef } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import type { Group } from "three";
+import WorldScene from "./WorldScene";
+
+function CameraRig() {
+  const rig = useRef<Group>(null);
+
+  useFrame(({ pointer }, delta) => {
+    if (!rig.current) return;
+
+    const targetX = pointer.x * 0.22;
+    const targetY = pointer.y * 0.12;
+
+    rig.current.position.x += (targetX - rig.current.position.x) * Math.min(delta * 1.6, 1);
+    rig.current.position.y += (targetY - rig.current.position.y) * Math.min(delta * 1.6, 1);
+  });
+
+  return (
+    <group ref={rig}>
+      <WorldScene />
+    </group>
+  );
+}
+
+export default function SceneExperience() {
+  return (
+    <div className="scene-experience" aria-hidden="true">
+      <Canvas
+        camera={{ position: [0, 3.3, 8.5], fov: 44, near: 0.1, far: 60 }}
+        onCreated={({ camera }) => camera.lookAt(0, 1.5, -3)}
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, alpha: false, powerPreference: "default" }}
+        fallback={<div className="scene-fallback" />}
+      >
+        <CameraRig />
+      </Canvas>
+    </div>
+  );
+}
