@@ -13,6 +13,7 @@ type WorldSceneProps = {
   hovered?: boolean;
   onEnter?: () => void;
   onHoverChange?: (hovered: boolean) => void;
+  onGatewayToggle?: (active: boolean) => void;
   onDestinationSelect?: (id: DestinationId) => void;
   selectedDestination?: DestinationId | null;
   activeJourneyChapterId?: string;
@@ -89,7 +90,7 @@ function Monument({ position, size, rotation = 0, theme }: { position: [number, 
   </group>;
 }
 
-function Gateway({ theme, hovered, onHoverChange }: { theme: "dark" | "light"; hovered: boolean; onHoverChange?: (value: boolean) => void }) {
+function Gateway({ theme, hovered, onHoverChange, onGatewayToggle }: { theme: "dark" | "light"; hovered: boolean; onHoverChange?: (value: boolean) => void; onGatewayToggle?: (active: boolean) => void }) {
   const light = theme === "light";
   const [activated, setActivated] = useState(false);
   const artifact = useRef<Group>(null);
@@ -109,7 +110,7 @@ function Gateway({ theme, hovered, onHoverChange }: { theme: "dark" | "light"; h
     }
   });
   return <group position={[0, 2.65, -5.7]}>
-    <group ref={artifact} onPointerOver={(event) => { event.stopPropagation(); onHoverChange?.(true); }} onPointerOut={() => { if (!pointerDrag.current.active && !activated) onHoverChange?.(false); }} onPointerDown={(event) => { event.stopPropagation(); pointerDrag.current = { active: true, x: event.clientX, y: event.clientY }; didDrag.current = false; const target = event.nativeEvent.target; if (target instanceof Element) target.setPointerCapture(event.pointerId); }} onPointerMove={(event) => { event.stopPropagation(); if (!pointerDrag.current.active || !artifact.current) return; const dx = event.clientX - pointerDrag.current.x; const dy = event.clientY - pointerDrag.current.y; if (Math.abs(dx) + Math.abs(dy) > 2) didDrag.current = true; artifact.current.rotation.y += dx * 0.012; artifact.current.rotation.x += dy * 0.012; targetRotation.current.x = artifact.current.rotation.x; targetRotation.current.z = artifact.current.rotation.z; pointerDrag.current.x = event.clientX; pointerDrag.current.y = event.clientY; }} onPointerUp={(event) => { event.stopPropagation(); pointerDrag.current.active = false; }} onPointerCancel={() => { pointerDrag.current.active = false; }} onClick={(event) => { event.stopPropagation(); if (didDrag.current) { didDrag.current = false; return; } setActivated((value) => { const next = !value; onHoverChange?.(next); return next; }); }}>
+    <group ref={artifact} onPointerOver={(event) => { event.stopPropagation(); onHoverChange?.(true); }} onPointerOut={() => { if (!pointerDrag.current.active && !activated) onHoverChange?.(false); }} onPointerDown={(event) => { event.stopPropagation(); pointerDrag.current = { active: true, x: event.clientX, y: event.clientY }; didDrag.current = false; const target = event.nativeEvent.target; if (target instanceof Element) target.setPointerCapture(event.pointerId); }} onPointerMove={(event) => { event.stopPropagation(); if (!pointerDrag.current.active || !artifact.current) return; const dx = event.clientX - pointerDrag.current.x; const dy = event.clientY - pointerDrag.current.y; if (Math.abs(dx) + Math.abs(dy) > 2) didDrag.current = true; artifact.current.rotation.y += dx * 0.012; artifact.current.rotation.x += dy * 0.012; targetRotation.current.x = artifact.current.rotation.x; targetRotation.current.z = artifact.current.rotation.z; pointerDrag.current.x = event.clientX; pointerDrag.current.y = event.clientY; }} onPointerUp={(event) => { event.stopPropagation(); pointerDrag.current.active = false; }} onPointerCancel={() => { pointerDrag.current.active = false; }} onClick={(event) => { event.stopPropagation(); if (didDrag.current) { didDrag.current = false; return; } const next = !activated; setActivated(next); onHoverChange?.(next); onGatewayToggle?.(next); }}>
       <mesh castShadow rotation={[0.15, 0.25, 0]}><dodecahedronGeometry args={[1.08, 0]} /><meshStandardMaterial color={light ? "#a98c79" : "#886653"} metalness={0.58} roughness={0.42} emissive={light ? "#4b2922" : "#321a25"} emissiveIntensity={0.26} /></mesh>
       <mesh rotation={[0.3, 0.8, 0.2]}><dodecahedronGeometry args={[0.74, 0]} /><meshStandardMaterial color={light ? "#c18b66" : "#b27a5a"} metalness={0.68} roughness={0.24} emissive={light ? "#8d5140" : "#6c3a37"} emissiveIntensity={0.48} /></mesh>
       <mesh position={[0, 0, 0.76]}><icosahedronGeometry args={[0.38, 1]} /><meshPhysicalMaterial color={light ? "#e4fff1" : "#a8f5d2"} emissive={light ? "#4ebf99" : "#287f70"} emissiveIntensity={hovered || activated ? 2.4 : 1.35} metalness={0.12} roughness={0.1} transmission={0.3} thickness={0.8} transparent opacity={0.92} /></mesh>
@@ -218,8 +219,8 @@ function JourneyEnvironment({ theme, activeJourneyChapterId = journeyStops[0].id
 }
 
 function WorldGeometry(props: WorldSceneProps) {
-  const { mode = "gateway", theme = "dark", hovered = false, onHoverChange, onDestinationSelect, selectedDestination } = props;
-  if (mode === "gateway") return <><ambientLight intensity={theme === "light" ? 0.72 : 0.55} /><hemisphereLight args={["#e9f5ee", "#17151d", 0.8]} /><directionalLight position={[-3, 5, 5]} intensity={theme === "light" ? 2.6 : 2.2} color={theme === "light" ? "#fff2d9" : "#dfd4c5"} /><pointLight position={[0, 2.7, -4.6]} intensity={theme === "light" ? 24 : 18} distance={9} color={theme === "light" ? "#a8ffe0" : "#79f4ca"} decay={2} /><pointLight position={[1.3, 3.6, -5.1]} intensity={8} distance={6} color="#e5bd83" decay={2} /><Gateway theme={theme} hovered={hovered} onHoverChange={onHoverChange} /></>;
+  const { mode = "gateway", theme = "dark", hovered = false, onHoverChange, onGatewayToggle, onDestinationSelect, selectedDestination } = props;
+  if (mode === "gateway") return <><ambientLight intensity={theme === "light" ? 0.72 : 0.55} /><hemisphereLight args={["#e9f5ee", "#17151d", 0.8]} /><directionalLight position={[-3, 5, 5]} intensity={theme === "light" ? 2.6 : 2.2} color={theme === "light" ? "#fff2d9" : "#dfd4c5"} /><pointLight position={[0, 2.7, -4.6]} intensity={theme === "light" ? 24 : 18} distance={9} color={theme === "light" ? "#a8ffe0" : "#79f4ca"} decay={2} /><pointLight position={[1.3, 3.6, -5.1]} intensity={8} distance={6} color="#e5bd83" decay={2} /><Gateway theme={theme} hovered={hovered} onHoverChange={onHoverChange} onGatewayToggle={onGatewayToggle} /></>;
   if (mode === "journey") return <JourneyEnvironment {...props} />;
   return <><Atmosphere theme={theme} /><Water theme={theme} /><RippleLight />
     <Monument theme={theme} position={[-7.2, 2.6, -12]} size={[1.2, 5.2, 1.1]} rotation={0.12} /><Monument theme={theme} position={[7.4, 3.1, -15]} size={[1.45, 6.3, 1.2]} rotation={-0.14} />
