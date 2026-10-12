@@ -1,5 +1,11 @@
 # React + TypeScript + Vite
 
+## Cloudflare Pages
+
+The production site is built from `main` with `npm run build` and published from
+`dist`. The Vite base path defaults to `/` for the Cloudflare custom domain;
+the GitHub Pages workflow sets `GITHUB_PAGES=true` for its repository subpath.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
