@@ -4,11 +4,13 @@
 @media(max-width:680px){html{scroll-padding-top:76px}.header{min-height:70px;padding-inline:5.5%;justify-content:space-between}.menu-toggle{display:inline-flex;border:1px solid var(--line);color:var(--ink);background:transparent;padding:9px 12px;font:.68rem var(--mono);text-transform:uppercase}.nav{display:none;position:absolute;left:0;right:0;top:69px;margin:0;padding:20px 5.5% 24px;background:var(--paper);border-bottom:1px solid var(--line);flex-direction:column;gap:0}.nav.open{display:flex}.nav a{padding:14px 0;border-bottom:1px solid var(--line);font-size:.8rem}.hero{display:flex;flex-direction:column;align-items:stretch;min-height:auto;padding-block:66px 40px;gap:35px}h1{font-size:clamp(4rem,16vw,6.8rem)}.hero-meta{margin-top:42px}.portal-art{min-height:0;aspect-ratio:.98;max-height:none}.side-note{display:none}.ticker{gap:14px;padding-inline:5%;font-size:.58rem}.section{padding-block:82px}.section-head{margin-bottom:38px}.section-head h2,.about h2{font-size:clamp(3.2rem,13vw,5rem)}.project,.project-2{grid-template-columns:1fr;gap:25px;padding-block:18px 48px}.project-2 .project-image{order:0}.project-image{min-height:250px}.about-grid{grid-template-columns:1fr;gap:12px}.about-grid>div:nth-child(2){padding:0}.stamp{grid-column:1;margin-top:8px}.capabilities{grid-template-columns:1fr}.capabilities article{min-height:auto;padding:24px 0 32px}.capabilities article+article{border-left:0;border-top:1px solid var(--line);padding-left:0}.capabilities h3{margin-top:30px}.capabilities article>b{right:4px}.journey{padding-block:82px}.contact{padding-block:95px}.contact h2{font-size:clamp(4rem,17vw,7rem)}.footer{padding:25px 5.5%;flex-wrap:wrap;gap:14px 22px}.footer p{order:3;flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
-/* SIROSIU mark: replace the old cursor-like suffix with a small rotating diamond. */
-.logo { display:inline-flex; align-items:center; gap:.42rem; }
+/* SIROSIU mark: a small orbital spark that echoes the site's gateway motif. */
+.logo { display:inline-flex; align-items:center; gap:.48rem; }
 .logo span { display:none; }
-.logo::after { content:""; width:.42rem; height:.42rem; border:1px solid var(--acid); transform:rotate(45deg); box-shadow:0 0 0 3px color-mix(in srgb,var(--acid) 12%,transparent); transition:transform 220ms ease,background 220ms ease; }
-.logo:hover::after { background:var(--acid); transform:rotate(135deg) scale(1.08); }
+.logo::before { content:""; width:.3rem; height:.3rem; margin-right:-.42rem; border-radius:50%; background:var(--acid); box-shadow:0 0 10px color-mix(in srgb,var(--acid) 65%,transparent); transition:transform 240ms ease,box-shadow 240ms ease; }
+.logo::after { content:""; width:.8rem; height:.38rem; border:1px solid color-mix(in srgb,var(--acid) 75%,transparent); border-radius:50%; transform:rotate(-32deg); transition:transform 300ms cubic-bezier(.2,.8,.2,1),border-color 240ms ease; }
+.logo:hover::before { transform:scale(1.35); box-shadow:0 0 14px color-mix(in srgb,var(--acid) 80%,transparent); }
+.logo:hover::after { transform:rotate(28deg) scale(1.12); border-color:var(--acid); }
 
 
 /* Stage 05 Prototype v2: real-time 3D hero */
