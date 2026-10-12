@@ -58,7 +58,7 @@ function App() {
   return <><CustomCursor />
     <a className="skip" href="#main">Skip to content</a>
     <header className="header">
-      <a className="logo" href="#top" onClick={close}><img className="logo-mark" src="/sirosiu-threshold-mark.png" alt="" />SIROSIU</a>
+      <a className="logo" href="#top" onClick={close}>SIROSIU</a>
       <button className="menu-toggle" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}>{open ? "Close" : "Menu"}</button>
       <nav id="nav" aria-label="Main navigation" className={open ? "nav open" : "nav"}>{nav.map(([label, href]) => <a key={href} href={href} onClick={close}>{label}</a>)}</nav>
       <small className="edition">PERSONAL PORTFOLIO / 2026</small>
@@ -94,7 +94,7 @@ function App() {
 
       <section className="contact shell" id="contact"><p className="eyebrow">05 / Contact</p><h2>Let’s build<br /><em>what’s next.</em></h2><p>For collaborations, conversations, and future opportunities, connect through the public profiles below. Email: <a href="mailto:sirosiusugi@gmail.com">sirosiusugi@gmail.com</a></p><p className="contact-state">Open to collaboration.</p><div className="social-links">{socialLinks.map(([label, href]) => <a key={href} href={href} target="_blank" rel="noreferrer">{label} ↗</a>)}<a href="#contact" className="disabled" aria-disabled="true" onClick={(event) => event.preventDefault()}>Résumé in progress ↗</a></div><p className="note">The résumé link will become active when the PDF is ready.</p></section>
     </main>
-    <footer className="footer"><a className="logo" href="#top"><img className="logo-mark" src="/sirosiu-threshold-mark.png" alt="" />SIROSIU</a><p>Engineering, intelligence, and imagination.<small>Personal portfolio · 2026</small></p><a href="#top">Back to top ↑</a></footer>
+    <footer className="footer"><a className="logo" href="#top">SIROSIU</a><p>Engineering, intelligence, and imagination.<small>Personal portfolio · 2026</small></p><a href="#top">Back to top ↑</a></footer>
   </>;
 }
 

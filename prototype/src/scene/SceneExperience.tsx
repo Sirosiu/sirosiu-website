@@ -99,8 +99,8 @@ export default function SceneExperience({ theme = "dark" }: { theme?: "dark" | "
       </div>}
       {transitioningTo && <div className="destination-transition" role="status" aria-live="polite"><span>CALIBRATING COORDINATE</span><strong>{transitioningTo}</strong><i /></div>}
     </div>
-    <button type="button" className="portal-enter" onClick={phase === "destination" ? returnToGateway : beginEntry} disabled={phase === "entering" || phase === "exiting"}>{phase === "entering" ? "Crossing the threshold…" : phase === "exiting" ? "Returning…" : phase === "destination" ? "← Return to gateway" : "Enter the gateway ↗"}</button>
-    <p className="portal-status" aria-live="polite">{phase === "entering" ? "Passing through the ring." : phase === "exiting" ? "The horizon is re-forming." : phase === "destination" ? selected ? `Selected: ${selected.title}.` : hovered ? "Select a coordinate in the world." : "Click a floating coordinate or use the controls below." : hovered ? "Gateway responding — click to cross." : "Hover the gateway or use the accessible control to enter."}</p>
+    {(phase !== "idle" || hovered) && <><button type="button" className="portal-enter" onClick={phase === "destination" ? returnToGateway : beginEntry} disabled={phase === "entering" || phase === "exiting"}>{phase === "entering" ? "Crossing the threshold…" : phase === "exiting" ? "Returning…" : phase === "destination" ? "← Return to gateway" : "Enter the gateway ↗"}</button>
+    <p className="portal-status" aria-live="polite">{phase === "entering" ? "Passing through the ring." : phase === "exiting" ? "The horizon is re-forming." : phase === "destination" ? selected ? `Selected: ${selected.title}.` : hovered ? "Select a coordinate in the world." : "Click a floating coordinate or use the controls below." : "Gateway responding — click to cross."}</p></>}
   </div>;
 }
 
