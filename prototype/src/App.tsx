@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { journeyChapters } from "./content/journey";
 import SceneExperience from "./scene/SceneExperience";
 
@@ -16,7 +16,10 @@ function CustomCursor() {
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const move = (event: PointerEvent) => {
-      if (cursor.current) { cursor.current.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`; cursor.current.classList.add("is-visible"); }
+      if (cursor.current) {
+        cursor.current.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+        cursor.current.classList.add("is-visible");
+      }
     };
     const show = () => cursor.current?.classList.add("is-visible");
     const hide = () => cursor.current?.classList.remove("is-visible");
@@ -36,9 +39,21 @@ function CustomCursor() {
 function App() {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("light");
+  const themeTransitionTimer = useRef<number | null>(null);
   const close = () => setOpen(false);
 
-  useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+  useLayoutEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+
+  const switchTheme = () => {
+    const root = document.documentElement;
+    root.classList.add("theme-transitioning");
+    if (themeTransitionTimer.current !== null) window.clearTimeout(themeTransitionTimer.current);
+    setTheme((current) => current === "dark" ? "light" : "dark");
+    themeTransitionTimer.current = window.setTimeout(() => {
+      root.classList.remove("theme-transitioning");
+      themeTransitionTimer.current = null;
+    }, 520);
+  };
 
   return <><CustomCursor />
     <a className="skip" href="#main">Skip to content</a>
@@ -47,7 +62,7 @@ function App() {
       <button className="menu-toggle" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}>{open ? "Close" : "Menu"}</button>
       <nav id="nav" aria-label="Main navigation" className={open ? "nav open" : "nav"}>{nav.map(([label, href]) => <a key={href} href={href} onClick={close}>{label}</a>)}</nav>
       <small className="edition">PERSONAL PORTFOLIO / 2026</small>
-      <button className="theme-toggle" type="button" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} onClick={() => setTheme(theme === "dark" ? "light" : "dark")}><span aria-hidden="true">{theme === "dark" ? "☼" : "◐"}</span>{theme === "dark" ? "Light mode" : "Dark mode"}</button>
+      <button className="theme-toggle" type="button" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} onClick={switchTheme}><span aria-hidden="true">{theme === "dark" ? "☼" : "◐"}</span>{theme === "dark" ? "Light mode" : "Dark mode"}</button>
     </header>
 
     <main id="main">

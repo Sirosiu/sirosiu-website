@@ -12,7 +12,7 @@ const destinationCopy: Record<DestinationId, { title: string; description: strin
   journey: { title: "The journey", description: "Learning milestones and experience, distinguished carefully between current, complete, and planned." },
 };
 
-function CameraRig({ phase, reducedMotion, mode, theme, hovered, onEnter, onHoverChange, onArrival, onExitComplete, selectedDestination, onDestinationSelect, activeJourneyChapterId, onJourneyChapterSelect }: { phase: PortalPhase; reducedMotion: boolean; mode: SceneMode; theme: "dark" | "light"; hovered: boolean; onEnter: () => void; onHoverChange: (value: boolean) => void; onArrival: () => void; onExitComplete: () => void; selectedDestination: DestinationId | null; onDestinationSelect: (id: DestinationId) => void; activeJourneyChapterId: string; onJourneyChapterSelect: (id: string) => void }) {
+function CameraRig({ phase, reducedMotion, mode, theme, hovered, onEnter, onHoverChange, onGatewayToggle, onArrival, onExitComplete, selectedDestination, onDestinationSelect, activeJourneyChapterId, onJourneyChapterSelect }: { phase: PortalPhase; reducedMotion: boolean; mode: SceneMode; theme: "dark" | "light"; hovered: boolean; onEnter: () => void; onHoverChange: (value: boolean) => void; onGatewayToggle: (active: boolean) => void; onArrival: () => void; onExitComplete: () => void; selectedDestination: DestinationId | null; onDestinationSelect: (id: DestinationId) => void; activeJourneyChapterId: string; onJourneyChapterSelect: (id: string) => void }) {
   const rig = useRef<Group>(null);
   const transition = useRef({ phase, startedAt: 0, fromScale: 1, fromZ: 0, completed: false });
   useEffect(() => {
@@ -53,7 +53,7 @@ function CameraRig({ phase, reducedMotion, mode, theme, hovered, onEnter, onHove
     rig.current.position.y += ((pointer.y * motion * 0.52) - rig.current.position.y) * ease;
     rig.current.scale.x += (1 - rig.current.scale.x) * ease; rig.current.scale.y = rig.current.scale.x; rig.current.scale.z = rig.current.scale.x;
   });
-  return <group ref={rig}><WorldScene mode={mode} theme={theme} hovered={hovered} onEnter={onEnter} onHoverChange={onHoverChange} onDestinationSelect={onDestinationSelect} selectedDestination={selectedDestination} activeJourneyChapterId={activeJourneyChapterId} onJourneyChapterSelect={onJourneyChapterSelect} reducedMotion={reducedMotion} /></group>;
+  return <group ref={rig}><WorldScene mode={mode} theme={theme} hovered={hovered} onEnter={onEnter} onHoverChange={onHoverChange} onGatewayToggle={onGatewayToggle} onDestinationSelect={onDestinationSelect} selectedDestination={selectedDestination} activeJourneyChapterId={activeJourneyChapterId} onJourneyChapterSelect={onJourneyChapterSelect} reducedMotion={reducedMotion} /></group>;
 }
 
 export default function SceneExperience({ theme = "dark" }: { theme?: "dark" | "light" }) {
@@ -82,12 +82,17 @@ export default function SceneExperience({ theme = "dark" }: { theme?: "dark" | "
   const arrive = useCallback(() => setPhase((value) => value === "entering" ? "destination" : value), []);
   useEffect(() => () => { if (destinationTimer.current !== null) window.clearTimeout(destinationTimer.current); }, []);
   const returnToGateway = useCallback(() => { if (destinationTimer.current !== null) window.clearTimeout(destinationTimer.current); setTransitioningTo(null); setSelectedDestination(null); setHovered(false); setPhase("exiting"); }, []);
+  const toggleGatewayField = useCallback((active: boolean) => {
+    setHovered(active);
+    if (active && phase === "idle") setPhase("destination");
+    if (!active && phase === "destination" && selectedDestination === null) setPhase("idle");
+  }, [phase, selectedDestination]);
   const selectDestination = useCallback((id: DestinationId) => { if (destinationTimer.current !== null || selectedDestination === id) return; setTransitioningTo(id); destinationTimer.current = window.setTimeout(() => { setSelectedDestination(id); setTransitioningTo(null); destinationTimer.current = null; }, reducedMotion ? 20 : 620); }, [reducedMotion, selectedDestination]);
   const selected = selectedDestination ? destinationCopy[selectedDestination] : null;
   return <div className={`scene-shell phase-${phase} theme-${theme}${hovered ? " is-hovered" : ""}${phase === "destination" && selectedDestination === "projects" ? " project-mode" : ""}${phase === "destination" && selectedDestination === "about" ? " about-mode" : ""}${phase === "destination" && selectedDestination === "capabilities" ? " capabilities-mode" : ""}${phase === "destination" && selectedDestination === "journey" ? " journey-mode" : ""}`}>
     <div className="scene-experience">
       <Canvas camera={{ position: [0, 3.35, 8.6], fov: 43, near: 0.1, far: 60 }} onCreated={({ camera }) => camera.lookAt(0, 1.6, -5)} dpr={[1, 1.4]} gl={{ antialias: true, alpha: true, powerPreference: "default" }} fallback={<div className="scene-fallback" />}>
-        <CameraRig phase={phase} reducedMotion={reducedMotion} mode={mode} theme={theme} hovered={hovered} onEnter={beginEntry} onHoverChange={setHovered} onArrival={arrive} onExitComplete={() => setPhase((value) => value === "exiting" ? "idle" : value)} selectedDestination={selectedDestination} onDestinationSelect={selectDestination} activeJourneyChapterId={activeJourneyChapterId} onJourneyChapterSelect={setActiveJourneyChapterId} />
+        <CameraRig phase={phase} reducedMotion={reducedMotion} mode={mode} theme={theme} hovered={hovered} onEnter={beginEntry} onHoverChange={setHovered} onGatewayToggle={toggleGatewayField} onArrival={arrive} onExitComplete={() => setPhase((value) => value === "exiting" ? "idle" : value)} selectedDestination={selectedDestination} onDestinationSelect={selectDestination} activeJourneyChapterId={activeJourneyChapterId} onJourneyChapterSelect={setActiveJourneyChapterId} />
       </Canvas>
       {phase === "destination" && selectedDestination === "projects" ? <ProjectWorld onBack={() => setSelectedDestination(null)} onReturn={returnToGateway} /> : phase === "destination" && selectedDestination === "about" ? <AboutWorld onBack={() => setSelectedDestination(null)} onReturn={returnToGateway} /> : phase === "destination" && selectedDestination === "capabilities" ? <CapabilitiesWorld onBack={() => setSelectedDestination(null)} onReturn={returnToGateway} /> : phase === "destination" && selectedDestination === "journey" ? <JourneyWorld activeId={activeJourneyChapterId} onChapterSelect={(id) => { setActiveJourneyChapterId(id); window.history.replaceState(null, "", `#journey-${id}`); }} onBack={() => setSelectedDestination(null)} onReturn={returnToGateway} onProjects={() => selectDestination("projects")} /> : phase === "destination" && <div className="direction-orbit" aria-live="polite">
         <div className="direction-orbit-core" aria-hidden="true"><i /><i /><b>+</b></div>
@@ -100,7 +105,7 @@ export default function SceneExperience({ theme = "dark" }: { theme?: "dark" | "
       {transitioningTo && <div className="destination-transition" role="status" aria-live="polite"><span>CALIBRATING COORDINATE</span><strong>{transitioningTo}</strong><i /></div>}
     </div>
     <button type="button" className="portal-enter" onClick={phase === "destination" ? returnToGateway : beginEntry} disabled={phase === "entering" || phase === "exiting"}>{phase === "entering" ? "Crossing the threshold…" : phase === "exiting" ? "Returning…" : phase === "destination" ? "← Return to gateway" : "Enter the gateway ↗"}</button>
-    <p className="portal-status" aria-live="polite">{phase === "entering" ? "Passing through the ring." : phase === "exiting" ? "The horizon is re-forming." : phase === "destination" ? selected ? `Selected: ${selected.title}.` : hovered ? "Select a coordinate in the world." : "Click a floating coordinate or use the controls below." : hovered ? "Gateway responding — click to cross." : "Hover the gateway or use the accessible control to enter."}</p>
+    <p className="portal-status" aria-live="polite">{phase === "entering" ? "Passing through the ring." : phase === "exiting" ? "The horizon is re-forming." : phase === "destination" ? selected ? `Selected: ${selected.title}.` : "Select a coordinate in the world." : "Hover the gateway or use the accessible control to enter."}</p>
   </div>;
 }
 
