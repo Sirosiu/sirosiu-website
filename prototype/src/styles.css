@@ -308,6 +308,10 @@ html.theme-transitioning body * {
 .nav a { font-size:.58rem; letter-spacing:.08em; }
 .button:not(.disabled) { background:var(--ink); color:var(--paper); } .button:not(.disabled):hover { background:var(--surface-deep); }
 .about { background:var(--surface-deep); color:var(--ink); } .about .eyebrow, .about-grid>div:nth-child(2)>p:not(.about-lede), .about .note { color:var(--muted); }
+:root[data-theme="light"] .about { color:#eef5ed; }
+:root[data-theme="light"] .about .eyebrow,
+:root[data-theme="light"] .about-grid>div:nth-child(2)>p:not(.about-lede),
+:root[data-theme="light"] .about .note { color:#c8d8ca; }
 .journey { background:var(--surface); } .project-image { background:var(--surface-raised); }
 .project-2 .project-image { background-color:var(--surface-raised); background-image:linear-gradient(rgb(183 226 205 / 12%) 1px,transparent 1px),linear-gradient(90deg,rgb(183 226 205 / 12%) 1px,transparent 1px); }
 .theme-toggle { display:inline-flex; align-items:center; gap:8px; padding:8px 11px; border:1px solid var(--line); background:transparent; color:var(--ink); font:.62rem var(--mono); letter-spacing:.05em; text-transform:uppercase; cursor:pointer; white-space:nowrap; }
