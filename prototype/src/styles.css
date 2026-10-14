@@ -626,6 +626,40 @@ html.theme-transitioning body * {
   .hero .scene-shell > .portal-status { position:relative; top:clamp(-96px, calc(10vw - 222px), -30px); text-align:left; }
 }
 
+/* Keep the phone layout inside the viewport without changing the desktop composition. */
+@media (max-width:680px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .hero-copy,
+  .visual,
+  .scene-shell,
+  .scene-experience {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .hero-brand {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .hero-brand span {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+  }
+
+  .scene-experience canvas {
+    max-width: 100%;
+  }
+}
+
 @media (hover:hover) and (pointer:fine) {
   .custom-cursor {
     width:26px;
