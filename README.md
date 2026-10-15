@@ -1,81 +1,65 @@
-# React + TypeScript + Vite
+# SIROSIU
 
-## Cloudflare Pages
+**SIROSIU is a personal project exploring engineering, technology, and creative experimentation.** This repository contains the website code behind [sirosiu.com](https://sirosiu.com).
 
-The production site is built from `main` with `npm run build` and published from
-`dist`. The Vite base path defaults to `/` for the Cloudflare custom domain;
-the GitHub Pages workflow sets `GITHUB_PAGES=true` for its repository subpath.
+The site is an ongoing work in progress. Its direction brings together a distinctive digital experience, visual design, interaction, and ideas I'm exploring along the way.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Tech stack
 
-Currently, two official plugins are available:
+The current website prototype uses:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- TypeScript
+- Vite
+- Three.js
+- React Three Fiber
+- React Three Drei
 
-## React Compiler
+The repository root contains the deployment/build wrapper; the isolated website prototype lives in `prototype/`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Run the prototype locally
 
-## Expanding the ESLint configuration
+Requirements: a current Node.js LTS release and npm.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+cd prototype
+npm ci
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Vite prints the local development URL in the terminal. Open that URL in your browser.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+To create and preview a production build of the prototype:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run build
+npm run preview
 ```
+
+Run those commands from `prototype/`.
+
+## Build for deployment
+
+From the repository root:
+
+```bash
+npm install
+npm run build
+```
+
+The root build script installs the prototype dependencies, builds the prototype, and copies its output into the root `dist/` directory.
+
+For Cloudflare Pages, the repository's current build setup expects the production build to run from the `main` branch and publish the `dist` directory. Verify the project's Cloudflare Pages settings before changing hosting or DNS configuration.
+
+## Project status
+
+SIROSIU is actively evolving. Features and visual experiments should be treated as work in progress unless they are present in the current deployed version.
+
+## Links
+
+- **Live website:** https://sirosiu.com
+- **Repository:** https://github.com/Sirosiu/sirosiu-website
+
+---
+
+Built and maintained as part of the ongoing SIROSIU journey.
