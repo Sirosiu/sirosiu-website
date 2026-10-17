@@ -78,7 +78,55 @@ function App() {
         <span className="side-note">AN EXPERIMENT IN SCALE</span>
       </section>
 
-      <section className="section shell projects-state" id="projects"><div className="section-head"><p className="eyebrow">01 / Selected work</p><h2>Ideas, <em>in formation.</em></h2><p>The project archive is ready. Verified work will appear here as it takes shape.</p><a className="underlink" href="#top">Enter the archive through the gateway ↗</a></div></section>
+      <section className="section shell projects-state" id="projects">
+        <div className="section-head">
+          <p className="eyebrow">01 / Selected work</p>
+          <h2>Ideas, <em>in formation.</em></h2>
+          <p>Two ongoing builds: one explores financial security, the other the digital space behind SIROSIU.</p>
+        </div>
+        <div className="featured-project-grid">
+          <article className="featured-project-card featured-project-fraudlens">
+            <div className="featured-project-visual" aria-hidden="true">
+              <span className="featured-project-index">01 / SYSTEMS</span>
+              <div className="fraudlens-visual">
+                <span className="fraudlens-orbit fraudlens-orbit-one"></span>
+                <span className="fraudlens-orbit fraudlens-orbit-two"></span>
+                <span className="fraudlens-core">F</span>
+                <span className="fraudlens-node fraudlens-node-one"></span>
+                <span className="fraudlens-node fraudlens-node-two"></span>
+                <span className="fraudlens-node fraudlens-node-three"></span>
+              </div>
+              <span className="featured-project-caption">SIMULATED STREAM <i>→</i> ALERT REVIEW</span>
+            </div>
+            <div className="featured-project-copy">
+              <p className="eyebrow">FULL-STACK PROTOTYPE</p>
+              <h3>FraudLens</h3>
+              <p>A fraud-monitoring prototype that scores simulated card transactions with XGBoost, then routes alerts through FastAPI and WebSockets to an analyst dashboard.</p>
+              <ul className="featured-project-tags" aria-label="Technologies"><li>XGBoost</li><li>FastAPI</li><li>WebSockets</li><li>SQLite</li><li>Next.js</li></ul>
+              <a className="underlink featured-project-link" href="https://github.com/Sirosiu/Fraudlens" target="_blank" rel="noreferrer">View GitHub repository ↗</a>
+            </div>
+          </article>
+          <article className="featured-project-card featured-project-site">
+            <div className="featured-project-visual" aria-hidden="true">
+              <span className="featured-project-index">02 / PERSONAL SPACE</span>
+              <div className="sirosiu-visual">
+                <span className="sirosiu-visual-frame"></span>
+                <span className="sirosiu-visual-orbit"></span>
+                <span className="sirosiu-visual-word">SIROSIU</span>
+                <span className="sirosiu-visual-coordinate">BUILDING WHAT COMES NEXT</span>
+              </div>
+              <span className="featured-project-caption">ENGINEERING <i>·</i> CURIOSITY <i>·</i> DESIGN</span>
+            </div>
+            <div className="featured-project-copy">
+              <p className="eyebrow">PERSONAL WEBSITE · IN PROGRESS</p>
+              <h3>SIROSIU</h3>
+              <p>An evolving personal website for engineering, interactive design, and curiosity-led exploration—built as a distinct digital home for the SIROSIU identity.</p>
+              <ul className="featured-project-tags" aria-label="Technologies"><li>React</li><li>TypeScript</li><li>Vite</li><li>Three.js</li></ul>
+              <a className="underlink featured-project-link" href="https://github.com/Sirosiu/sirosiu-website" target="_blank" rel="noreferrer">View GitHub repository ↗</a>
+            </div>
+          </article>
+        </div>
+      </section>
 
       <section className="about" id="about"><div className="shell about-grid"><div><p className="eyebrow">02 / About</p><h2>A mind<br />in <em>motion.</em></h2><img className="portrait-cutout" src="/sirosiu-portrait-previous.png" alt="Ankush holding a small puppet outdoors" /></div><div><p className="about-lede">Curiosity first. Engineering follows.</p><p>I'm an Electronics and Communication Engineering student driven by curiosity, creativity, and the desire to understand how things work. I enjoy exploring ideas, learning new skills, and turning concepts into real projects. Through SIROSIU, I'm building my own space to experiment, grow, and create things that reflect how I think.</p><p>Beyond technology, I'm interested in human behavior, neuroscience, memory, personal development, new places, trekking, music, and questions as large as dark matter. I'm drawn to anything that expands my perspective, builds discipline, or helps me understand the world a little better.</p><p className="note">Ankush · Electronics and Communication Engineering student</p></div><div className="stamp" aria-hidden="true"><b>S</b><small>STAY<br />CURIOUS</small></div></div></section>
 
