@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Canvas, useFrame } from "@react-three/fiber";
 import type { Group } from "three";
@@ -149,40 +149,15 @@ export function ProjectWorld({ onBack, onReturn, standalone = false }: { onBack:
     { number: "02", title: "SIROSIU Website", detail: "An evolving personal portfolio for engineering, curiosity, and creative technology, including an immersive 3D gateway and project archive.", accent: "PERSONAL PLATFORM / 02", status: "ONGOING", tools: "React · TypeScript · Vite · Three.js", repository: "https://github.com/Sirosiu/sirosiu-website" },
   ];
   const [activeProject, setActiveProject] = useState<number | null>(null);
-  const [archiveScroll, setArchiveScroll] = useState(0);
-  const [dragRotation, setDragRotation] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const [compactViewport, setCompactViewport] = useState(() => window.matchMedia("(max-width: 680px)").matches);
-  const dragStart = useRef<number | null>(null);
-  const dragMoved = useRef(false);
   const active = activeProject === null ? null : projects[activeProject];
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 680px)");
-    const update = () => setCompactViewport(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
-  const beginCardDrag = (event: PointerEvent<HTMLElement>) => {
-    dragStart.current = event.clientX;
-    dragMoved.current = false;
-    setDragging(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-  const moveCardDrag = (event: PointerEvent<HTMLElement>) => {
-    if (dragStart.current === null) return;
-    const distance = event.clientX - dragStart.current;
-    if (Math.abs(distance) > 4) dragMoved.current = true;
-    setDragRotation(Math.max(-18, Math.min(18, distance / 5)));
-  };
-  const endCardDrag = () => {
-    dragStart.current = null;
-    setDragging(false);
-  };
-  return <section className="project-world" data-lenis-prevent aria-labelledby="project-world-title" onScroll={(event) => setArchiveScroll(event.currentTarget.scrollTop)}>
+  return <section className="project-world" data-lenis-prevent aria-labelledby="project-world-title">
     <div className="project-world-sky" aria-hidden="true"><span/><span/><span/></div>
-    <header className="project-world-header"><div><p className="world-kicker">SIROSIU / PROJECT ARCHIVE</p><h2 id="project-world-title">Work in<br/><em>formation.</em></h2><p className="project-world-intro">Two real builds, still taking shape. Drag the forms to explore; select one for its details and source.</p></div><button type="button" className="project-skip" onClick={() => document.getElementById("project-cards")?.scrollIntoView({ behavior: "smooth", block: "center" })}>Skip to project cards ↓</button></header>
-    <div className="project-monoliths" id="project-cards" aria-label="Interactive project cards">{projects.map((project, index) => { const tilt = compactViewport ? 0 : Math.max(-18, Math.min(18, (index - 0.5) * 10 - archiveScroll / 40 + dragRotation)); const openProject = () => { if (dragMoved.current) { dragMoved.current = false; return; } setActiveProject(index); }; return <article className={`project-monolith project-card${dragging ? " is-dragging" : ""}`} key={project.number} tabIndex={0} role="button" aria-label={`Open ${project.title} details`} onPointerDown={beginCardDrag} onPointerMove={moveCardDrag} onPointerUp={endCardDrag} onPointerCancel={endCardDrag} onClick={openProject} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openProject(); } }} style={{ transform: compactViewport ? "none" : `perspective(900px) rotateY(${tilt}deg) rotateX(${dragRotation / 3}deg)` }}><span>{project.number}</span><b>{project.accent}</b><div className="project-monolith-copy"><strong>{project.title}</strong><small>{project.status}</small><p>{project.detail}</p><em>{project.tools}</em></div><span className="project-card-open" aria-hidden="true">↗</span></article>; })}</div>
+    <header className="project-world-header"><div><p className="world-kicker">SIROSIU / PROJECT ARCHIVE</p><h2 id="project-world-title">Work in<br/><em>formation.</em></h2><p className="project-world-intro">Two real builds, still taking shape. Choose a project to see what it does and explore its source.</p></div></header>
+    <div className="project-list" aria-label="Selected projects">{projects.map((project, index) => <button type="button" className="project-entry" key={project.number} onClick={() => setActiveProject(index)} aria-label={`Open ${project.title} details`}>
+      <span className="project-entry-index">{project.number}<small>{project.accent}</small></span>
+      <span className="project-entry-copy"><strong>{project.title}</strong><span>{project.detail}</span><small>{project.tools}</small></span>
+      <span className="project-entry-status">{project.status}<i aria-hidden="true">↗</i></span>
+    </button>)}</div>
     {active && <div className="project-detail" role="dialog" aria-modal="true" aria-labelledby="project-detail-title"><button type="button" className="project-detail-close" onClick={() => setActiveProject(null)}>Close ×</button><p className="world-kicker">{active.accent} · {active.status}</p><h3 id="project-detail-title">{active.title}</h3><p>{active.detail}</p><div className="project-detail-meta"><span>TOOLS</span><b>{active.tools}</b><span>STATUS</span><b>{active.status}</b></div><a className="project-detail-repository" href={active.repository} target="_blank" rel="noreferrer">Open GitHub repository ↗</a></div>}
     <footer className="project-world-controls"><button type="button" onClick={onBack}>{standalone ? "Close archive ×" : "← Back to coordinates"}</button>{!standalone && <button type="button" onClick={onReturn}>Return to gateway ↗</button>}</footer>
   </section>;
