@@ -11,9 +11,28 @@ const navigation = [
 ]
 
 const projects = [
-  { number: '01', status: 'PROJECT DETAILS TO BE ADDED' },
-  { number: '02', status: 'PROJECT DETAILS TO BE ADDED' },
-  { number: '03', status: 'PROJECT DETAILS TO BE ADDED' },
+  {
+    number: '01',
+    status: 'FULL-STACK PROTOTYPE',
+    title: 'FraudLens',
+    description:
+      'A fraud-monitoring prototype that scores simulated card transactions with XGBoost, then routes alerts through FastAPI and WebSockets to an analyst dashboard.',
+    technologies: ['XGBoost', 'FastAPI', 'WebSockets', 'SQLite', 'Next.js'],
+    repository: 'https://github.com/Sirosiu/Fraudlens',
+    visual: 'fraudlens',
+    caption: 'SIMULATED STREAM / ALERT REVIEW',
+  },
+  {
+    number: '02',
+    status: 'PERSONAL WEBSITE / IN PROGRESS',
+    title: 'SIROSIU',
+    description:
+      'An evolving personal website for engineering, interactive design, and curiosity-led exploration—a digital home for the SIROSIU identity.',
+    technologies: ['React', 'TypeScript', 'Vite', 'Three.js'],
+    repository: 'https://github.com/Sirosiu/sirosiu-website',
+    visual: 'sirosiu',
+    caption: 'ENGINEERING / CURIOSITY / DESIGN',
+  },
 ]
 
 function App() {
@@ -119,33 +138,41 @@ function App() {
             <h2>Ideas into <span>form.</span></h2>
           </div>
           <p className="section-intro">
-            Projects will live here — with the thinking, decisions, and evidence
-            behind each one.
+            Two ongoing builds: one explores financial security, the other the
+            digital space behind SIROSIU.
           </p>
         </div>
 
         <div className="project-grid">
           {projects.map((project) => (
             <article className="project-card" key={project.number}>
-              <div className={`project-visual project-visual-${project.number}`}>
+              <div className={`project-visual project-visual-${project.visual}`} aria-hidden="true">
                 <span className="project-index">S / {project.number}</span>
-                <div className="project-placeholder-mark" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
+                <div className={`project-art project-art-${project.visual}`}>
+                  <span className="project-art-orbit project-art-orbit-one" />
+                  <span className="project-art-orbit project-art-orbit-two" />
+                  <span className="project-art-core">{project.visual === 'fraudlens' ? 'F' : 'S'}</span>
+                  <span className="project-art-node project-art-node-one" />
+                  <span className="project-art-node project-art-node-two" />
                 </div>
-                <span className="project-visual-caption">WORK IN PROGRESS</span>
+                <span className="project-visual-caption">{project.caption}</span>
               </div>
               <div className="project-meta">
                 <div>
                   <p className="project-status">{project.status}</p>
-                  <h3>Title to be added</h3>
+                  <h3>{project.title}</h3>
                 </div>
                 <span className="project-arrow" aria-hidden="true">↗</span>
               </div>
-              <p className="project-note">
-                Placeholder — replace with a verified project and its outcomes.
-              </p>
+              <p className="project-note">{project.description}</p>
+              <ul className="project-technologies" aria-label={`${project.title} technologies`}>
+                {project.technologies.map((technology) => (
+                  <li key={technology}>{technology}</li>
+                ))}
+              </ul>
+              <a className="project-repository" href={project.repository} target="_blank" rel="noreferrer">
+                View GitHub repository <span aria-hidden="true">↗</span>
+              </a>
             </article>
           ))}
         </div>
