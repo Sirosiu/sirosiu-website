@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useLayoutEffect, useState } from "react";
 import Lenis from "lenis";
 import { journeyChapters } from "./content/journey";
 
-const LandscapeHero = lazy(() => import("./scene/LandscapeHero"));
+const SceneExperience = lazy(() => import("./scene/SceneExperience"));
 const ProjectWorld = lazy(() => import("./scene/SceneExperience").then((module) => ({ default: module.ProjectWorld })));
 
 const navigation = [
@@ -96,20 +96,16 @@ function App() {
     </header>
 
     <main id="main">
-      <section className="hero" id="top" aria-labelledby="hero-title">
-        <Suspense fallback={<div className="hero-world-fallback" aria-hidden="true" />}><LandscapeHero /></Suspense>
-        <div className="hero-shade" aria-hidden="true" />
-        <div className="hero-content">
-          <p className="hero-intro"><span className="intro-pulse" aria-hidden="true" /> An independent space for curiosity</p>
-          <p className="hero-hello">Hello, I’m</p>
-          <h1 id="hero-title">SIROSIU<span>.</span></h1>
-          <p className="hero-line">Curiosity has a world<br />of its <em>own.</em></p>
-          <p className="hero-description">Building what comes next. Exploring engineering, intelligent systems, and ideas that make me look closer.</p>
-          <div className="hero-actions"><a className="button button-light" href="#about">Meet Ankush <span aria-hidden="true">↘</span></a><a className="text-link text-link-light" href="#journey">Follow the curiosity <span aria-hidden="true">↓</span></a></div>
-          <div className="hero-bottom"><span>ECE STUDENT · INDEPENDENT BUILDER</span><span>01 / A WORLD STILL TAKING SHAPE</span></div>
+      <section className="hero hero-original" id="top" aria-labelledby="hero-title">
+        <div className="hero-copy">
+          <p className="eyebrow hero-brand"><i aria-hidden="true" /><strong>SIROSIU</strong><span>INDEPENDENT BUILDER · ECE STUDENT · CURIOUS BY DESIGN</span></p>
+          <h1 id="hero-title">Too curious<br />to stay <em>still.</em></h1>
+          <p className="intro">Building what comes next. SIROSIU is a personal space for exploration, engineering, and building ideas into reality.</p>
+          <div className="actions"><a className="button" href="#projects">Enter the archive <span aria-hidden="true">↘</span></a><a className="underlink" href="#about">Meet the person →</a></div>
+          <div className="hero-meta"><span>01 — SIROSIU</span><span>BUILDING WHAT COMES NEXT ↓</span></div>
         </div>
-        <a className="scroll-cue" href="#projects" aria-label="Scroll to the work section"><span>Scroll to explore</span><i aria-hidden="true" /></a>
-        <p className="environment-credit">SUNSET FOREST ENVIRONMENT · POLY HAVEN / CC0</p>
+        <div className="visual"><Suspense fallback={<div className="scene-fallback" aria-hidden="true" />}><SceneExperience theme={theme} /></Suspense><p className="caption">FIG. 01 / An opening into the unknown</p></div>
+        <span className="side-note">AN EXPERIMENT IN SCALE</span>
       </section>
 
       <section className="projects section-shell" id="projects" aria-labelledby="projects-title">
