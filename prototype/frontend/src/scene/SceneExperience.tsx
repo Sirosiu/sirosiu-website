@@ -152,9 +152,17 @@ export function ProjectWorld({ onBack, onReturn, standalone = false }: { onBack:
   const [archiveScroll, setArchiveScroll] = useState(0);
   const [dragRotation, setDragRotation] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [compactViewport, setCompactViewport] = useState(() => window.matchMedia("(max-width: 680px)").matches);
   const dragStart = useRef<number | null>(null);
   const dragMoved = useRef(false);
   const active = activeProject === null ? null : projects[activeProject];
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 680px)");
+    const update = () => setCompactViewport(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   const beginCardDrag = (event: PointerEvent<HTMLElement>) => {
     dragStart.current = event.clientX;
     dragMoved.current = false;
@@ -174,7 +182,7 @@ export function ProjectWorld({ onBack, onReturn, standalone = false }: { onBack:
   return <section className="project-world" data-lenis-prevent aria-labelledby="project-world-title" onScroll={(event) => setArchiveScroll(event.currentTarget.scrollTop)}>
     <div className="project-world-sky" aria-hidden="true"><span/><span/><span/></div>
     <header className="project-world-header"><div><p className="world-kicker">SIROSIU / PROJECT ARCHIVE</p><h2 id="project-world-title">Work in<br/><em>formation.</em></h2><p className="project-world-intro">Two real builds, still taking shape. Drag the forms to explore; select one for its details and source.</p></div><button type="button" className="project-skip" onClick={() => document.getElementById("project-cards")?.scrollIntoView({ behavior: "smooth", block: "center" })}>Skip to project cards ↓</button></header>
-    <div className="project-monoliths" id="project-cards" aria-label="Interactive project cards">{projects.map((project, index) => { const tilt = Math.max(-18, Math.min(18, (index - 0.5) * 10 - archiveScroll / 40 + dragRotation)); const openProject = () => { if (dragMoved.current) { dragMoved.current = false; return; } setActiveProject(index); }; return <article className={`project-monolith project-card${dragging ? " is-dragging" : ""}`} key={project.number} tabIndex={0} role="button" aria-label={`Open ${project.title} details`} onPointerDown={beginCardDrag} onPointerMove={moveCardDrag} onPointerUp={endCardDrag} onPointerCancel={endCardDrag} onClick={openProject} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openProject(); } }} style={{ transform: `perspective(900px) rotateY(${tilt}deg) rotateX(${dragRotation / 3}deg)` }}><span>{project.number}</span><b>{project.accent}</b><div className="project-monolith-copy"><strong>{project.title}</strong><small>{project.status}</small><p>{project.detail}</p><em>{project.tools}</em></div><span className="project-card-open" aria-hidden="true">↗</span></article>; })}</div>
+    <div className="project-monoliths" id="project-cards" aria-label="Interactive project cards">{projects.map((project, index) => { const tilt = compactViewport ? 0 : Math.max(-18, Math.min(18, (index - 0.5) * 10 - archiveScroll / 40 + dragRotation)); const openProject = () => { if (dragMoved.current) { dragMoved.current = false; return; } setActiveProject(index); }; return <article className={`project-monolith project-card${dragging ? " is-dragging" : ""}`} key={project.number} tabIndex={0} role="button" aria-label={`Open ${project.title} details`} onPointerDown={beginCardDrag} onPointerMove={moveCardDrag} onPointerUp={endCardDrag} onPointerCancel={endCardDrag} onClick={openProject} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openProject(); } }} style={{ transform: compactViewport ? "none" : `perspective(900px) rotateY(${tilt}deg) rotateX(${dragRotation / 3}deg)` }}><span>{project.number}</span><b>{project.accent}</b><div className="project-monolith-copy"><strong>{project.title}</strong><small>{project.status}</small><p>{project.detail}</p><em>{project.tools}</em></div><span className="project-card-open" aria-hidden="true">↗</span></article>; })}</div>
     {active && <div className="project-detail" role="dialog" aria-modal="true" aria-labelledby="project-detail-title"><button type="button" className="project-detail-close" onClick={() => setActiveProject(null)}>Close ×</button><p className="world-kicker">{active.accent} · {active.status}</p><h3 id="project-detail-title">{active.title}</h3><p>{active.detail}</p><div className="project-detail-meta"><span>TOOLS</span><b>{active.tools}</b><span>STATUS</span><b>{active.status}</b></div><a className="project-detail-repository" href={active.repository} target="_blank" rel="noreferrer">Open GitHub repository ↗</a></div>}
     <footer className="project-world-controls"><button type="button" onClick={onBack}>{standalone ? "Close archive ×" : "← Back to coordinates"}</button>{!standalone && <button type="button" onClick={onReturn}>Return to gateway ↗</button>}</footer>
   </section>;

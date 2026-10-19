@@ -127,6 +127,7 @@ h2 em { color: var(--accent); }
 .project-monolith.project-card>span:first-child, .project-monolith.project-card>b { position: absolute; z-index: 2; left: clamp(20px, 3vw, 36px); color: #f2c4a2; font: .53rem var(--mono); letter-spacing: .1em; }
 .project-monolith.project-card>span:first-child { top: clamp(20px, 3vw, 36px); }
 .project-monolith.project-card>b { top: auto; bottom: clamp(20px, 3vw, 36px); writing-mode: vertical-rl; }
+.project-monolith.project-card>b { top:clamp(20px,3vw,36px); right:clamp(70px,8vw,92px); bottom:auto; left:auto; max-width:58%; writing-mode:horizontal-tb; text-align:right; }
 .project-monolith-copy { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 13px; max-width: 440px; pointer-events: none; }
 .project-monolith-copy strong { font-size: clamp(1.8rem, 4vw, 3.5rem); line-height: .98; letter-spacing: -.065em; }
 .project-monolith-copy small { color: #f0bd9c; font: .53rem var(--mono); letter-spacing: .1em; }
@@ -144,7 +145,7 @@ h2 em { color: var(--accent); }
 .project-detail-meta b { color: #f3e9dd; font-size: .73rem; font-weight: 500; line-height: 1.6; }
 .project-detail-repository { position: relative; display: inline-flex; gap: 12px; padding-bottom: 5px; border-bottom: 1px solid rgb(240 167 125 / 55%); color: #f2c4a2; font-size: .8rem; text-decoration: none; }
 @keyframes archive-overlay-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes archive-world-in { from { opacity: 0; transform: scale(1.025); } to { opacity: 1; transform: scale(1); } }
+@keyframes archive-world-in { from { transform: scale(1.025); } to { transform: scale(1); } }
 @keyframes archive-detail-in { from { opacity: 0; transform: translate(-50%, -46%) scale(.97); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 
 .about { padding-top: 0; padding-bottom: clamp(95px, 14vw, 180px); background: var(--paper-soft); }
@@ -256,11 +257,16 @@ h2 em { color: var(--accent); }
   .projects { padding-bottom: 82px; }
   .projects-grid { grid-template-columns: 1fr; gap: 27px; padding: 54px 0 40px; }
   .project-archive-overlay { z-index: 90; }
-  .project-world-header { min-height: 350px; padding: 24px 6% 30px; }
+  .project-world-header { min-height: 0; gap: 22px; padding: 24px 6% 30px; }
   .project-world-header h2 { font-size: clamp(3.2rem, 15vw, 5rem); }
   .project-world-intro { max-width: 360px; font-size: .8rem; }
   .project-monoliths { grid-template-columns: 1fr; gap: 22px; margin: 0 auto 38px; padding-inline: 6%; perspective: 900px; }
   .project-monolith.project-card, .project-monolith.project-card:nth-child(2) { min-height: 330px; margin-top: 0; }
+  .project-monolith.project-card>b { top:24px; right:68px; left:auto; max-width:58%; font-size:.45rem; }
+  .project-monolith-copy { max-width:100%; gap:10px; }
+  .project-monolith-copy strong { font-size:clamp(1.7rem,8vw,2.6rem); }
+  .project-monolith-copy p { font-size:.82rem; }
+  .project-monolith-copy em { overflow-wrap:anywhere; }
   .project-world-controls { padding: 0 6% 24px; }
   .project-world-controls button { min-height: 42px; }
   h2 { font-size: clamp(2.75rem, 12vw, 4.3rem); }
@@ -355,7 +361,7 @@ h2 em { color: var(--accent); }
 .hero-original .destination-transition span { color:var(--muted); font:.52rem var(--mono); letter-spacing:.15em; }
 .hero-original .destination-transition strong { font:italic clamp(1.8rem,4vw,3rem) var(--serif); text-transform:capitalize; }
 .hero-original .destination-transition i { width:32px; height:32px; border:1px solid var(--accent); border-right-color:transparent; border-radius:50%; animation:coordinate-spin 900ms linear infinite; }
-.scene-destination-overlay { position:fixed; z-index:120; inset:0; overflow:auto; overscroll-behavior:contain; color:#f1eee7; background:#101615; animation:destination-page-in 520ms cubic-bezier(.2,.75,.2,1) both; }
+.scene-destination-overlay { position:fixed; z-index:120; inset:0; overflow:auto; overscroll-behavior:contain; color:#f1eee7; background:#101615; }
 .scene-destination-overlay .project-world { position:absolute; }
 .scene-destination-overlay .destination-world,.scene-destination-overlay .about-world,.scene-destination-overlay .journey-world { position:relative; min-height:100%; overflow:auto; padding:clamp(34px,7vw,92px) max(6vw,calc((100vw - 1180px)/2)) 38px; color:#f0eee7; background:radial-gradient(ellipse at 80% 5%,rgb(159 116 77 / 22%),transparent 38%),linear-gradient(145deg,#17201d,#101514 62%,#171b1c); }
 .scene-destination-overlay .destination-world header,.scene-destination-overlay .about-world-header,.scene-destination-overlay .journey-world-header { position:relative; z-index:1; max-width:780px; margin-bottom:clamp(32px,6vw,72px); }
