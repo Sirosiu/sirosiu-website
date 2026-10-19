@@ -21,12 +21,12 @@ const socials = [
 
 function SmoothScroll() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const lenis = new Lenis({
       autoRaf: true,
       anchors: true,
       smoothWheel: true,
       syncTouch: false,
+      stopInertiaOnNavigate: true,
     });
     return () => lenis.destroy();
   }, []);
