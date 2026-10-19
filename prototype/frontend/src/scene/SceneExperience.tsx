@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { createPortal } from "react-dom";
 import { Canvas, useFrame } from "@react-three/fiber";
 import type { Group } from "three";
 import { journeyChapters, journeyIntroduction } from "../content/journey";
@@ -94,9 +95,9 @@ export default function SceneExperience({ theme = "dark" }: { theme?: "dark" | "
       <Canvas camera={{ position: [0, 3.35, 8.6], fov: 43, near: 0.1, far: 60 }} onCreated={({ camera }) => camera.lookAt(0, 1.6, -5)} dpr={[1, 1.4]} gl={{ antialias: true, alpha: true, powerPreference: "default" }} fallback={<div className="scene-fallback" />}>
         <CameraRig phase={phase} reducedMotion={reducedMotion} mode={mode} theme={theme} hovered={hovered} onEnter={beginEntry} onHoverChange={setHovered} onGatewayToggle={toggleGatewayField} onArrival={arrive} onExitComplete={() => setPhase((value) => value === "exiting" ? "idle" : value)} selectedDestination={selectedDestination} onDestinationSelect={selectDestination} activeJourneyChapterId={activeJourneyChapterId} onJourneyChapterSelect={setActiveJourneyChapterId} />
       </Canvas>
-      {phase === "destination" && selectedDestination ? <div className="scene-destination-overlay" key={selectedDestination}>
+      {phase === "destination" && selectedDestination ? createPortal(<div className="scene-destination-overlay" key={selectedDestination}>
         {selectedDestination === "projects" ? <ProjectWorld onBack={() => setSelectedDestination(null)} onReturn={returnToGateway} /> : selectedDestination === "about" ? <AboutWorld onBack={() => setSelectedDestination(null)} onReturn={returnToGateway} /> : selectedDestination === "capabilities" ? <CapabilitiesWorld onBack={() => setSelectedDestination(null)} onReturn={returnToGateway} /> : <JourneyWorld activeId={activeJourneyChapterId} onChapterSelect={(id) => { setActiveJourneyChapterId(id); window.history.replaceState(null, "", `#journey-${id}`); }} onBack={() => setSelectedDestination(null)} onReturn={returnToGateway} onProjects={() => selectDestination("projects")} />}
-      </div> : phase === "destination" && <div className="direction-orbit" aria-live="polite">
+      </div>, document.body) : phase === "destination" && <div className="direction-orbit" aria-live="polite">
         <div className="direction-orbit-core" aria-hidden="true"><i /><i /><b>+</b></div>
         <p className="direction-orbit-label">SIROSIU / INNER COORDINATES</p>
         <div role="list" aria-label="Portfolio destinations">

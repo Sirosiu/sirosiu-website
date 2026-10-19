@@ -355,8 +355,8 @@ h2 em { color: var(--accent); }
 .hero-original .destination-transition span { color:var(--muted); font:.52rem var(--mono); letter-spacing:.15em; }
 .hero-original .destination-transition strong { font:italic clamp(1.8rem,4vw,3rem) var(--serif); text-transform:capitalize; }
 .hero-original .destination-transition i { width:32px; height:32px; border:1px solid var(--accent); border-right-color:transparent; border-radius:50%; animation:coordinate-spin 900ms linear infinite; }
-.scene-destination-overlay { position:fixed; z-index:90; inset:0; overflow:auto; overscroll-behavior:contain; color:#f1eee7; background:#101615; animation:destination-page-in 520ms cubic-bezier(.2,.75,.2,1) both; }
-.scene-destination-overlay .project-world { position:fixed; }
+.scene-destination-overlay { position:fixed; z-index:120; inset:0; overflow:auto; overscroll-behavior:contain; color:#f1eee7; background:#101615; animation:destination-page-in 520ms cubic-bezier(.2,.75,.2,1) both; }
+.scene-destination-overlay .project-world { position:absolute; }
 .scene-destination-overlay .destination-world,.scene-destination-overlay .about-world,.scene-destination-overlay .journey-world { position:relative; min-height:100%; overflow:auto; padding:clamp(34px,7vw,92px) max(6vw,calc((100vw - 1180px)/2)) 38px; color:#f0eee7; background:radial-gradient(ellipse at 80% 5%,rgb(159 116 77 / 22%),transparent 38%),linear-gradient(145deg,#17201d,#101514 62%,#171b1c); }
 .scene-destination-overlay .destination-world header,.scene-destination-overlay .about-world-header,.scene-destination-overlay .journey-world-header { position:relative; z-index:1; max-width:780px; margin-bottom:clamp(32px,6vw,72px); }
 .scene-destination-overlay .destination-world h2,.scene-destination-overlay .about-world h2,.scene-destination-overlay .journey-world h2 { color:#f0eee7; font-size:clamp(3rem,8vw,7.5rem); line-height:.92; }
