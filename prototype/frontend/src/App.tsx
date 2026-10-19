@@ -3,9 +3,10 @@ import Lenis from "lenis";
 import { journeyChapters } from "./content/journey";
 
 const LandscapeHero = lazy(() => import("./scene/LandscapeHero"));
+const ProjectWorld = lazy(() => import("./scene/SceneExperience").then((module) => ({ default: module.ProjectWorld })));
 
 const navigation = [
-  ["Work", "#projects"],
+  ["Projects", "#projects"],
   ["About", "#about"],
   ["Capabilities", "#capabilities"],
   ["Journey", "#journey"],
@@ -56,6 +57,7 @@ function CustomCursor() {
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -63,11 +65,21 @@ function App() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        setArchiveOpen(false);
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (!archiveOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [archiveOpen]);
 
   return <>
     <SmoothScroll />
@@ -104,19 +116,9 @@ function App() {
         <div className="section-index"><span>01</span><span>Selected work</span></div>
         <div className="projects-grid">
           <div><p className="eyebrow">The work archive</p><h2 id="projects-title">Ideas, made<br /><em>tangible.</em></h2></div>
-          <div className="projects-note"><p>A couple of things I’m building: one explores fraud detection workflows; the other is the evolving home of SIROSIU.</p><a className="text-link" href="https://github.com/Sirosiu" target="_blank" rel="noreferrer">Explore my GitHub <span aria-hidden="true">↗</span></a></div>
+          <div className="projects-note"><p>Two builds are taking shape inside the interactive archive. Open a project to explore its details and source.</p><button className="button button-archive" type="button" aria-haspopup="dialog" aria-expanded={archiveOpen} onClick={() => setArchiveOpen(true)}>Enter the project archive <span aria-hidden="true">↗</span></button></div>
         </div>
-        <div className="project-cards">
-          <article className="project-card project-card-fraud">
-            <div className="project-card-art" aria-hidden="true"><span className="fraud-orbit fraud-orbit-one" /><span className="fraud-orbit fraud-orbit-two" /><span className="fraud-core">F</span><span className="fraud-signal">SIGNAL / ANALYSIS</span></div>
-            <div className="project-card-copy"><div className="project-card-meta"><span>01 / APPLICATION</span><span>IN DEVELOPMENT</span></div><h3>FraudLens</h3><p>A fraud-monitoring prototype combining a simulated transaction stream, a machine-learning classifier, and an alert-review dashboard.</p><div className="project-tags"><span>Next.js</span><span>FastAPI</span><span>XGBoost</span><span>SQLite</span></div><a href="https://github.com/Sirosiu/Fraudlens" target="_blank" rel="noreferrer" aria-label="View FraudLens on GitHub">View repository <span aria-hidden="true">↗</span></a></div>
-          </article>
-          <article className="project-card project-card-site">
-            <div className="project-card-art" aria-hidden="true"><span className="site-window"><i /><i /><i /><b /><b /><b /></span><span className="site-coordinate">SIROSIU / 01</span></div>
-            <div className="project-card-copy"><div className="project-card-meta"><span>02 / PERSONAL PLATFORM</span><span>ONGOING</span></div><h3>SIROSIU Website</h3><p>A personal portfolio shaped around engineering, curiosity, and an evolving creative direction—with an immersive 3D landscape.</p><div className="project-tags"><span>React</span><span>TypeScript</span><span>Three.js</span><span>Vite</span></div><a href="https://github.com/Sirosiu/sirosiu-website" target="_blank" rel="noreferrer" aria-label="View the SIROSIU website source on GitHub">View repository <span aria-hidden="true">↗</span></a></div>
-          </article>
-        </div>
-        <div className="archive-rule"><span>PROJECT ARCHIVE</span><span>2 BUILDS · STILL IN MOTION</span></div>
+        <div className="archive-rule"><span>PROJECT ARCHIVE</span><span>INTERACTIVE · OPEN TO EXPLORE</span></div>
       </section>
 
       <section className="about section-shell" id="about" aria-labelledby="about-title">
@@ -154,6 +156,12 @@ function App() {
         </div>
       </section>
     </main>
+
+    {archiveOpen && <div className="project-archive-overlay" role="dialog" aria-modal="true" aria-label="Interactive project archive">
+      <Suspense fallback={<div className="project-archive-loading">Opening the archive…</div>}>
+        <ProjectWorld standalone onBack={() => setArchiveOpen(false)} onReturn={() => setArchiveOpen(false)} />
+      </Suspense>
+    </div>}
 
     <footer className="site-footer"><a className="wordmark" href="#top">SIROSIU</a><p>Building what comes next.<span>© 2026 SIROSIU · A personal portfolio by Ankush</span></p><a className="back-top" href="#top">Back to the beginning ↑</a></footer>
   </>;
