@@ -140,13 +140,10 @@ function JourneyWorld({ activeId, onChapterSelect, onBack, onReturn, onProjects 
   </section>;
 }
 
-function ProjectWorld({ onBack, onReturn }: { onBack: () => void; onReturn: () => void }) {
-  // Keep the future project data editable without exposing placeholder work publicly.
-  const showProjectPlaceholders = false;
+export function ProjectWorld({ onBack, onReturn, standalone = false }: { onBack: () => void; onReturn: () => void; standalone?: boolean }) {
   const projects = [
-    { number: "01", title: "Gateway study", detail: "A realtime portal environment exploring scale, atmosphere, reflective water, and cinematic transition.", accent: "EXPERIMENT / 01", status: "IN PROGRESS", tools: "React · Three.js · R3F" },
-    { number: "02", title: "Project placeholder", detail: "A verified project will appear here with its purpose, role, process, and evidence of the result.", accent: "ARCHIVE / 02", status: "DETAILS TO ADD", tools: "Tools · Role · Outcome" },
-    { number: "03", title: "Future project placeholder", detail: "This monolith is ready for the next real project when it exists. No achievement is being invented.", accent: "RESERVED / 03", status: "RESERVED", tools: "Coming later" },
+    { number: "01", title: "FraudLens", detail: "A fraud-monitoring prototype that analyzes a simulated transaction stream with an XGBoost classifier and routes flagged activity into an alert-review workflow.", accent: "FRAUD DETECTION / PROTOTYPE", status: "IN DEVELOPMENT", tools: "Next.js · TypeScript · FastAPI · XGBoost · SQLite", repository: "https://github.com/Sirosiu/Fraudlens" },
+    { number: "02", title: "SIROSIU Website", detail: "An evolving personal portfolio for engineering, curiosity, and creative technology, including an immersive 3D gateway and project archive.", accent: "PERSONAL PLATFORM / 02", status: "ONGOING", tools: "React · TypeScript · Vite · Three.js", repository: "https://github.com/Sirosiu/sirosiu-website" },
   ];
   const [activeProject, setActiveProject] = useState<number | null>(null);
   const [archiveScroll, setArchiveScroll] = useState(0);
@@ -156,14 +153,14 @@ function ProjectWorld({ onBack, onReturn }: { onBack: () => void; onReturn: () =
   const dragMoved = useRef(false);
   const active = activeProject === null ? null : projects[activeProject];
   const beginCardDrag = (event: PointerEvent<HTMLElement>) => {
-    dragStart.current = event.clientY;
+    dragStart.current = event.clientX;
     dragMoved.current = false;
     setDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
   const moveCardDrag = (event: PointerEvent<HTMLElement>) => {
     if (dragStart.current === null) return;
-    const distance = event.clientY - dragStart.current;
+    const distance = event.clientX - dragStart.current;
     if (Math.abs(distance) > 4) dragMoved.current = true;
     setDragRotation(Math.max(-18, Math.min(18, distance / 5)));
   };
@@ -171,12 +168,12 @@ function ProjectWorld({ onBack, onReturn }: { onBack: () => void; onReturn: () =
     dragStart.current = null;
     setDragging(false);
   };
-  return <section className="project-world" aria-labelledby="project-world-title" onScroll={(event) => setArchiveScroll(event.currentTarget.scrollTop)}>
+  return <section className="project-world" data-lenis-prevent aria-labelledby="project-world-title" onScroll={(event) => setArchiveScroll(event.currentTarget.scrollTop)}>
     <div className="project-world-sky" aria-hidden="true"><span/><span/><span/></div>
-    <header className="project-world-header"><div><p className="world-kicker">SIROSIU / PROJECT ARCHIVE</p><h2 id="project-world-title">Work in<br/><em>formation.</em></h2><p className="project-world-intro">The archive is ready for verified work. New coordinates will appear here as projects take shape.</p></div>{showProjectPlaceholders && <button type="button" className="project-skip" onClick={() => document.getElementById("project-cards")?.scrollIntoView({ behavior: "smooth", block: "center" })}>Skip to all projects ↓</button>}</header>
-    {showProjectPlaceholders && <div className="project-monoliths" id="project-cards" aria-label="Interactive project cards">{projects.map((project, index) => { const tilt = Math.max(-18, Math.min(18, (index - 1) * 10 - archiveScroll / 40 + dragRotation)); const openProject = () => { if (dragMoved.current) { dragMoved.current = false; return; } setActiveProject(index); }; return <article className={`project-monolith project-card${dragging ? " is-dragging" : ""}`} key={project.number} tabIndex={0} role="button" aria-label={`Open ${project.title}`} onPointerDown={beginCardDrag} onPointerMove={moveCardDrag} onPointerUp={endCardDrag} onPointerCancel={endCardDrag} onClick={openProject} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openProject(); } }} style={{ transform: `perspective(700px) rotateY(${tilt}deg) rotateX(${dragRotation / 3}deg)` }}><span>{project.number}</span><b>{project.accent}</b><div className="project-monolith-copy"><strong>{project.title}</strong><small>{project.status}</small><p>{project.detail}</p><em>{project.tools}</em></div><button type="button" aria-label={`Open ${project.title} details`} className="project-card-open" onClick={(event) => { event.stopPropagation(); setActiveProject(index); }}>↗</button></article>; })}</div>}
-    {active && <div className="project-detail" role="dialog" aria-modal="true" aria-labelledby="project-detail-title"><button type="button" className="project-detail-close" onClick={() => setActiveProject(null)}>Close ×</button><p className="world-kicker">{active.accent} · {active.status}</p><h3 id="project-detail-title">{active.title}</h3><p>{active.detail}</p><div className="project-detail-meta"><span>TOOLS</span><b>{active.tools}</b><span>STATUS</span><b>{active.status}</b></div><small>Dummy project data for prototype review. Replace with verified project information before publishing.</small></div>}
-    <footer className="project-world-controls"><button type="button" onClick={onBack}>← Back to coordinates</button><button type="button" onClick={onReturn}>Return to gateway ↗</button></footer>
+    <header className="project-world-header"><div><p className="world-kicker">SIROSIU / PROJECT ARCHIVE</p><h2 id="project-world-title">Work in<br/><em>formation.</em></h2><p className="project-world-intro">Two real builds, still taking shape. Drag the forms to explore; select one for its details and source.</p></div><button type="button" className="project-skip" onClick={() => document.getElementById("project-cards")?.scrollIntoView({ behavior: "smooth", block: "center" })}>Skip to project cards ↓</button></header>
+    <div className="project-monoliths" id="project-cards" aria-label="Interactive project cards">{projects.map((project, index) => { const tilt = Math.max(-18, Math.min(18, (index - 0.5) * 10 - archiveScroll / 40 + dragRotation)); const openProject = () => { if (dragMoved.current) { dragMoved.current = false; return; } setActiveProject(index); }; return <article className={`project-monolith project-card${dragging ? " is-dragging" : ""}`} key={project.number} tabIndex={0} role="button" aria-label={`Open ${project.title} details`} onPointerDown={beginCardDrag} onPointerMove={moveCardDrag} onPointerUp={endCardDrag} onPointerCancel={endCardDrag} onClick={openProject} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openProject(); } }} style={{ transform: `perspective(900px) rotateY(${tilt}deg) rotateX(${dragRotation / 3}deg)` }}><span>{project.number}</span><b>{project.accent}</b><div className="project-monolith-copy"><strong>{project.title}</strong><small>{project.status}</small><p>{project.detail}</p><em>{project.tools}</em></div><span className="project-card-open" aria-hidden="true">↗</span></article>; })}</div>
+    {active && <div className="project-detail" role="dialog" aria-modal="true" aria-labelledby="project-detail-title"><button type="button" className="project-detail-close" onClick={() => setActiveProject(null)}>Close ×</button><p className="world-kicker">{active.accent} · {active.status}</p><h3 id="project-detail-title">{active.title}</h3><p>{active.detail}</p><div className="project-detail-meta"><span>TOOLS</span><b>{active.tools}</b><span>STATUS</span><b>{active.status}</b></div><a className="project-detail-repository" href={active.repository} target="_blank" rel="noreferrer">Open GitHub repository ↗</a></div>}
+    <footer className="project-world-controls"><button type="button" onClick={onBack}>{standalone ? "Close archive ×" : "← Back to coordinates"}</button>{!standalone && <button type="button" onClick={onReturn}>Return to gateway ↗</button>}</footer>
   </section>;
 }
 
