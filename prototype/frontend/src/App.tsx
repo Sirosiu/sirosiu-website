@@ -29,7 +29,15 @@ function SmoothScroll() {
       syncTouch: false,
       stopInertiaOnNavigate: true,
     });
-    return () => lenis.destroy();
+    const navigate = (event: Event) => {
+      const targetId = (event as CustomEvent<string>).detail;
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      lenis.scrollTo(target, { offset: -82, duration: 1.15 });
+      window.history.replaceState(null, "", `#${targetId}`);
+    };
+    window.addEventListener("sirosiu:navigate", navigate);
+    return () => { window.removeEventListener("sirosiu:navigate", navigate); lenis.destroy(); };
   }, []);
   return null;
 }
@@ -90,7 +98,7 @@ function App() {
       <a className="wordmark" href="#top" aria-label="SIROSIU, back to top">SIROSIU</a>
       <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="site-nav" onClick={() => setMenuOpen((value) => !value)}>{menuOpen ? "Close" : "Menu"}</button>
       <nav id="site-nav" className={menuOpen ? "site-nav is-open" : "site-nav"} aria-label="Main navigation">
-        {navigation.map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}
+        {navigation.map(([label, href]) => <a key={href} href={href} onClick={(event) => { event.preventDefault(); setMenuOpen(false); window.dispatchEvent(new CustomEvent("sirosiu:navigate", { detail: href.slice(1) })); }}>{label}</a>)}
       </nav>
       <button className="theme-toggle" type="button" onClick={() => setTheme((value) => value === "light" ? "dark" : "light")} aria-label={`Switch to ${theme === "light" ? "dark" : "light"} appearance`}><span aria-hidden="true">{theme === "light" ? "◐" : "☼"}</span>{theme === "light" ? "Dark" : "Light"}</button>
     </header>
