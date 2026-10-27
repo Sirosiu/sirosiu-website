@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npm --prefix prototype ci && npm --prefix prototype run build && node -e \"const fs=require('fs'); fs.rmSync('dist',{recursive:true,force:true}); fs.cpSync('prototype/dist','dist',{recursive:true})\"",
+    "dev": "npm --prefix site-next run dev",
+    "build": "npm --prefix site-next install && npm --prefix site-next run build && node -e \"const fs=require('fs'); fs.rmSync('dist',{recursive:true,force:true}); fs.cpSync('site-next/dist','dist',{recursive:true})\"",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "npm --prefix site-next run preview"
   },
   "dependencies": {
     "react": "^19.2.8",
