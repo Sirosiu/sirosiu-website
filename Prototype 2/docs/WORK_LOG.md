@@ -855,3 +855,12 @@ This is the chronological index of meaningful work, not a duplicate of the detai
 - **Verification:**
   - Ran `npm run build` both at root and inside `Prototype 2/` — both successfully installed and compiled Vite production bundles to `dist/` with `_redirects` included.
   - Committed as `a333091` and pushed to `origin fix/restore-original-hero-main`.
+
+### 2026-10-28 — Add Root package-lock.json & .nvmrc for Cloudflare Pages npm ci
+
+- **Root Cause of Failed Check in PR #13:**
+  - Cloudflare Pages uses `npm ci` by default during dependency installation.
+  - Adding root `package.json` without a companion root `package-lock.json` caused `npm ci` to exit with error code `EUSAGE` immediately.
+  - Fixed by generating root `package-lock.json` and adding `.nvmrc` pin (Node 20).
+- **Verification:**
+  - `npm ci && npm run build` verified locally at root; successfully compiles `Prototype 2/site-next` and populates `dist/` in 1.63s.
