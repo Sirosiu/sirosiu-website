@@ -864,3 +864,12 @@ This is the chronological index of meaningful work, not a duplicate of the detai
   - Fixed by generating root `package-lock.json` and adding `.nvmrc` pin (Node 20).
 - **Verification:**
   - `npm ci && npm run build` verified locally at root; successfully compiles `Prototype 2/site-next` and populates `dist/` in 1.63s.
+
+### 2026-10-28 — Submodule Clean & Cloudflare Pages Deploy Success
+
+- **Submodule Fix:**
+  - Removed dangling gitlink references for `Prototype 1/sirosiu-public-review` and `Prototype 2/sirosiu-public-review` from git tracking.
+  - Added `@types/three` directly to `Prototype 2/site-next/package.json` devDependencies so clean CI environments compile TypeScript with 0 errors.
+- **Verification:**
+  - Cloudflare Pages check run completed with **`✅ Deploy successful!`**.
+  - Live preview verified at `https://25074019.sirosiu.pages.dev` returning HTTP 200.
