@@ -6,6 +6,24 @@ Use five project chats total: **00 Project HQ** (this main conversation), plus f
 
 Chat histories are separate and do not sync automatically. The current files in `Prototype 2/` are the shared memory. A chat without repository/workspace access must be given the relevant current documents or asked to inspect the GitHub branch.
 
+## Source-first, selective reuse
+
+The user wants us to use good existing code where it fits, instead of rebuilding every interaction from the inspiration sites. First define the SIROSIU need; then look for the original/official repository or a well-maintained library. Label evidence precisely: original site source, official library, creator example, third-party recreation, or visual/technique reference. A third-party recreation is not proof of the original implementation.
+
+Before recommending a source, record its canonical URL, inspected revision/date, license and attribution terms, relevant files/features, framework/runtime requirements, maintenance signals, integration cost, limitations, and intended SIROSIU use in `docs/ASSET_REGISTER.md`. Keep live-site observations in `REFERENCE_LIBRARY.md`. Select only what supports the chosen experience; preserve SIROSIU's own identity, content, and design. Avoid sources with unclear rights. Do not install, import, or write implementation code during the research phase. When implementation is opened, use the user's source-first direction and the recorded license review; do not ask the user to re-approve the general strategy.
+
+## Portable handoff and work log
+
+`docs/WORK_LOG.md` is the chronological index of meaningful work. Append an entry after each research/build/review task with the date, purpose, evidence/source, changed files, decision status, checks actually run, and unresolved items. Put detailed site findings in `REFERENCE_LIBRARY.md`, source/license records in `ASSET_REGISTER.md`, durable choices in `DECISIONS.md`, phase status in `PROJECT_STATE.md`/`ROADMAP.md`, and the immediate resume point in `handoffs/CURRENT_HANDOFF.md`; do not duplicate long findings in the log.
+
+Any AI agent continuing this work must read `AGENTS.md`, `PROJECT_STATE.md`, `docs/PROJECT_BRIEF.md`, `docs/DECISIONS.md`, `docs/ROADMAP.md`, `docs/CHAT_WORKFLOW.md`, `docs/WORK_LOG.md`, and the current handoff before acting. Check branch and working-tree status first, preserve unrelated changes, and take one bounded task at a time. At the end, update the handoff and log, state what changed and what was actually checked, and leave the next action explicit. If the agent cannot see the repository, provide these files and the relevant reference/asset entry; never rely on chat summaries as the only record.
+
+### Copy-ready continuation prompt for another AI
+
+```text
+Continue the SIROSIU website redesign from the repository, not from assumed chat history. First inspect the branch and working-tree status. Read Prototype 2/AGENTS.md, PROJECT_STATE.md, docs/PROJECT_BRIEF.md, docs/DECISIONS.md, docs/ROADMAP.md, docs/CHAT_WORKFLOW.md, docs/WORK_LOG.md, docs/handoffs/CURRENT_HANDOFF.md, and the specific reference/asset records for your task. Preserve unrelated changes and work only inside Prototype 2. The user wants a fresh, original SIROSIU design and selective reuse of suitable existing code; do not recreate every reference feature or copy a site. Verify each source and license, document research/actions/decisions/checks in the designated docs, and keep proposals provisional until approved. Follow the current handoff's next task. Do not claim checks you did not run or make production/deployment changes.
+```
+
 ## Shared rules — paste before each specialist role
 
 ```text
