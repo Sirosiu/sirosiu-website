@@ -1,0 +1,10 @@
+{
+  "name": "sirosiu-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix \"Prototype 2/site-next\" install && npm --prefix \"Prototype 2/site-next\" run build && node -e \"const fs=require('fs'); fs.rmSync('dist',{recursive:true,force:true}); fs.cpSync('Prototype 2/site-next/dist','dist',{recursive:true})\"",
+    "dev": "npm --prefix \"Prototype 2/site-next\" run dev",
+    "preview": "npm --prefix \"Prototype 2/site-next\" run preview"
+  }
+}
