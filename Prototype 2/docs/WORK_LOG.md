@@ -841,3 +841,17 @@ This is the chronological index of meaningful work, not a duplicate of the detai
     - **Test 1 (System Light Mode):** Emulated `prefers-color-scheme: light` with empty storage. Site opened immediately in Light Mode with daytime clouds and light toggle (`system_default_light_mode.png`).
     - **Test 2 (System Dark Mode):** Emulated `prefers-color-scheme: dark` with empty storage. Site opened immediately in Dark Mode with 3D ocean and dark toggle (`system_default_dark_mode.png`).
     - **Test 3 (Manual Override Persistence):** Toggled theme explicitly and verified `localStorage` retained the selection across page reloads.
+
+### 2026-10-28 — Cloudflare Pages Build Pipeline Configuration & SPA Fallback
+
+- **User direction:** Fix repository configurations so that pulling/deploying to Cloudflare Pages automatically renders Prototype 2 (`site-next`) on the live website.
+- **Root Cause & Fix:**
+  - The repository root previously lacked a `package.json`, causing root-level Cloudflare Pages builds to fail or be unable to identify the build script.
+  - `Prototype 2/package.json` had an outdated build script pointing to legacy `prototype/` rather than `site-next/`.
+  - Added [package.json](file:///home/sirosiu-sugi/Documents/Github/sirosiu-website/package.json) at repo root to run `npm --prefix "Prototype 2/site-next" install && npm --prefix "Prototype 2/site-next" run build` and mirror `dist/`.
+  - Updated [Prototype 2/package.json](file:///home/sirosiu-sugi/Documents/Github/sirosiu-website/Prototype%202/package.json) build command to build `site-next/` into `Prototype 2/dist/`.
+  - Added [_redirects](file:///home/sirosiu-sugi/Documents/Github/sirosiu-website/Prototype%202/site-next/public/_redirects) (`/* /index.html 200`) into `Prototype 2/site-next/public/` to ensure Cloudflare Pages properly handles client-side routing and direct URL refreshes without 404s.
+  - Added root [.gitignore](file:///home/sirosiu-sugi/Documents/Github/sirosiu-website/.gitignore).
+- **Verification:**
+  - Ran `npm run build` both at root and inside `Prototype 2/` — both successfully installed and compiled Vite production bundles to `dist/` with `_redirects` included.
+  - Committed as `a333091` and pushed to `origin fix/restore-original-hero-main`.
