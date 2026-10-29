@@ -402,7 +402,11 @@ export default function ThemeToggleSwitch({ className, isLight: controlledIsLigh
     <div
       ref={containerRef}
       className={`theme-toggle-container${isLight ? ' is-light' : ''}${isHovered ? ' is-hovered' : ''} ${className || ''}`}
-      onClick={toggle}
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggle()
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       role="switch"
@@ -412,6 +416,7 @@ export default function ThemeToggleSwitch({ className, isLight: controlledIsLigh
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
+          e.stopPropagation()
           toggle()
         }
       }}

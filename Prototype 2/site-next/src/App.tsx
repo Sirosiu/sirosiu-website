@@ -99,7 +99,11 @@ export default function App() {
 
   return (
     <>
-      <PortfolioHero onNavigate={navigate} />
+      <PortfolioHero
+        isLight={isLight}
+        onToggleTheme={handleToggleTheme}
+        onNavigate={navigate}
+      />
       <CanvasCursor />
     </>
   )

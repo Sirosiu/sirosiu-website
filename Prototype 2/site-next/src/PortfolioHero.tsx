@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import InteractiveOceanBackground from './InteractiveOceanBackground'
 import InteractiveCloudsBackground from './InteractiveCloudsBackground'
 import HandwrittenSignature from './HandwrittenSignature'
@@ -28,15 +28,81 @@ const getInitialThemeIsLight = (): boolean => {
 
 interface PortfolioHeroProps {
   onNavigate?: (path: string) => void
+  isLight?: boolean
+  onToggleTheme?: (next: boolean) => void
 }
 
-export default function PortfolioHero({ onNavigate }: PortfolioHeroProps = {}) {
+export default function PortfolioHero({
+  onNavigate,
+  isLight: controlledIsLight,
+  onToggleTheme: controlledOnToggleTheme,
+}: PortfolioHeroProps = {}) {
   const [ready, setReady] = useState(false)
-  const [isLight, setIsLight] = useState(getInitialThemeIsLight)
+  const [internalLight, setInternalLight] = useState(getInitialThemeIsLight)
+  const isLight = controlledIsLight !== undefined ? controlledIsLight : internalLight
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark')
   }, [isLight])
+
+  const handleThemeToggle = useCallback(
+    (next: boolean) => {
+      // 1. Snapshot the visitor's current view before theme change
+      const scrollY = window.scrollY
+      const innerHeight = window.innerHeight
+
+      // Find the currently active section in the viewport to anchor to
+      const sections = ['contact', 'about', 'experience', 'work']
+      let anchorSection: { id: string; top: number } | null = null
+
+      for (const id of sections) {
+        const el = document.getElementById(id)
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          // If this section is currently within the visible viewport bounds
+          if (rect.top <= innerHeight * 0.75 && rect.bottom >= innerHeight * 0.1) {
+            anchorSection = { id, top: rect.top }
+            break
+          }
+        }
+      }
+
+      // Update state (both local and parent if provided)
+      if (controlledIsLight === undefined) {
+        setInternalLight(next)
+      }
+      controlledOnToggleTheme?.(next)
+      try {
+        localStorage.setItem('sirosiu-theme', next ? 'light' : 'dark')
+      } catch {}
+
+      // 2. Multi-frame scroll restoration to protect against canvas remounts, reflows, and height fluctuations
+      const restoreScroll = () => {
+        if (anchorSection) {
+          const el = document.getElementById(anchorSection.id)
+          if (el) {
+            const currentTop = el.getBoundingClientRect().top
+            const delta = currentTop - anchorSection.top
+            if (Math.abs(delta) > 1) {
+              window.scrollBy({ top: delta, behavior: 'instant' })
+              return
+            }
+          }
+        }
+        // Fallback: restore exact scrollY
+        if (Math.abs(window.scrollY - scrollY) > 2) {
+          window.scrollTo({ top: scrollY, behavior: 'instant' })
+        }
+      }
+
+      requestAnimationFrame(restoreScroll)
+      setTimeout(restoreScroll, 16)
+      setTimeout(restoreScroll, 50)
+      setTimeout(restoreScroll, 120)
+      setTimeout(restoreScroll, 280)
+    },
+    [controlledIsLight, controlledOnToggleTheme]
+  )
 
   // Listen for OS system theme changes if user hasn't made an explicit choice
   useEffect(() => {
@@ -47,20 +113,23 @@ export default function PortfolioHero({ onNavigate }: PortfolioHeroProps = {}) {
     const mql = window.matchMedia('(prefers-color-scheme: light)')
     const onSystemThemeChange = (e: MediaQueryListEvent) => {
       if (!localStorage.getItem('sirosiu-theme')) {
-        setIsLight(e.matches)
+        handleThemeToggle(e.matches)
       }
     }
     mql.addEventListener('change', onSystemThemeChange)
     return () => mql.removeEventListener('change', onSystemThemeChange)
-  }, [])
+  }, [handleThemeToggle])
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window.location.hash === '#about' || window.location.pathname === '/about')) {
+    if (typeof window === 'undefined') return
+    const rawHash = window.location.hash.replace('#', '')
+    const targetId = rawHash || (window.location.pathname === '/about' ? 'about' : '')
+    if (targetId && targetId !== 'home') {
       let count = 0
       let activeTimer: ReturnType<typeof setTimeout> | null = null
 
       const syncScroll = () => {
-        const el = document.getElementById('about')
+        const el = document.getElementById(targetId)
         if (el) {
           const rect = el.getBoundingClientRect()
           if (Math.abs(rect.top - 20) > 40) {
@@ -80,13 +149,6 @@ export default function PortfolioHero({ onNavigate }: PortfolioHeroProps = {}) {
       }
     }
   }, [])
-
-  const handleThemeToggle = (next: boolean) => {
-    setIsLight(next)
-    try {
-      localStorage.setItem('sirosiu-theme', next ? 'light' : 'dark')
-    } catch {}
-  }
 
   return (
     <main className="single-portfolio-hero" data-theme={isLight ? 'light' : 'dark'}>
@@ -268,7 +330,7 @@ export default function PortfolioHero({ onNavigate }: PortfolioHeroProps = {}) {
       <AboutSection />
 
       {/* 04 / Contact Section: Recruiter Context, Direct Email, Downloadable Résumé, Verified Profiles & Inquiry Form */}
-      <ContactSection />
+      <ContactSection isLight={isLight} onToggleTheme={handleThemeToggle} />
 
       {/* Centered Liquid Glass Bottom Navigation Dock (Aceternity UI) */}
       <LiquidGlassBottomNav

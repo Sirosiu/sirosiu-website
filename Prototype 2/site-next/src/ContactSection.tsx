@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
+import ThemeToggleSwitch from './ThemeToggleSwitch'
 
-export default function ContactSection() {
+interface ContactSectionProps {
+  isLight?: boolean
+  onToggleTheme?: (next: boolean) => void
+}
+
+export default function ContactSection({ isLight, onToggleTheme }: ContactSectionProps = {}) {
   const [copied, setCopied] = useState(false)
   const [formState, setFormState] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [formData, setFormData] = useState({
@@ -306,6 +312,12 @@ export default function ContactSection() {
           </div>
 
           <div className="footer-right">
+            {onToggleTheme && (
+              <div className="footer-theme-toggle-wrap">
+                <span className="footer-theme-label">THEME</span>
+                <ThemeToggleSwitch isLight={isLight} onToggle={onToggleTheme} />
+              </div>
+            )}
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
