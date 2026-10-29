@@ -6,14 +6,15 @@ export type NavTabId = 'home' | 'projects' | 'experience' | 'about' | 'contact'
 interface NavTabItem {
   id: NavTabId
   label: string
+  shortLabel?: string
   icon?: string
 }
 
 const NAV_TABS: NavTabItem[] = [
   { id: 'home', label: 'Home', icon: '✦' },
   { id: 'projects', label: 'Projects', icon: '⊞' },
-  { id: 'experience', label: 'Experience', icon: '⚡' },
-  { id: 'about', label: 'About Me', icon: '◈' },
+  { id: 'experience', label: 'Experience', shortLabel: 'Exp', icon: '⚡' },
+  { id: 'about', label: 'About Me', shortLabel: 'About', icon: '◈' },
   { id: 'contact', label: 'Contact', icon: '✉' },
 ]
 
@@ -265,7 +266,16 @@ export default function LiquidGlassBottomNav({
               <span className="liquid-glass-dock-icon" aria-hidden="true">
                 {tab.icon}
               </span>
-              <span className="liquid-glass-dock-label">{tab.label}</span>
+              <span className="liquid-glass-dock-label">
+                {tab.shortLabel ? (
+                  <>
+                    <span className="dock-label-full">{tab.label}</span>
+                    <span className="dock-label-short">{tab.shortLabel}</span>
+                  </>
+                ) : (
+                  tab.label
+                )}
+              </span>
             </button>
           )
         })}
