@@ -14,21 +14,21 @@ const workItems: WorkItem[] = [
     title: 'Volumetric Clouds & Fluid 3D Environments',
     description: 'Sculpting mathematical cumulus formations, dynamic lighting, and real-time GPU wave physics that respond to user presence.',
     tags: ['Three.js', 'GLSL Shaders', 'Volumetrics'],
-    year: '2026',
+    year: '2024',
   },
   {
     index: '02',
     title: 'Generative Vector Fields & Neural Dynamics',
     description: 'Developing organic mathematical noise fields, harmonic particle streams, and generative WebGL neural auras.',
     tags: ['WebGL', 'Flow Fields', 'FBM Noise'],
-    year: '2026',
+    year: '2024',
   },
   {
     index: '03',
     title: 'Tactile Editorial & Spatial Digital Craft',
     description: 'Harmonizing haute horlogerie typography, warm parchment design systems, and responsive kinetic interactions.',
     tags: ['Creative Dev', 'React', 'Design Systems'],
-    year: '2026',
+    year: '2025',
   },
 ]
 

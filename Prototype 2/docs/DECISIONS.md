@@ -43,3 +43,4 @@ Any earlier approved Prototype 1 style, specific visual concept, hero scene, pal
 | 2026-10-26 | Confirm a portfolio-selection hub with distinct addressable portfolio routes and refresh-safe nested pages. |
 | 2026-10-26 | Adapt Portfolio 01 around an original particle portrait, global pointer response, India chapter, projects, and contact; keep its content placeholders user-supplied. |
 | 2026-10-26 | Use the newly supplied portrait for the local particle field, increase star density, and smooth the interpolation after the user reviewed the preview. |
+| 2026-10-29 | A temporary `/avatar-preview` avatar study was made for local review, then removed at the user's direction. No avatar feature is active; future avatar work needs a new request. |

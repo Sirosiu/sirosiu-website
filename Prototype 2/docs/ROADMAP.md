@@ -10,7 +10,7 @@ Create the shared project rules/docs and establish `site-next/` without changing
 
 ## Active task — First local experience
 
-The preview is available at `http://127.0.0.1:5173/portfolio-1`. Portfolio 01 now uses the user's locally processed portrait as a dense star field, with cursor response, an India map chapter, project slots, and a contact ending. The project and contact material is still needed; keep those details as placeholders until supplied.
+The preview is available at `http://127.0.0.1:5173/portfolio-1`. Portfolio 01 uses the user's locally processed portrait as a dense star field, with cursor response, an India map chapter, project slots, and a contact ending. The project and contact material is still needed; keep those details as placeholders until supplied. A temporary avatar study was removed at the user's direction on 2026-10-29.
 
 ## 1. Read-only audit and content intake — Complete
 

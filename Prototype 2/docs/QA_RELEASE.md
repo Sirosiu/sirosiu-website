@@ -4,6 +4,8 @@
 
 `site-next/` now contains the local hub and the first particle portfolio. After feedback about density and smoothness, Portfolio 01 uses the user's transparent portrait matte, 72,000 desktop / 36,000 phone points, tone-based brightness, precomputed coordinates, typed buffers, batched drawing, and eased motion. Compared the local portrait in Brave with the user's supplied reference screenshot and the live Daniel Ingrassia page; the updated field has a denser, brighter bust with more source-photo contrast. The local preview is open at `http://127.0.0.1:5173/portfolio-1`. `npm --prefix site-next run build` and `git diff --check` passed on 2026-10-26. Earlier browser review confirmed nested project routes survive refresh. Comprehensive responsive, keyboard, accessibility, and device-performance review remains open. No automated tests were added or run.
 
+**Avatar preview trial (2026-10-29):** The temporary procedural Three.js avatar was built, and desktop Brave showed its greeting wave and drag rotation. The user then asked to remove it; `/avatar-preview` and its implementation have been deleted. No avatar feature is active. The normal responsive, keyboard/accessibility, and device-performance review for the remaining site is still open.
+
 ## Prototype review checklist
 
 - Approved content is accurate and links work.

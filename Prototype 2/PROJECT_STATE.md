@@ -1,6 +1,6 @@
 # SIROSIU Website — Project State
 
-Last updated: 2026-10-27
+Last updated: 2026-10-29
 Repository: https://github.com/Sirosiu/sirosiu-website
 Workspace: `Prototype 2/`
 Branch at start of scaffold work: `fix/restore-original-hero-main`
@@ -11,7 +11,7 @@ Build a distinctive, polished SIROSIU website with a strong visual identity, pur
 
 ## Current phase
 
-**Phase 2 — Local prototype in progress.** The current hero at `/portfolio-1` has a typewriter headline, SIROSIU/India copy, the preserved Raging Sea visual, and an adaptive Canvas 2D trail cursor with an always-visible guiding dot. The native system cursor is suppressed across all interactive and page elements. When still, the ribbon gracefully rests while the guiding dot maintains a gentle guiding pulse; on hover, the ring expands over interactive targets; and across dark (`#121211`) and light (`#e5dfd4`) sections, both the guiding dot and ribbon trails automatically invert and adapt via `mix-blend-mode: difference` for optimal contrast. Preview: `http://127.0.0.1:5173/portfolio-1`. Implementation details: `site-next/src/CanvasCursor.tsx` and `site-next/src/styles.css`. The app build passes; Vite reports a JavaScript bundle advisory.
+**Phase 2 — Local prototype in progress.** The current hero at `/portfolio-1` has a typewriter headline, SIROSIU/India copy, the preserved Raging Sea visual, and an adaptive Canvas 2D trail cursor with an always-visible guiding dot. The native system cursor is suppressed across all interactive and page elements. When still, the ribbon gracefully rests while the guiding dot maintains a gentle guiding pulse; on hover, the ring expands over interactive targets; and across dark (`#121211`) and light (`#e5dfd4`) sections, both the guiding dot and ribbon trails automatically invert and adapt via `mix-blend-mode: difference` for optimal contrast. Preview: `http://127.0.0.1:5173/portfolio-1`. Implementation details: `site-next/src/CanvasCursor.tsx` and `site-next/src/styles.css`. The app build passes; Vite reports a JavaScript bundle advisory. The one-off avatar study made on 2026-10-29 was removed at the user's direction.
 
 The research context is retained below for future selection and reuse. No copy or media from the portfolio inspiration-site references was imported. The PMNDRS particle example remains research/reference only; its temporary implementation was removed. The active cursor is an independent Canvas 2D implementation inspired by Cursify's documented behavior; no Cursify source was copied because its repository has no license. Seventeen references are logged in `docs/REFERENCE_LIBRARY.md`. The desktop and phone/tablet reference passes are complete for the original twelve-site list, and the newer five-site inspiration batch is also complete. The associated GitHub and license evidence, including limits and unverified claims, remains in the reference library and asset register. Existing app copies remain preserved.
 
