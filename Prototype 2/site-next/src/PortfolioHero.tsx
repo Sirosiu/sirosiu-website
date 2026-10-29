@@ -241,7 +241,7 @@ export default function PortfolioHero({
         </div>
       </header>
 
-      <section className="hero-stage" aria-labelledby="hero-title">
+      <section id="hero" className="hero-stage" aria-labelledby="hero-title">
         <div className="hero-copy hero-copy-left">
           {/* 1. Hero Introduction Cluster: Headline, Bio & Target Role */}
           <div className="hero-intro-cluster">
@@ -395,18 +395,35 @@ export default function PortfolioHero({
 
       {/* Centered Liquid Glass Bottom Navigation Dock (Aceternity UI) */}
       <LiquidGlassBottomNav
-        initialTab={typeof window !== 'undefined' && window.location.hash === '#about' ? 'about' : 'home'}
+        initialTab={
+          typeof window !== 'undefined'
+            ? window.location.hash === '#contact'
+              ? 'contact'
+              : window.location.hash === '#about'
+              ? 'about'
+              : window.location.hash === '#experience'
+              ? 'experience'
+              : window.location.hash === '#work'
+              ? 'projects'
+              : 'home'
+            : 'home'
+        }
         onTabChange={(tab) => {
-          if (tab === 'projects') {
-            onNavigate?.('/projects')
-          } else if (tab === 'about') {
-            const el = document.getElementById('about')
+          if (tab === 'home') {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+            try {
+              window.history.pushState(null, '', window.location.pathname)
+            } catch {}
+          } else {
+            const targetId = tab === 'projects' ? 'work' : tab
+            const el = document.getElementById(targetId)
             if (el) {
               const y = el.getBoundingClientRect().top + window.pageYOffset - 20
               window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+              try {
+                window.history.pushState(null, '', `#${targetId}`)
+              } catch {}
             }
-          } else if (tab === 'home') {
-            window.scrollTo({ top: 0, behavior: 'smooth' })
           }
         }}
       />

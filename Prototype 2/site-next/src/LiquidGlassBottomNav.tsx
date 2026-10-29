@@ -1,7 +1,7 @@
 import { useState, useRef, useLayoutEffect, useEffect } from 'react'
 import LiquidGlass from './LiquidGlass'
 
-export type NavTabId = 'home' | 'about' | 'projects'
+export type NavTabId = 'home' | 'projects' | 'experience' | 'about' | 'contact'
 
 interface NavTabItem {
   id: NavTabId
@@ -11,8 +11,10 @@ interface NavTabItem {
 
 const NAV_TABS: NavTabItem[] = [
   { id: 'home', label: 'Home', icon: '✦' },
-  { id: 'about', label: 'About Me', icon: '◈' },
   { id: 'projects', label: 'Projects', icon: '⊞' },
+  { id: 'experience', label: 'Experience', icon: '⚡' },
+  { id: 'about', label: 'About Me', icon: '◈' },
+  { id: 'contact', label: 'Contact', icon: '✉' },
 ]
 
 interface LiquidGlassBottomNavProps {
@@ -29,6 +31,8 @@ export default function LiquidGlassBottomNav({
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([])
   const lastScrollYRef = useRef(0)
   const isInputFocusedRef = useRef(false)
+  const isManualNavigatingRef = useRef(false)
+  const manualNavTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Measure tab dimensions with font-readiness protection
   const [geometry, setGeometry] = useState<{
@@ -162,33 +166,77 @@ export default function LiquidGlassBottomNav({
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  // Scroll spy: automatically sync active tab with scroll position on homepage
+  // Dynamic Scroll Spy: Track the actual section currently in view
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (window.location.pathname.startsWith('/projects')) return
 
+    let spyTicking = false
+
     const handleScrollSpy = () => {
-      const scrollY = window.scrollY
-      const aboutEl = document.getElementById('about')
+      if (isManualNavigatingRef.current) return
 
-      if (aboutEl) {
-        const rect = aboutEl.getBoundingClientRect()
-        // If about section is in the primary reading area of viewport
-        if (rect.top <= window.innerHeight * 0.55 && rect.bottom >= 120) {
-          if (activeTab !== 'about') setActiveTab('about')
-          return
-        }
-      }
+      if (!spyTicking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY
+          const winHeight = window.innerHeight
+          const docHeight = document.documentElement.scrollHeight
 
-      if (scrollY < 350) {
-        if (activeTab !== 'home') setActiveTab('home')
+          // 1. Bottom of page edge: Viewing Contact / Footer
+          if (scrollY + winHeight >= docHeight - 70) {
+            setActiveTab((prev) => (prev !== 'contact' ? 'contact' : prev))
+            spyTicking = false
+            return
+          }
+
+          // 2. Top of page edge: Viewing Hero
+          if (scrollY < 200) {
+            setActiveTab((prev) => (prev !== 'home' ? 'home' : prev))
+            spyTicking = false
+            return
+          }
+
+          // 3. Middle sections: Check reading line (45% from top of viewport)
+          const readingLine = winHeight * 0.45
+          const sectionMap: { id: NavTabId; elementId: string }[] = [
+            { id: 'contact', elementId: 'contact' },
+            { id: 'about', elementId: 'about' },
+            { id: 'experience', elementId: 'experience' },
+            { id: 'projects', elementId: 'work' },
+          ]
+
+          for (const sec of sectionMap) {
+            const el = document.getElementById(sec.elementId)
+            if (el) {
+              const rect = el.getBoundingClientRect()
+              if (rect.top <= readingLine && rect.bottom > readingLine) {
+                setActiveTab((prev) => (prev !== sec.id ? sec.id : prev))
+                spyTicking = false
+                return
+              }
+            }
+          }
+
+          // Fallback: If above work section, default to home
+          const workEl = document.getElementById('work')
+          if (workEl && workEl.getBoundingClientRect().top > readingLine) {
+            setActiveTab((prev) => (prev !== 'home' ? 'home' : prev))
+          }
+
+          spyTicking = false
+        })
+        spyTicking = true
       }
     }
 
     window.addEventListener('scroll', handleScrollSpy, { passive: true })
+    window.addEventListener('resize', handleScrollSpy)
     handleScrollSpy()
-    return () => window.removeEventListener('scroll', handleScrollSpy)
-  }, [activeTab])
+    return () => {
+      window.removeEventListener('scroll', handleScrollSpy)
+      window.removeEventListener('resize', handleScrollSpy)
+    }
+  }, [])
 
   // Keep in sync when initialTab changes (e.g. routing transitions)
   useEffect(() => {
@@ -198,6 +246,14 @@ export default function LiquidGlassBottomNav({
   const handleSelectTab = (id: NavTabId) => {
     setActiveTab(id)
     setIsVisible(true)
+
+    // Briefly lock scroll spy during smooth scroll jump
+    isManualNavigatingRef.current = true
+    if (manualNavTimerRef.current) clearTimeout(manualNavTimerRef.current)
+    manualNavTimerRef.current = setTimeout(() => {
+      isManualNavigatingRef.current = false
+    }, 950)
+
     if (onTabChange) {
       onTabChange(id)
     }

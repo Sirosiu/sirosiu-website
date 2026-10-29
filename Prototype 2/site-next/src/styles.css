@@ -3687,33 +3687,6 @@ html[data-theme="light"] {
   visibility: hidden;
 }
 
-@media (max-width: 600px) {
-  .liquid-glass-dock-wrapper {
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-    max-width: calc(100vw - 24px);
-  }
-
-  .liquid-glass-dock-shell {
-    padding: 3px 4px;
-    border-radius: 999px;
-  }
-
-  .liquid-glass-dock-inner {
-    padding: 3px 4px;
-    gap: 3px;
-  }
-
-  .liquid-glass-dock-item {
-    padding: 7px 12px;
-    font-size: 12px;
-    gap: 6px;
-  }
-
-  .liquid-glass-dock-icon {
-    font-size: 11px;
-  }
-}
-
 /* Generic Minimal Concept Switcher Ribbon */
 .generic-concept-switcher {
   display: inline-flex;
@@ -4270,6 +4243,50 @@ html[data-theme="light"] {
 
 [data-theme="light"] .liquid-glass-dock-item.is-active .liquid-glass-dock-icon {
   color: #9c5412;
+}
+
+@media (max-width: 850px) {
+  .liquid-glass-dock-item {
+    padding: 7px 12px;
+    font-size: 12px;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 600px) {
+  .liquid-glass-dock-wrapper {
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 16px);
+  }
+
+  .liquid-glass-dock-shell {
+    padding: 3px;
+    border-radius: 999px;
+  }
+
+  .liquid-glass-dock-inner {
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .liquid-glass-dock-item {
+    padding: 6px 7px;
+    font-size: 11px;
+    gap: 3.5px;
+    white-space: nowrap;
+  }
+
+  .liquid-glass-dock-icon {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 375px) {
+  .liquid-glass-dock-item {
+    padding: 5px 5px;
+    font-size: 11px;
+    gap: 2.5px;
+  }
 }
 
 /* --------------------------------------------------------------------------

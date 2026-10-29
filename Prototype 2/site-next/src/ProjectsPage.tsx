@@ -274,7 +274,15 @@ export default function ProjectsPage({
           initialTab="projects"
           onTabChange={(tab) => {
             if (tab === 'home') navigate('/')
-            else if (tab === 'about') navigate('/#about')
+            else if (tab === 'projects') {
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            } else if (tab === 'experience') {
+              navigate('/#experience')
+            } else if (tab === 'about') {
+              navigate('/#about')
+            } else if (tab === 'contact') {
+              navigate('/#contact')
+            }
           }}
         />
       )}
