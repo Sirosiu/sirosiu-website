@@ -25,7 +25,10 @@ export default function LiquidGlassBottomNav({
   onTabChange,
 }: LiquidGlassBottomNavProps) {
   const [activeTab, setActiveTab] = useState<NavTabId>(initialTab)
+  const [isVisible, setIsVisible] = useState(true)
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([])
+  const lastScrollYRef = useRef(0)
+  const isInputFocusedRef = useRef(false)
 
   // Measure tab dimensions with font-readiness protection
   const [geometry, setGeometry] = useState<{
@@ -66,12 +69,105 @@ export default function LiquidGlassBottomNav({
     }
   }, [activeTab])
 
+  // Intelligent Scroll Direction Awareness:
+  // - Hide dock when scrolling down (reading / exploring content)
+  // - Reveal dock when scrolling up (navigation intent)
+  // - Always show near the top of the page (hero area)
+  // - Reveal when reaching the absolute bottom of page (where safe clearance is reserved)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    let ticking = false
+    lastScrollYRef.current = window.scrollY
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentY = window.scrollY
+          const delta = currentY - lastScrollYRef.current
+          const winHeight = window.innerHeight
+          const docHeight = document.documentElement.scrollHeight
+          const isAtBottom = currentY + winHeight >= docHeight - 40
+          const isNearTop = currentY < 80
+
+          if (!isInputFocusedRef.current) {
+            if (isNearTop) {
+              setIsVisible(true)
+            } else if (isAtBottom) {
+              setIsVisible(true)
+            } else if (delta > 8 && currentY > 100) {
+              // Scrolling down: glide dock down out of the way
+              setIsVisible(false)
+            } else if (delta < -8) {
+              // Scrolling up: reveal dock for navigation
+              setIsVisible(true)
+            }
+          }
+
+          lastScrollYRef.current = currentY
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Auto-hide when any form input or textarea is focused (e.g. contact form, mobile keyboards)
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement | null
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT')
+      ) {
+        isInputFocusedRef.current = true
+        setIsVisible(false)
+      }
+    }
+
+    const handleFocusOut = () => {
+      isInputFocusedRef.current = false
+      // Reveal dock on blur if not scrolling down or near top/bottom
+      setIsVisible(true)
+    }
+
+    document.addEventListener('focusin', handleFocusIn)
+    document.addEventListener('focusout', handleFocusOut)
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn)
+      document.removeEventListener('focusout', handleFocusOut)
+    }
+  }, [])
+
+  // Desktop Bottom Proximity Sensor:
+  // If desktop user hovers within 80px of the viewport bottom, reveal dock smoothly
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isInputFocusedRef.current) return
+      if (window.innerHeight - e.clientY < 80) {
+        setIsVisible(true)
+      }
+    }
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
+
   // Scroll spy: automatically sync active tab with scroll position on homepage
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (window.location.pathname.startsWith('/projects')) return
 
-    const handleScroll = () => {
+    const handleScrollSpy = () => {
       const scrollY = window.scrollY
       const aboutEl = document.getElementById('about')
 
@@ -89,9 +185,9 @@ export default function LiquidGlassBottomNav({
       }
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScrollSpy, { passive: true })
+    handleScrollSpy()
+    return () => window.removeEventListener('scroll', handleScrollSpy)
   }, [activeTab])
 
   // Keep in sync when initialTab changes (e.g. routing transitions)
@@ -101,6 +197,7 @@ export default function LiquidGlassBottomNav({
 
   const handleSelectTab = (id: NavTabId) => {
     setActiveTab(id)
+    setIsVisible(true)
     if (onTabChange) {
       onTabChange(id)
     }
@@ -111,7 +208,11 @@ export default function LiquidGlassBottomNav({
   const gliderWidth = Math.max(20, geometry.width - 6)
 
   return (
-    <nav className="liquid-glass-dock-wrapper" aria-label="Quick navigation">
+    <nav
+      className={`liquid-glass-dock-wrapper${!isVisible ? ' is-hidden' : ''}`}
+      aria-label="Quick navigation"
+      aria-hidden={!isVisible}
+    >
       {/* Main Liquid Glass Shell */}
       <LiquidGlass
         radius={999}

@@ -269,13 +269,15 @@ export default function ProjectsPage({
       )}
 
       {/* Floating Centered Liquid Glass Bottom Navigation Dock */}
-      <LiquidGlassBottomNav
-        initialTab="projects"
-        onTabChange={(tab) => {
-          if (tab === 'home') navigate('/')
-          else if (tab === 'about') navigate('/#about')
-        }}
-      />
+      {!selectedProject && (
+        <LiquidGlassBottomNav
+          initialTab="projects"
+          onTabChange={(tab) => {
+            if (tab === 'home') navigate('/')
+            else if (tab === 'about') navigate('/#about')
+          }}
+        />
+      )}
     </main>
   )
 }

@@ -3254,8 +3254,8 @@ html[data-theme="light"] {
   }
 
   .contact-section {
-    min-height: 100svh;
-    padding: 88px 22px 20px;
+    min-height: auto;
+    padding: 88px 22px 50px;
   }
 
   .contact-content h2 {
@@ -3482,13 +3482,49 @@ html[data-theme="light"] {
   position: fixed;
   bottom: 22px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(0);
   z-index: 95;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease, visibility 0.4s ease;
+  will-change: transform, opacity;
+}
+
+.liquid-glass-dock-wrapper.is-hidden {
+  transform: translateX(-50%) translateY(calc(100% + 40px));
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+@media (max-width: 600px) {
+  .liquid-glass-dock-wrapper {
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 24px);
+  }
+
+  .liquid-glass-dock-shell {
+    padding: 3px 4px;
+    border-radius: 999px;
+  }
+
+  .liquid-glass-dock-inner {
+    padding: 3px 4px;
+    gap: 3px;
+  }
+
+  .liquid-glass-dock-item {
+    padding: 7px 12px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .liquid-glass-dock-icon {
+    font-size: 10px;
+  }
 }
 
 /* Generic Minimal Concept Switcher Ribbon */
@@ -4109,7 +4145,7 @@ html[data-theme="light"] {
   background: #090909;
   color: #f2eee8;
   overflow-x: hidden;
-  padding-bottom: 120px;
+  padding-bottom: max(160px, calc(120px + env(safe-area-inset-bottom, 0px)));
 }
 [data-theme="light"].projects-page-root,
 .projects-page-root[data-theme="light"] {
@@ -6136,12 +6172,13 @@ html[data-theme="light"] {
 /* Global Site Footer */
 .global-site-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 44px 0 72px;
+  padding: 44px 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 24px;
+  margin-bottom: max(140px, calc(110px + env(safe-area-inset-bottom, 0px)));
 }
 
 [data-theme="light"] .global-site-footer {
@@ -6399,9 +6436,16 @@ html[data-theme="light"] {
 }
 
 @media (max-width: 640px) {
-  .about-section,
+  .about-section {
+    padding: 80px 6vw 60px;
+  }
   .contact-section {
-    padding: 100px 6vw 50px;
+    padding: 80px 6vw 50px;
+  }
+  .global-site-footer {
+    padding: 32px 0 20px;
+    margin-bottom: max(140px, calc(110px + env(safe-area-inset-bottom, 0px)));
+    gap: 16px;
   }
   .about-education-card,
   .contact-form-card,
@@ -6762,7 +6806,7 @@ html[data-theme="light"] {
 .experience-section {
   position: relative;
   z-index: 2;
-  padding: 130px 8vw 110px;
+  padding: 130px 8vw max(140px, calc(110px + env(safe-area-inset-bottom, 0px)));
   background: #07080c;
   color: #ece9e2;
   border-top: 1px solid rgba(236, 233, 226, 0.1);
@@ -7016,6 +7060,15 @@ html[data-theme="light"] {
   .experience-card {
     grid-template-columns: 1fr;
     gap: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .experience-section {
+    padding: 80px 6vw max(120px, calc(90px + env(safe-area-inset-bottom, 0px)));
+  }
+  .experience-card {
+    padding: 24px 20px;
   }
 }
 
