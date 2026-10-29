@@ -29,7 +29,6 @@ export default function LiquidGlassBottomNav({
   const [activeTab, setActiveTab] = useState<NavTabId>(initialTab)
   const [isVisible, setIsVisible] = useState(true)
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([])
-  const lastScrollYRef = useRef(0)
   const isInputFocusedRef = useRef(false)
   const isManualNavigatingRef = useRef(false)
   const manualNavTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -73,53 +72,8 @@ export default function LiquidGlassBottomNav({
     }
   }, [activeTab])
 
-  // Intelligent Scroll Direction Awareness:
-  // - Hide dock when scrolling down (reading / exploring content)
-  // - Reveal dock when scrolling up (navigation intent)
-  // - Always show near the top of the page (hero area)
-  // - Reveal when reaching the absolute bottom of page (where safe clearance is reserved)
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    let ticking = false
-    lastScrollYRef.current = window.scrollY
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentY = window.scrollY
-          const delta = currentY - lastScrollYRef.current
-          const winHeight = window.innerHeight
-          const docHeight = document.documentElement.scrollHeight
-          const isAtBottom = currentY + winHeight >= docHeight - 40
-          const isNearTop = currentY < 80
-
-          if (!isInputFocusedRef.current) {
-            if (isNearTop) {
-              setIsVisible(true)
-            } else if (isAtBottom) {
-              setIsVisible(true)
-            } else if (delta > 8 && currentY > 100) {
-              // Scrolling down: glide dock down out of the way
-              setIsVisible(false)
-            } else if (delta < -8) {
-              // Scrolling up: reveal dock for navigation
-              setIsVisible(true)
-            }
-          }
-
-          lastScrollYRef.current = currentY
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  // Auto-hide when any form input or textarea is focused (e.g. contact form, mobile keyboards)
+  // Keep compact dock visible across all resting points so visitors always have direct section navigation.
+  // Auto-hides only when a form input/textarea is focused to prevent mobile soft-keyboard collisions.
   useEffect(() => {
     if (typeof document === 'undefined') return
 
@@ -133,12 +87,14 @@ export default function LiquidGlassBottomNav({
       ) {
         isInputFocusedRef.current = true
         setIsVisible(false)
+      } else if (target && target.closest('.liquid-glass-dock-wrapper')) {
+        isInputFocusedRef.current = false
+        setIsVisible(true)
       }
     }
 
     const handleFocusOut = () => {
       isInputFocusedRef.current = false
-      // Reveal dock on blur if not scrolling down or near top/bottom
       setIsVisible(true)
     }
 
@@ -247,11 +203,12 @@ export default function LiquidGlassBottomNav({
     setActiveTab(id)
     setIsVisible(true)
 
-    // Briefly lock scroll spy during smooth scroll jump
+    // Briefly lock scroll spy during smooth scroll jump, protect dock visibility
     isManualNavigatingRef.current = true
     if (manualNavTimerRef.current) clearTimeout(manualNavTimerRef.current)
     manualNavTimerRef.current = setTimeout(() => {
       isManualNavigatingRef.current = false
+      setIsVisible(true)
     }, 950)
 
     if (onTabChange) {
@@ -268,7 +225,7 @@ export default function LiquidGlassBottomNav({
       role="navigation"
       className={`liquid-glass-dock-wrapper${!isVisible ? ' is-hidden' : ''}`}
       aria-label="Quick page navigation"
-      aria-hidden={!isVisible}
+      onFocus={() => setIsVisible(true)}
     >
       {/* Main Liquid Glass Shell */}
       <LiquidGlass

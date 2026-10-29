@@ -245,7 +245,10 @@ export default function PortfolioHero({
             RÉSUMÉ <span aria-hidden="true">↓</span>
           </a>
           <ThemeToggleSwitch isLight={isLight} onToggle={handleThemeToggle} />
-          <a href="#contact" className="hero-nav-talk">LET&apos;S TALK <span aria-hidden="true">↗</span></a>
+          <a href="#contact" className="hero-nav-talk" title="Jump to direct contact inquiry">
+            <span className="talk-label-full">LET&apos;S TALK <span aria-hidden="true">↗</span></span>
+            <span className="talk-label-compact" aria-hidden="true">TALK ↗</span>
+          </a>
         </nav>
       </header>
 

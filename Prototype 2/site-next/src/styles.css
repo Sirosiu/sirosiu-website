@@ -608,6 +608,10 @@ html.has-canvas-cursor select {
   transition: all 0.22s ease;
 }
 
+.talk-label-compact {
+  display: none;
+}
+
 .hero-nav-talk:hover {
   background: rgba(215, 166, 110, 0.22);
   border-color: #d7a66e;
@@ -1711,40 +1715,71 @@ html[data-theme="light"] {
   .hero-footer { font-size: 11px; }
 }
 
+@media (max-width: 768px) {
+  .hero-nav-resume-btn {
+    display: none !important;
+  }
+}
+
 @media (max-width: 600px) {
   .hero-nav {
-    min-height: 56px;
-    width: calc(100% - 24px);
+    min-height: 52px;
+    width: min(100% - 32px, 620px);
+    margin-inline: auto;
     gap: 8px;
+    justify-content: space-between;
+    align-items: center;
   }
   .hero-logo-signature .signature-container {
-    width: 105px !important;
-    max-width: 105px !important;
+    width: 95px !important;
+    max-width: 95px !important;
   }
   .hero-nav-actions {
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
+    align-items: center;
   }
   .hero-nav-resume-btn {
-    padding: 5px 8px;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    gap: 3px;
+    display: none !important;
+  }
+  .theme-toggle-container {
+    width: 48px !important;
+    height: 26px !important;
   }
   .theme-toggle-canvas {
-    width: 44px !important;
-    height: 24px !important;
+    width: 40px !important;
+    height: 22px !important;
+  }
+  .talk-label-full {
+    display: none;
+  }
+  .talk-label-compact {
+    display: inline;
   }
   .hero-nav-talk {
-    padding: 5px 8px;
+    padding: 6px 12px;
     font-size: 11px;
+    font-weight: 700;
     letter-spacing: 0.06em;
-    gap: 3px;
+    gap: 4px;
+    white-space: nowrap;
+    border-radius: 999px;
   }
   .hero-copy h1,
   .hero-headline-display {
     font-size: clamp(30px, 8.8vw, 40px);
     line-height: 1.05;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-logo-signature .signature-container {
+    width: 85px !important;
+    max-width: 85px !important;
+  }
+  .hero-nav-talk {
+    padding: 5px 9px;
+    font-size: 11px;
   }
 }
 
@@ -3825,6 +3860,13 @@ html[data-theme="light"] {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+}
+
+.liquid-glass-dock-wrapper.is-hidden:focus-within {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
 }
 
 /* Generic Minimal Concept Switcher Ribbon */
