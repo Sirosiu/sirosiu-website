@@ -35,7 +35,7 @@ export default function HandwrittenSignature() {
     setIsWriting(true)
     startTimeRef.current = 0
 
-    const duration = 2400 // 2.4 seconds smooth handwriting flow
+    const duration = 1600 // 1.6 seconds smooth handwriting flow
 
     const animate = (time: number) => {
       if (!startTimeRef.current) startTimeRef.current = time

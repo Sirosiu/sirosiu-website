@@ -120,12 +120,27 @@ export default function PortfolioHero({ onNavigate }: PortfolioHeroProps = {}) {
 
       <section className="hero-stage" aria-labelledby="hero-title">
         <div className="hero-copy hero-copy-left">
-          {/* Master Blended Stack: Tactile IC Modules + Continuous Pipeline Flow */}
-          <UnifiedTactilePipelineStack />
-          <HeroHeadlineReveal onReady={() => setReady(true)} />
-          <p className={`hero-intro${ready ? ' is-visible' : ''}`}>
-            I&apos;m Ankush (Sirosiu). I engineer high-performance systems across the compute stack—bridging digital logic, hardware acceleration, and autonomous intelligence.
-          </p>
+          {/* 1. Hero Introduction Cluster: Headline, Bio & Target Role */}
+          <div className="hero-intro-cluster">
+            <HeroHeadlineReveal onReady={() => setReady(true)} />
+            <p className={`hero-intro${ready ? ' is-visible' : ''}`}>
+              I&apos;m Ankush (Sirosiu). I engineer high-performance systems across the compute stack—bridging digital logic, hardware acceleration, and autonomous intelligence.
+            </p>
+            <div className="hero-intro-role-contact">
+              <span className="hero-target-role">
+                <span className="role-status-dot" aria-hidden="true" />
+                HARDWARE ACCELERATION &amp; APPLIED AI
+              </span>
+              <a href="#contact" className="hero-intro-talk-btn">
+                LET&apos;S TALK <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+
+          {/* 2. Master Blended Stack: Tactile IC Modules + Continuous Pipeline Flow */}
+          <div className="hero-technical-selector-wrap">
+            <UnifiedTactilePipelineStack />
+          </div>
         </div>
 
         {/* Right column: Portrait sitting above location & scroll info */}
