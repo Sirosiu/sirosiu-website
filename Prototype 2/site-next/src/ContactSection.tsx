@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react'
 export default function ContactSection() {
   const [copied, setCopied] = useState(false)
   const [formState, setFormState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [deliveryMethod, setDeliveryMethod] = useState<'endpoint' | 'mailto'>('endpoint')
   const [errorMessage, setErrorMessage] = useState('')
   const [copiedSentText, setCopiedSentText] = useState(false)
   const successHeadingRef = useRef<HTMLHeadingElement>(null)
@@ -16,6 +17,9 @@ export default function ContactSection() {
   })
 
   const emailAddress = 'sirosiusugi@gmail.com'
+  const hasBackendEndpoint = Boolean(
+    (import.meta as any).env?.VITE_CONTACT_ENDPOINT || (import.meta as any).env?.VITE_WEB3FORMS_KEY
+  )
 
   const handleCopyEmail = async () => {
     try {
@@ -80,9 +84,32 @@ export default function ContactSection() {
         throw new Error('Simulated network delivery failure: endpoint returned 503 Service Unavailable.')
       }
 
-      // 3. Real network endpoint if configured via environment or worker route
+      // 3. Real network endpoint if configured via environment (Formspree, Web3Forms, Cloudflare Worker, etc.)
       const endpoint = (import.meta as any).env?.VITE_CONTACT_ENDPOINT
-      if (endpoint) {
+      const web3FormsKey = (import.meta as any).env?.VITE_WEB3FORMS_KEY
+
+      if (web3FormsKey) {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            access_key: web3FormsKey,
+            name: formData.name,
+            email: formData.email,
+            subject: `[Portfolio Inquiry] ${formData.topic} - ${formData.name}`,
+            message: formData.message,
+            from_name: formData.name,
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || `Submission failed with status ${res.status}`)
+        }
+        setDeliveryMethod('endpoint')
+      } else if (endpoint) {
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
@@ -100,9 +127,14 @@ export default function ContactSection() {
         if (!res.ok) {
           throw new Error(`Submission failed with status ${res.status}: ${res.statusText}`)
         }
+        setDeliveryMethod('endpoint')
       } else {
-        // Local preview without external backend: simulated network dispatch
-        await new Promise((resolve) => setTimeout(resolve, 850))
+        // Static client fallback: launch email client with pre-filled message
+        await new Promise((resolve) => setTimeout(resolve, 450))
+        if (typeof window !== 'undefined') {
+          window.location.href = mailtoHref
+        }
+        setDeliveryMethod('mailto')
       }
 
       setFormState('sent')
@@ -274,27 +306,43 @@ export default function ContactSection() {
 
               {formState === 'sent' ? (
                 <div className="form-sent-notification" role="status" aria-live="polite">
-                  <span className="sent-icon" aria-hidden="true">✓</span>
+                  <span className="sent-icon" aria-hidden="true">
+                    {deliveryMethod === 'endpoint' ? '✓' : '✉'}
+                  </span>
                   <h4 ref={successHeadingRef} tabIndex={-1} className="feedback-heading">
-                    Message Dispatched
+                    {deliveryMethod === 'endpoint'
+                      ? 'Message Delivered to Inbox'
+                      : 'Email Draft Opened in Mail App'}
                   </h4>
                   <p>
-                    Thank you, {formData.name.trim() || 'friend'}! Your inquiry has been processed. A direct email has also been prepared so you can confirm transmission to {emailAddress}.
+                    {deliveryMethod === 'endpoint' ? (
+                      <>
+                        Thank you, {formData.name.trim() || 'friend'}! Your inquiry has been transmitted directly to{' '}
+                        <strong>{emailAddress}</strong>. I typically reply within 24 hours.
+                      </>
+                    ) : (
+                      <>
+                        Your default email client has been launched with your inquiry addressed to{' '}
+                        <strong>{emailAddress}</strong>. Please press <strong>Send</strong> in your mail application to complete delivery.
+                      </>
+                    )}
                   </p>
                   <div className="sent-actions-row">
-                    <a
-                      href={mailtoHref}
-                      className="sent-fallback-btn"
-                    >
-                      Open in Your Email Client ↗
-                    </a>
+                    {deliveryMethod === 'mailto' && (
+                      <a
+                        href={mailtoHref}
+                        className="sent-fallback-btn"
+                      >
+                        Re-Open Email Client ↗
+                      </a>
+                    )}
                     <button
                       type="button"
                       onClick={handleCopyMessage}
                       className="sent-copy-btn"
                       aria-label="Copy message text to clipboard"
                     >
-                      {copiedSentText ? '✓ COPIED' : 'COPY MESSAGE DETAILS'}
+                      {copiedSentText ? '✓ COPIED TO CLIPBOARD' : 'COPY MESSAGE DETAILS'}
                     </button>
                   </div>
                   <button
@@ -422,10 +470,12 @@ export default function ContactSection() {
                   >
                     {formState === 'sending' ? (
                       <>
-                        <span className="spinner-dot" /> TRANSMITTING...
+                        <span className="spinner-dot" /> {hasBackendEndpoint ? 'TRANSMITTING...' : 'LAUNCHING EMAIL...'}
                       </>
-                    ) : (
+                    ) : hasBackendEndpoint ? (
                       'TRANSMIT MESSAGE ↗'
+                    ) : (
+                      'PREPARE EMAIL DRAFT ↗'
                     )}
                   </button>
                 </form>
