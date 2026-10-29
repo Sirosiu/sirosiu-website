@@ -123,6 +123,41 @@ export default function HeroHeadlineReveal({ onReady }: HeroHeadlineRevealProps)
     }
   }, [effect, animKey])
 
+  const pillRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const EFFECTS: HeadlineEffect[] = ['typewriter', 'editorial-blur', 'matrix-decode', 'kinetic-mask']
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let nextIndex: number | null = null
+
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault()
+        nextIndex = (index + 1) % EFFECTS.length
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault()
+        nextIndex = (index - 1 + EFFECTS.length) % EFFECTS.length
+        break
+      case 'Home':
+        e.preventDefault()
+        nextIndex = 0
+        break
+      case 'End':
+        e.preventDefault()
+        nextIndex = EFFECTS.length - 1
+        break
+      default:
+        break
+    }
+
+    if (nextIndex !== null) {
+      handleSelectEffect(EFFECTS[nextIndex])
+      pillRefs.current[nextIndex]?.focus()
+    }
+  }
+
   const handleSelectEffect = (next: HeadlineEffect) => {
     setEffect(next)
     try {
@@ -136,42 +171,54 @@ export default function HeroHeadlineReveal({ onReady }: HeroHeadlineRevealProps)
       {/* Effect Selector Ribbon (Allows user to test all 4 options live) */}
       <div className="headline-effect-switcher" aria-label="Headline Reveal Animation Options">
         <span className="effect-switcher-label">HEADLINE EFFECT:</span>
-        <div className="effect-pills-row" role="tablist">
+        <div className="effect-pills-row" role="tablist" aria-orientation="horizontal">
           <button
+            ref={(el) => { pillRefs.current[0] = el }}
             type="button"
             role="tab"
             aria-selected={effect === 'typewriter'}
+            tabIndex={effect === 'typewriter' ? 0 : -1}
             onClick={() => handleSelectEffect('typewriter')}
+            onKeyDown={(e) => handleKeyDown(e, 0)}
             className={`effect-pill ${effect === 'typewriter' ? 'is-active' : ''}`}
             title="Clean terminal type-in once, then cursor disappears completely"
           >
             1: TYPEWRITER (NO LOOP)
           </button>
           <button
+            ref={(el) => { pillRefs.current[1] = el }}
             type="button"
             role="tab"
             aria-selected={effect === 'editorial-blur'}
+            tabIndex={effect === 'editorial-blur' ? 0 : -1}
             onClick={() => handleSelectEffect('editorial-blur')}
+            onKeyDown={(e) => handleKeyDown(e, 1)}
             className={`effect-pill ${effect === 'editorial-blur' ? 'is-active' : ''}`}
             title="Smooth staggered word blur and upward slide"
           >
             2: EDITORIAL BLUR
           </button>
           <button
+            ref={(el) => { pillRefs.current[2] = el }}
             type="button"
             role="tab"
             aria-selected={effect === 'matrix-decode'}
+            tabIndex={effect === 'matrix-decode' ? 0 : -1}
             onClick={() => handleSelectEffect('matrix-decode')}
+            onKeyDown={(e) => handleKeyDown(e, 2)}
             className={`effect-pill ${effect === 'matrix-decode' ? 'is-active' : ''}`}
             title="Hardware opcode unscramble resolving left-to-right"
           >
             3: SILICON DECODE
           </button>
           <button
+            ref={(el) => { pillRefs.current[3] = el }}
             type="button"
             role="tab"
             aria-selected={effect === 'kinetic-mask'}
+            tabIndex={effect === 'kinetic-mask' ? 0 : -1}
             onClick={() => handleSelectEffect('kinetic-mask')}
+            onKeyDown={(e) => handleKeyDown(e, 3)}
             className={`effect-pill ${effect === 'kinetic-mask' ? 'is-active' : ''}`}
             title="Kinetic mask wipe sliding up from baseline"
           >

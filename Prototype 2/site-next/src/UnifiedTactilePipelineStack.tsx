@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 interface StackStage {
   id: string
@@ -77,6 +77,7 @@ const STACK_STAGES: StackStage[] = [
 export default function UnifiedTactilePipelineStack() {
   const [activeStage, setActiveStage] = useState(0)
   const current = STACK_STAGES[activeStage]
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const handleScrollToWork = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -86,21 +87,64 @@ export default function UnifiedTactilePipelineStack() {
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let nextIndex: number | null = null
+
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault()
+        nextIndex = (index + 1) % STACK_STAGES.length
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault()
+        nextIndex = (index - 1 + STACK_STAGES.length) % STACK_STAGES.length
+        break
+      case 'Home':
+        e.preventDefault()
+        nextIndex = 0
+        break
+      case 'End':
+        e.preventDefault()
+        nextIndex = STACK_STAGES.length - 1
+        break
+      default:
+        break
+    }
+
+    if (nextIndex !== null) {
+      setActiveStage(nextIndex)
+      tabRefs.current[nextIndex]?.focus()
+    }
+  }
+
   return (
     <div className="unified-stack-pipeline">
       {/* Sequential Pipeline of Tactile Hardware ICs */}
-      <div className="pipeline-ic-rail" role="tablist" aria-label="Technical Stack Architecture">
+      <div
+        className="pipeline-ic-rail"
+        role="tablist"
+        aria-label="Technical Stack Architecture"
+        aria-orientation="horizontal"
+      >
         {STACK_STAGES.map((stage, idx) => {
           const isSelected = activeStage === idx
           return (
             <div key={stage.id} className="pipeline-node-segment">
               {/* Tactile IC Module Card */}
               <button
+                ref={(el) => {
+                  tabRefs.current[idx] = el
+                }}
                 type="button"
                 role="tab"
+                id={`stack-tab-${stage.id}`}
+                aria-controls="stack-panel-telemetry"
                 aria-selected={isSelected}
-                tabIndex={0}
+                tabIndex={isSelected ? 0 : -1}
                 onClick={() => setActiveStage(idx)}
+                onKeyDown={(e) => handleKeyDown(e, idx)}
                 className={`tactile-pipeline-card ${isSelected ? 'is-active' : ''}`}
               >
                 {/* Header row: Part number & Status LED */}
@@ -140,7 +184,13 @@ export default function UnifiedTactilePipelineStack() {
       </div>
 
       {/* PCB Bus Telemetry Readout (Verified Spec & Generic Tool Evidence) */}
-      <div className="pipeline-telemetry-bus">
+      <div
+        id="stack-panel-telemetry"
+        role="tabpanel"
+        aria-labelledby={`stack-tab-${current.id}`}
+        className="pipeline-telemetry-bus"
+        tabIndex={0}
+      >
         <div className="bus-header-row">
           <div className="bus-id-block">
             <span className="bus-led-dot" style={{ backgroundColor: current.statusLedColor }} />
