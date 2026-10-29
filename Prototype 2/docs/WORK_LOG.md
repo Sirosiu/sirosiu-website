@@ -11,6 +11,17 @@ This is the chronological index of meaningful work, not a duplicate of the detai
 
 ## Entries
 
+### 2026-10-29 — Navigation Loop Fix, Caustic Pill Liquid Glass Dock, Restored Cursor & Resume Integration
+
+- **User direction:** Fix navigation loop (Home -> About Me -> Projects -> About Me returning to Home instead of About Me); eliminate empty dock sides and add organic fade with options; restore initial cursor trail physics; and integrate official résumé.
+- **Implementations:**
+  - `src/App.tsx` & `src/PortfolioHero.tsx`: Added iterative layout tracking to navigation and route hash scroll so navigating to `/#about` from `/projects` accurately pins to the `#about` section through async 3D/canvas mounting.
+  - `src/LiquidGlassBottomNav.tsx`: Implemented Option 1 (Caustic Pill) as the permanent active glider with full-span width, zero empty sides, top specular glass arc, and organic amber lateral/vertical fade in both dark and light modes.
+  - `src/CanvasCursor.tsx`: Restored byte-for-byte to the initial organic fluid ribbon simulation with 50 nodes and default spring/friction physics.
+  - `public/assets/Ankush_Malothia_Resume.pdf`: Integrated the user's official 89 KB résumé PDF.
+  - `src/AboutSection.tsx` & `src/data/projectsData.ts`: Synchronized education (NIT Jalandhar B.Tech ECE, Expected 2028) and featured project entries (Ave, FraudLens, Antenna Modeling & EM Simulation, RV32I Core & Tensor Coprocessor).
+- **Checks:** `tsc --noEmit` and `npm run build` both succeeded with code 0. Chrome CDP automation tests confirmed navigation flow and visual rendering.
+
 ### 2026-10-26 — Source-first reuse and portable continuation
 
 - **Purpose:** Carry the user's direction into the shared project record after the current inspiration batch.
@@ -873,3 +884,30 @@ This is the chronological index of meaningful work, not a duplicate of the detai
 - **Verification:**
   - Cloudflare Pages check run completed with **`✅ Deploy successful!`**.
   - Live preview verified at `https://25074019.sirosiu.pages.dev` returning HTTP 200.
+### 2026-10-29 — Interactive cartoon avatar first preview
+
+- **User direction:** Make a first version of an interactive cartoon character based on the supplied multi-angle images and show it locally.
+- **Implementation:** Added a separate `/avatar-preview` page and a procedural Three.js character with curly hair, beard, dark casual clothing, backpack, watch, and sneakers. It waves automatically on entry and again by button/tap, follows pointer movement with its head, and rotates when dragged. The study uses the existing Three.js dependency; supplied images were visual references only and were not copied into the repository.
+- **Files:** `site-next/src/AvatarScene.tsx`, `site-next/src/AvatarPreview.tsx`, `site-next/src/App.tsx`, `site-next/src/styles.css`; refreshed project state, roadmap, decision, asset, QA, README, and handoff records.
+- **Verification:** `npm run build` in `site-next/` passed. Vite emitted a large-main-chunk advisory. Desktop Brave showed the greeting wave and drag rotation. `git diff --check` passed after the documentation edit. Mobile/tablet and reduced-motion QA remain open. No tests were added or run.
+- **Next:** Ask the user to review the local preview, then refine the face/proportions based on specific feedback. Keep the avatar separate from the portfolio until its direction is approved. No commit, push, or deployment was performed.
+
+### 2026-10-29 — Remove temporary avatar preview
+
+- **User direction:** Remove the avatar preview; it is not needed.
+- **Changes:** Removed the `/avatar-preview` route, page, Three.js scene, and page-specific styles. Updated project state, roadmap, README, QA, decision, asset, and handoff notes to mark the trial as removed. The user's source images remain outside the repository. Portfolio 01 and its existing visuals remain in place.
+- **Verification:** `npm run build` passed after cleanup; `git diff --check` passed. No tests were added or run.
+- **Next:** Resume the existing portfolio work; no avatar work is active.
+
+### 2026-10-29 — Rewrite Role Label, Headline & Opening Copy for Applied AI & Hardware Architecture
+
+- **User direction:** Rewrite role label and opening copy around user's actual focus: Applied AI systems, computer architecture, and AI hardware.
+- **Implementation:**
+  - Role Label (`.hero-eyebrow`): Updated from `CREATIVE DEVELOPER / INDIA` to `APPLIED AI SYSTEMS & ARCHITECTURE / INDIA`.
+  - Typewritten Headline (`greeting`): Updated from `'I make digital work feel alive.'` to `'Engineering intelligence from silicon to scale.'`.
+  - Headline Box Sizing: Expanded `.hero-copy h1` from `max-width: 8ch` to `max-width: 12ch` and `.hero-intro` from `29ch` to `35ch` in [styles.css](file:///home/sirosiu-sugi/Documents/Github/sirosiu-website/Prototype%202/site-next/src/styles.css) to provide natural typographic wrapping for technical terminology.
+  - Opening Copy (`.hero-intro`): Updated to: *"I'm Ankush (Sirosiu). I build applied AI systems and explore computer architecture—working at the intersection of machine intelligence, hardware acceleration, and scalable systems."*
+  - Document metadata: Updated `<title>` and `<meta name="description">` in [index.html](file:///home/sirosiu-sugi/Documents/Github/sirosiu-website/Prototype%202/site-next/index.html).
+- **Verification:**
+  - `npm run build` compiled in 1.96s with 0 errors.
+  - Headless Chrome captures verified both Light (`system_default_light_mode.png`) and Dark (`system_default_dark_mode.png`) modes.

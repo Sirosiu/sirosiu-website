@@ -1,9 +1,29 @@
 import { useEffect, useRef, useState } from 'react'
 
+export type CursorMode = 'lens' | 'reticle' | 'minimal'
+
 export default function SmoothCursorFollower() {
   const followerRef = useRef<HTMLDivElement>(null)
   const leadRef = useRef<HTMLDivElement>(null)
   const [motionAllowed, setMotionAllowed] = useState(true)
+  const [mode, setMode] = useState<CursorMode>(() => {
+    if (typeof window === 'undefined') return 'lens'
+    try {
+      const saved = localStorage.getItem('sirosiu-cursor-mode')
+      if (saved === 'reticle' || saved === 'minimal' || saved === 'lens') return saved
+    } catch {}
+    return 'lens'
+  })
+
+  // Listen for external mode changes
+  useEffect(() => {
+    const onModeChange = (e: Event) => {
+      const custom = e as CustomEvent<CursorMode>
+      if (custom.detail) setMode(custom.detail)
+    }
+    window.addEventListener('sirosiu-cursor-mode', onModeChange)
+    return () => window.removeEventListener('sirosiu-cursor-mode', onModeChange)
+  }, [])
 
   useEffect(() => {
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -27,8 +47,6 @@ export default function SmoothCursorFollower() {
     let isVisible = false
     let isHovering = false
     let isMouseDown = false
-    let isStill = true
-    let lastMoveTime = performance.now()
     let frameId = 0
 
     const followerEl = followerRef.current
@@ -37,8 +55,6 @@ export default function SmoothCursorFollower() {
     const onPointerMove = (e: PointerEvent) => {
       targetX = e.clientX
       targetY = e.clientY
-      lastMoveTime = performance.now()
-      isStill = false
 
       if (!isVisible) {
         isVisible = true
@@ -51,7 +67,10 @@ export default function SmoothCursorFollower() {
       // Check if hovering interactive target
       const target = e.target as HTMLElement | null
       const interactive = Boolean(
-        target && target.closest('a, button, [role="button"], input, textarea, select, .hero-sandbox-badge')
+        target &&
+          target.closest(
+            'a, button, [role="button"], input, textarea, select, .ic-chip-unit, .home-project-card, .skill-pillar-card, .experience-card'
+          )
       )
 
       if (interactive !== isHovering) {
@@ -95,48 +114,22 @@ export default function SmoothCursorFollower() {
     document.addEventListener('mouseleave', onMouseLeave)
     document.addEventListener('mouseenter', onMouseEnter)
 
-    // Physics update loop
+    // Physics update loop: High-fidelity damped tracking without elastic distortion
     const animate = () => {
       if (isVisible && followerEl && leadEl) {
-        // Immediate positioning for lead point
+        // Zero-lag immediate track for center lead point
         leadEl.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`
 
-        // Spring lag physics for follower
+        // Tight, responsive spring ease for follower (no sluggish dragging)
         const dx = targetX - followerX
         const dy = targetY - followerY
-        const ease = isHovering ? 0.22 : 0.16
+        const ease = isHovering ? 0.36 : 0.28
         followerX += dx * ease
         followerY += dy * ease
 
-        const speed = Math.hypot(dx, dy)
-        const now = performance.now()
-
-        // Check still state
-        if (speed < 0.25 && now - lastMoveTime > 90) {
-          if (!isStill) {
-            isStill = true
-            followerEl.classList.add('is-still')
-          }
-        } else {
-          if (isStill) {
-            isStill = false
-            followerEl.classList.remove('is-still')
-          }
-        }
-
-        // Dynamic velocity stretch & rotation (the signature Smooth Follower effect)
-        let angle = 0
-        let stretch = 1.0
-        let squeeze = 1.0
-
-        if (!isHovering && !isStill && speed > 1.2) {
-          angle = Math.atan2(dy, dx)
-          stretch = Math.min(1.0 + speed * 0.016, 1.65)
-          squeeze = 1.0 / Math.sqrt(stretch)
-        }
-
-        const scaleModifier = isMouseDown ? 0.75 : 1.0
-        followerEl.style.transform = `translate3d(${followerX}px, ${followerY}px, 0) rotate(${angle}rad) scale(${stretch * scaleModifier}, ${squeeze * scaleModifier})`
+        const scale = isMouseDown ? 0.84 : 1.0
+        // Clean translation with subtle press scale — NO awkward stretch/tilt
+        followerEl.style.transform = `translate3d(${followerX}px, ${followerY}px, 0) scale(${scale})`
       }
 
       frameId = requestAnimationFrame(animate)
@@ -160,16 +153,35 @@ export default function SmoothCursorFollower() {
 
   return (
     <>
-      {/* Central Lead Point (Immediate track with zero lag) */}
-      <div ref={leadRef} className="smooth-cursor-lead" aria-hidden="true">
+      {/* Central Precision Lead Point (Immediate track, zero lag) */}
+      <div ref={leadRef} className={`smooth-cursor-lead cursor-mode-${mode}`} aria-hidden="true">
         <div className="smooth-cursor-lead-dot" />
       </div>
 
-      {/* Smooth Follower (Physics trailing ring with velocity stretch & magnetic hover) */}
-      <div ref={followerRef} className="smooth-cursor-follower" aria-hidden="true">
-        <div className="smooth-cursor-follower-ring" />
-        <div className="smooth-cursor-follower-glow" />
-      </div>
+      {/* Follower Aura (Aperture Lens or Hardware Reticle) */}
+      {mode !== 'minimal' && (
+        <div
+          ref={followerRef}
+          className={`smooth-cursor-follower cursor-mode-${mode}`}
+          aria-hidden="true"
+        >
+          {mode === 'lens' && (
+            <>
+              <div className="smooth-cursor-follower-ring" />
+              <div className="smooth-cursor-follower-glow" />
+            </>
+          )}
+
+          {mode === 'reticle' && (
+            <div className="smooth-cursor-reticle">
+              <span className="reticle-tick tick-tl" />
+              <span className="reticle-tick tick-tr" />
+              <span className="reticle-tick tick-bl" />
+              <span className="reticle-tick tick-br" />
+            </div>
+          )}
+        </div>
+      )}
     </>
   )
 }

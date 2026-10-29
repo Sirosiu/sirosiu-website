@@ -1,10 +1,27 @@
 import { useEffect, useState } from 'react'
 import PortfolioHero from './PortfolioHero'
-import SmoothCursorFollower from './SmoothCursorFollower'
+import ProjectsPage from './ProjectsPage'
+import CanvasCursor from './CanvasCursor'
 import OceanSandbox from './OceanSandbox'
+
+const getInitialThemeIsLight = (): boolean => {
+  if (typeof window === 'undefined') return false
+  try {
+    const saved = localStorage.getItem('sirosiu-theme')
+    if (saved) return saved === 'light'
+    return window.matchMedia('(prefers-color-scheme: light)').matches
+  } catch {
+    return false
+  }
+}
 
 export default function App() {
   const [pathname, setPathname] = useState(window.location.pathname)
+  const [isLight, setIsLight] = useState(getInitialThemeIsLight)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark')
+  }, [isLight])
 
   useEffect(() => {
     const onPopState = () => {
@@ -14,9 +31,38 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
 
+  const handleToggleTheme = (next: boolean) => {
+    setIsLight(next)
+    try {
+      localStorage.setItem('sirosiu-theme', next ? 'light' : 'dark')
+    } catch {}
+  }
+
   const navigate = (path: string) => {
     window.history.pushState({}, '', path)
-    setPathname(path)
+    const nextPath = path.split('#')[0] || '/'
+    setPathname(nextPath)
+
+    if (path.includes('#about') || path === '/about') {
+      let count = 0
+      const syncScroll = () => {
+        const el = document.getElementById('about')
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          if (Math.abs(rect.top - 20) > 40) {
+            const y = rect.top + window.pageYOffset - 20
+            window.scrollTo({ top: Math.max(0, y), behavior: count === 0 ? 'auto' : 'smooth' })
+          }
+        }
+        count++
+        if (count < 8) {
+          setTimeout(syncScroll, 140)
+        }
+      }
+      syncScroll()
+    } else if (path === '/' || path === '/#home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   const isSandbox =
@@ -28,15 +74,33 @@ export default function App() {
     return (
       <>
         <OceanSandbox onBack={() => navigate('/portfolio-1')} />
-        <SmoothCursorFollower />
+        <CanvasCursor />
+      </>
+    )
+  }
+
+  const isProjects =
+    pathname === '/projects' ||
+    pathname.startsWith('/projects') ||
+    window.location.search.includes('projects')
+
+  if (isProjects) {
+    return (
+      <>
+        <ProjectsPage
+          navigate={navigate}
+          isLight={isLight}
+          onToggleTheme={handleToggleTheme}
+        />
+        <CanvasCursor />
       </>
     )
   }
 
   return (
     <>
-      <PortfolioHero />
-      <SmoothCursorFollower />
+      <PortfolioHero onNavigate={navigate} />
+      <CanvasCursor />
     </>
   )
 }

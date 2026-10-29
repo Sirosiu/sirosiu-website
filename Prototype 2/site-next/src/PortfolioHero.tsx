@@ -6,9 +6,13 @@ import HeroPortrait from './HeroPortrait'
 import ThemeToggleSwitch from './ThemeToggleSwitch'
 import InteractiveDaylightBubbles from './InteractiveDaylightBubbles'
 import FlowingDotsBackground from './FlowingDotsBackground'
-import TactileRevealSpotlight from './TactileRevealSpotlight'
-
-const greeting = 'I make digital work feel alive.'
+import LiquidGlassBottomNav from './LiquidGlassBottomNav'
+import ExperienceSection from './ExperienceSection'
+import AboutSection from './AboutSection'
+import ContactSection from './ContactSection'
+import UnifiedTactilePipelineStack from './UnifiedTactilePipelineStack'
+import HeroHeadlineReveal from './HeroHeadlineReveal'
+import { DEMO_PROJECTS, type ProjectItem } from './data/projectsData'
 
 const getInitialThemeIsLight = (): boolean => {
   if (typeof window === 'undefined') return false
@@ -22,8 +26,11 @@ const getInitialThemeIsLight = (): boolean => {
   }
 }
 
-export default function PortfolioHero() {
-  const [typed, setTyped] = useState('')
+interface PortfolioHeroProps {
+  onNavigate?: (path: string) => void
+}
+
+export default function PortfolioHero({ onNavigate }: PortfolioHeroProps = {}) {
   const [ready, setReady] = useState(false)
   const [isLight, setIsLight] = useState(getInitialThemeIsLight)
 
@@ -47,26 +54,39 @@ export default function PortfolioHero() {
     return () => mql.removeEventListener('change', onSystemThemeChange)
   }, [])
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window.location.hash === '#about' || window.location.pathname === '/about')) {
+      let count = 0
+      let activeTimer: ReturnType<typeof setTimeout> | null = null
+
+      const syncScroll = () => {
+        const el = document.getElementById('about')
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          if (Math.abs(rect.top - 20) > 40) {
+            const y = rect.top + window.pageYOffset - 20
+            window.scrollTo({ top: Math.max(0, y), behavior: count === 0 ? 'auto' : 'smooth' })
+          }
+        }
+        count++
+        if (count < 8) {
+          activeTimer = setTimeout(syncScroll, 140)
+        }
+      }
+
+      syncScroll()
+      return () => {
+        if (activeTimer) clearTimeout(activeTimer)
+      }
+    }
+  }, [])
+
   const handleThemeToggle = (next: boolean) => {
     setIsLight(next)
     try {
       localStorage.setItem('sirosiu-theme', next ? 'light' : 'dark')
     } catch {}
   }
-
-  useEffect(() => {
-    let index = 0
-    const timer = window.setInterval(() => {
-      index += 1
-      setTyped(greeting.slice(0, index))
-      if (index === greeting.length) {
-        window.clearInterval(timer)
-        window.setTimeout(() => setReady(true), 260)
-      }
-    }, 54)
-
-    return () => window.clearInterval(timer)
-  }, [])
 
   return (
     <main className="single-portfolio-hero" data-theme={isLight ? 'light' : 'dark'}>
@@ -83,8 +103,16 @@ export default function PortfolioHero() {
         <a className="hero-logo-signature" href="/" aria-label="Ankush Malothia">
           <HandwrittenSignature />
         </a>
-        <p>PORTFOLIO / 01</p>
+        <p className="hero-nav-role">HARDWARE ACCELERATION &amp; APPLIED AI</p>
         <div className="hero-nav-actions">
+          <a
+            href="/assets/Ankush_Malothia_Resume.pdf"
+            download="Ankush_Malothia_Resume.pdf"
+            className="hero-nav-resume-btn"
+            title="Download Official Résumé (PDF)"
+          >
+            RÉSUMÉ <span aria-hidden="true">↓</span>
+          </a>
           <ThemeToggleSwitch isLight={isLight} onToggle={handleThemeToggle} />
           <a href="#contact" className="hero-nav-talk">LET&apos;S TALK <span aria-hidden="true">↗</span></a>
         </div>
@@ -92,10 +120,11 @@ export default function PortfolioHero() {
 
       <section className="hero-stage" aria-labelledby="hero-title">
         <div className="hero-copy hero-copy-left">
-          <p className="hero-eyebrow">CREATIVE DEVELOPER / INDIA</p>
-          <h1 id="hero-title">{typed}<span className="hero-caret" aria-hidden="true" /></h1>
+          {/* Master Blended Stack: Tactile IC Modules + Continuous Pipeline Flow */}
+          <UnifiedTactilePipelineStack />
+          <HeroHeadlineReveal onReady={() => setReady(true)} />
           <p className={`hero-intro${ready ? ' is-visible' : ''}`}>
-            I&apos;m Sirosiu. I design and build thoughtful web experiences for people with something worth saying.
+            I&apos;m Ankush (Sirosiu). I engineer high-performance systems across the compute stack—bridging digital logic, hardware acceleration, and autonomous intelligence.
           </p>
         </div>
 
@@ -109,23 +138,140 @@ export default function PortfolioHero() {
         </div>
       </section>
 
-      <footer id="contact" className="hero-footer">
-        <span>SELECTED WORK / COMING TOGETHER</span>
-        <span>© {new Date().getFullYear()} SIROSIU</span>
-      </footer>
-
-      <section id="work" className="hero-next-section" aria-label="Next section">
+      <section id="work" className="hero-next-section" aria-label="Selected Projects">
         {/* Light Theme: Flowing dots architectural blueprint background */}
         <FlowingDotsBackground isActive={isLight} />
 
         <div className="hero-next-content">
-          <p>01 / THE WORK</p>
-          <h2>Good work starts with a clear point of view.</h2>
+          <div className="section-eyebrow-row">
+            <span className="section-eyebrow-tag">01 / SELECTED SYSTEMS</span>
+            <span className="section-eyebrow-divider">//</span>
+            <span className="section-eyebrow-text">ENGINEERING ARTIFACTS &amp; PROJECT STATUS</span>
+          </div>
 
-          {/* Light Theme: Architectural tactile reveal spotlight gallery */}
-          <TactileRevealSpotlight isActive={isLight} />
+          <h2 className="hero-work-heading">Architected across silicon, runtimes, and autonomous agents.</h2>
+          <p className="hero-work-sub">
+            Verified hardware accelerators, on-device agent runtimes, and high-frequency RF systems with measured benchmarks.
+          </p>
+
+          {/* Project Status Matrix (Directly visible on homepage) */}
+          <div className="home-projects-status-grid">
+            {DEMO_PROJECTS.map((proj: ProjectItem) => (
+              <article key={proj.id} className="home-project-card">
+                <div className="card-top-row">
+                  <span className="card-domain-tag">{proj.domain}</span>
+                  <span
+                    className={`card-status-badge ${
+                      proj.status === 'Built'
+                        ? 'is-built'
+                        : proj.status === 'In progress'
+                        ? 'is-progress'
+                        : 'is-planned'
+                    }`}
+                  >
+                    {proj.status === 'Built' && '● BUILT & VERIFIED'}
+                    {proj.status === 'In progress' && '◌ IN PROGRESS'}
+                    {proj.status === 'Planned' && '◇ PLANNED'}
+                  </span>
+                </div>
+
+                <h3 className="card-title">{proj.title}</h3>
+                <p className="card-headline">{proj.tagline}</p>
+
+                {/* Key Metrics */}
+                <div className="card-metrics-grid">
+                  {proj.metrics.map((m, mIdx) => (
+                    <div key={mIdx} className="card-metric-cell">
+                      <span className="metric-lbl">{m.label}</span>
+                      <span className="metric-val">{m.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Scope Transparency: Built vs Planned */}
+                <div className="card-scope-box">
+                  <div className="scope-col">
+                    <span className="scope-tag tag-built">BUILT:</span>
+                    <p className="scope-text">{proj.builtScope}</p>
+                  </div>
+                  {proj.plannedScope && (
+                    <div className="scope-col">
+                      <span className="scope-tag tag-planned">IN PROGRESS / PLANNED:</span>
+                      <p className="scope-text">{proj.plannedScope}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tech Badges */}
+                <div className="card-tags-row">
+                  {proj.tags.slice(0, 4).map((tag, tIdx) => (
+                    <span key={tIdx} className="card-tag">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Card Action */}
+                <div className="card-action-row">
+                  <button
+                    type="button"
+                    className="card-explore-btn"
+                    onClick={() => onNavigate?.('/projects')}
+                  >
+                    VIEW ARCHITECTURE SPEC SHEET ↗
+                  </button>
+                  <a
+                    href={proj.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="card-github-link"
+                    title="View GitHub Repository"
+                  >
+                    REPO ↗
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="home-work-catalog-cta">
+            <button
+              type="button"
+              className="hero-work-portal-btn"
+              onClick={() => onNavigate?.('/projects')}
+            >
+              OPEN FULL PROJECTS CATALOG &amp; SPEC DRAWER (3 SYSTEMS) ↗
+            </button>
+          </div>
         </div>
       </section>
+
+      {/* 02 / Track Record: Professional & Research Experience */}
+      <ExperienceSection />
+
+      {/* 03 / Professional Profile: Engineering Narrative, Academic Foundation & 4-Pillar Skills Matrix */}
+      <AboutSection />
+
+      {/* 04 / Contact Section: Recruiter Context, Direct Email, Downloadable Résumé, Verified Profiles & Inquiry Form */}
+      <ContactSection />
+
+      {/* Centered Liquid Glass Bottom Navigation Dock (Aceternity UI) */}
+      <LiquidGlassBottomNav
+        initialTab={typeof window !== 'undefined' && window.location.hash === '#about' ? 'about' : 'home'}
+        onTabChange={(tab) => {
+          if (tab === 'projects') {
+            onNavigate?.('/projects')
+          } else if (tab === 'about') {
+            const el = document.getElementById('about')
+            if (el) {
+              const y = el.getBoundingClientRect().top + window.pageYOffset - 20
+              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+            }
+          } else if (tab === 'home') {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }
+        }}
+      />
     </main>
   )
 }

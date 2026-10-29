@@ -1,15 +1,15 @@
 # Current Handoff
 
-Updated: 2026-10-27
+Updated: 2026-10-29
 Workspace: `Prototype 2/` on `fix/restore-original-hero-main`
 
-## Current checkpoint — 2026-10-26
+## Current checkpoint — 2026-10-29
 
 The user has directed the project to reuse suitable existing online/GitHub code where it fits, rather than recreating every feature from reference sites. Preserve an original SIROSIU identity and select only the mechanics needed for the approved experience. Continue to inspect exact source and license terms, compatibility, and integration cost before recommending repositories. The PMNDRS GPGPU cursor experiment was removed after the user clarified they meant Cursify's Canvas Cursor. The current implementation independently recreates its spring-trail behavior; the Cursify source remains unlicensed in the inspected repository, so no code was copied. See `docs/ASSET_REGISTER.md` and `docs/THIRD_PARTY_NOTICES.md`.
 
 The user also requires a complete, portable project record so another AI agent can continue without chat history. The new `docs/WORK_LOG.md` is the chronological index; `docs/CHAT_WORKFLOW.md` contains the source-review process and a copy-ready continuation prompt. Detailed research stays in `docs/REFERENCE_LIBRARY.md` and `docs/ASSET_REGISTER.md`.
 
-**Resume here:** the user reset the design to one simple portfolio and asked for the hero first. The current local preview is `http://127.0.0.1:5173/portfolio-1`. `site-next/src/CanvasCursor.tsx` renders a Cursify-inspired 20-trail canvas cursor with spring-linked nodes, smooth colored strokes, a capped DPR, safe pointer/touch input, reduced-motion behavior, and listener/animation cleanup. It does not intercept page input, and the native pointer remains visible. The PMNDRS cursor experiment and its extra packages/source have been removed. Cursify's unlicensed code was not copied; the locally authored technique adaptation and source review are documented in `docs/THIRD_PARTY_NOTICES.md` and `docs/ASSET_REGISTER.md`. The build passes; Vite gives a large-bundle advisory, and phone/tablet performance remains open. Continue only in `site-next/` for application changes.
+**Resume here:** the user asked to remove the temporary avatar study; `/avatar-preview` and its implementation were deleted on 2026-10-29. Continue with the single portfolio preview at `http://127.0.0.1:5173/portfolio-1`, inside `site-next/` only. Preserve existing working-tree changes and the other project copies. Do not commit, push, deploy, or alter production settings unless separately requested.
 
 ## Current phase
 
