@@ -5,6 +5,7 @@ import InteractiveOceanBackground from './InteractiveOceanBackground'
 import InteractiveCloudsBackground from './InteractiveCloudsBackground'
 import LiquidGlassBottomNav from './LiquidGlassBottomNav'
 import CometCard from './CometCard'
+import GlobalSiteFooter from './GlobalSiteFooter'
 import { DEMO_PROJECTS, type ProjectItem } from './data/projectsData'
 
 interface ProjectsPageProps {
@@ -27,13 +28,20 @@ export default function ProjectsPage({
       : DEMO_PROJECTS.filter((p) => p.domain.toLowerCase().includes(activeFilter.toLowerCase()))
 
   return (
-    <main className="projects-page-root" data-theme={isLight ? 'light' : 'dark'}>
-      {/* Dynamic Backgrounds */}
-      <InteractiveOceanBackground isActive={!isLight} />
-      <InteractiveCloudsBackground isActive={isLight} />
+    <div className="projects-page-root" data-theme={isLight ? 'light' : 'dark'}>
+      {/* Accessible Skip Link */}
+      <a href="#main-content" className="skip-to-content">
+        Skip to main content
+      </a>
 
-      {/* Header */}
-      <header className="projects-header">
+      {/* Dynamic Backgrounds */}
+      <div aria-hidden="true">
+        <InteractiveOceanBackground isActive={!isLight} />
+        <InteractiveCloudsBackground isActive={isLight} />
+      </div>
+
+      {/* Banner Landmark: Header */}
+      <header className="projects-header" role="banner">
         <a
           href="/"
           className="projects-brand-link"
@@ -41,7 +49,7 @@ export default function ProjectsPage({
             e.preventDefault()
             navigate('/')
           }}
-          aria-label="Return home"
+          aria-label="Return home - Ankush Malothia"
         >
           <HandwrittenSignature />
         </a>
@@ -52,7 +60,7 @@ export default function ProjectsPage({
           <span className="projects-header-title">SELECTED SYSTEMS</span>
         </div>
 
-        <div className="projects-header-actions">
+        <nav className="projects-header-actions" role="navigation" aria-label="Projects navigation">
           {onToggleTheme && (
             <ThemeToggleSwitch isLight={isLight} onToggle={onToggleTheme} />
           )}
@@ -63,11 +71,11 @@ export default function ProjectsPage({
           >
             ← BACK TO HOME
           </button>
-        </div>
+        </nav>
       </header>
 
-      {/* Main Container */}
-      <div className="projects-container">
+      {/* Main Content Landmark */}
+      <main id="main-content" role="main" tabIndex={-1} className="projects-container">
         {/* Intro Hero */}
         <section className="projects-intro-section">
           <div className="projects-intro-meta">
@@ -166,7 +174,7 @@ export default function ProjectsPage({
             ))}
           </div>
         </section>
-      </div>
+      </main>
 
       {/* ============================================================== */}
       {/* TECHNICAL SPEC SHEET MODAL / DRAWER                            */}
@@ -268,7 +276,10 @@ export default function ProjectsPage({
         </div>
       )}
 
-      {/* Floating Centered Liquid Glass Bottom Navigation Dock */}
+      {/* Contentinfo Landmark: Global Engineering Footer */}
+      <GlobalSiteFooter isLight={isLight} onToggleTheme={onToggleTheme} />
+
+      {/* Navigation Landmark: Floating Centered Liquid Glass Bottom Navigation Dock */}
       {!selectedProject && (
         <LiquidGlassBottomNav
           initialTab="projects"
@@ -286,6 +297,6 @@ export default function ProjectsPage({
           }}
         />
       )}
-    </main>
+    </div>
   )
 }

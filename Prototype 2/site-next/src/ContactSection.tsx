@@ -1,12 +1,6 @@
 import React, { useState, useRef } from 'react'
-import ThemeToggleSwitch from './ThemeToggleSwitch'
 
-interface ContactSectionProps {
-  isLight?: boolean
-  onToggleTheme?: (next: boolean) => void
-}
-
-export default function ContactSection({ isLight, onToggleTheme }: ContactSectionProps = {}) {
+export default function ContactSection() {
   const [copied, setCopied] = useState(false)
   const [formState, setFormState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
@@ -439,39 +433,6 @@ export default function ContactSection({ isLight, onToggleTheme }: ContactSectio
             </div>
           </div>
         </div>
-
-        {/* Global Engineering Footer */}
-        <footer className="global-site-footer">
-          <div className="footer-left">
-            <span className="footer-brand">ANKUSH MALOTHIA // SIROSIU</span>
-            <span className="footer-creds">
-              ELECTRONICS & COMMUNICATION ENGINEERING · SYSTEMS ARCHITECT
-            </span>
-          </div>
-
-          <div className="footer-center">
-            <span className="footer-tech-stack">
-              BUILT WITH REACT 19 · TYPESCRIPT · ACETERNITY LIQUID GLASS · HOSTED ON CLOUDFLARE PAGES
-            </span>
-          </div>
-
-          <div className="footer-right">
-            {onToggleTheme && (
-              <div className="footer-theme-toggle-wrap">
-                <span className="footer-theme-label">THEME</span>
-                <ThemeToggleSwitch isLight={isLight} onToggle={onToggleTheme} />
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="footer-back-to-top"
-            >
-              BACK TO TOP ↑
-            </button>
-            <span className="footer-copy">© {new Date().getFullYear()} ALL RIGHTS RESERVED</span>
-          </div>
-        </footer>
       </div>
     </section>
   )

@@ -10,6 +10,7 @@ import LiquidGlassBottomNav from './LiquidGlassBottomNav'
 import ExperienceSection from './ExperienceSection'
 import AboutSection from './AboutSection'
 import ContactSection from './ContactSection'
+import GlobalSiteFooter from './GlobalSiteFooter'
 import UnifiedTactilePipelineStack from './UnifiedTactilePipelineStack'
 import HeroHeadlineReveal from './HeroHeadlineReveal'
 import { DEMO_PROJECTS, type ProjectItem } from './data/projectsData'
@@ -212,22 +213,33 @@ export default function PortfolioHero({
   }, [])
 
   return (
-    <main className="single-portfolio-hero" data-theme={isLight ? 'light' : 'dark'}>
-      {/* Dark Theme: Full-screen ambient interactive 3D ocean background */}
-      <InteractiveOceanBackground isActive={!isLight} />
+    <div className="single-portfolio-hero" data-theme={isLight ? 'light' : 'dark'}>
+      {/* Accessible Skip Link for Keyboard & Screen Reader Users */}
+      <a href="#main-content" className="skip-to-content">
+        Skip to main content
+      </a>
 
-      {/* Light Theme: Flowing volumetric 3D clouds background */}
-      <InteractiveCloudsBackground isActive={isLight} />
+      {/* Decorative 3D Canvases & Particle Layers */}
+      <div aria-hidden="true">
+        {/* Dark Theme: Full-screen ambient interactive 3D ocean background */}
+        <InteractiveOceanBackground isActive={!isLight} />
 
-      {/* Light Theme: Interactive daylight buoyancy bubbles (clicks & CTA hovers) */}
-      <InteractiveDaylightBubbles isActive={isLight} />
+        {/* Light Theme: Flowing volumetric 3D clouds background */}
+        <InteractiveCloudsBackground isActive={isLight} />
 
-      <header className="hero-nav">
-        <a className="hero-logo-signature" href="/" aria-label="Ankush Malothia">
+        {/* Light Theme: Interactive daylight buoyancy bubbles (clicks & CTA hovers) */}
+        <InteractiveDaylightBubbles isActive={isLight} />
+      </div>
+
+      {/* 1. Banner Landmark: Top Site Header */}
+      <header className="hero-nav" role="banner">
+        <a className="hero-logo-signature" href="/" aria-label="Ankush Malothia - Home">
           <HandwrittenSignature />
         </a>
         <p className="hero-nav-role">HARDWARE ACCELERATION &amp; APPLIED AI</p>
-        <div className="hero-nav-actions">
+        
+        {/* Semantic Navigation Landmark for Header Actions */}
+        <nav className="hero-nav-actions" role="navigation" aria-label="Primary navigation">
           <a
             href="/assets/Ankush_Malothia_Resume.pdf"
             download="Ankush_Malothia_Resume.pdf"
@@ -238,10 +250,12 @@ export default function PortfolioHero({
           </a>
           <ThemeToggleSwitch isLight={isLight} onToggle={handleThemeToggle} />
           <a href="#contact" className="hero-nav-talk">LET&apos;S TALK <span aria-hidden="true">↗</span></a>
-        </div>
+        </nav>
       </header>
 
-      <section id="hero" className="hero-stage" aria-labelledby="hero-title">
+      {/* 2. Main Content Landmark */}
+      <main id="main-content" role="main" tabIndex={-1}>
+        <section id="hero" className="hero-stage" aria-labelledby="hero-title">
         <div className="hero-copy hero-copy-left">
           {/* 1. Hero Introduction Cluster: Headline, Bio & Target Role */}
           <div className="hero-intro-cluster">
@@ -276,7 +290,7 @@ export default function PortfolioHero({
         </div>
       </section>
 
-      <section id="work" className="hero-next-section" aria-label="Selected Projects">
+      <section id="work" className="hero-next-section" aria-labelledby="work-heading">
         {/* Light Theme: Flowing dots architectural blueprint background */}
         <FlowingDotsBackground isActive={isLight} />
 
@@ -287,7 +301,7 @@ export default function PortfolioHero({
             <span className="section-eyebrow-text">ENGINEERING ARTIFACTS &amp; PROJECT STATUS</span>
           </div>
 
-          <h2 className="hero-work-heading">Architected across silicon, runtimes, and autonomous agents.</h2>
+          <h2 id="work-heading" className="hero-work-heading">Architected across silicon, runtimes, and autonomous agents.</h2>
           <p className="hero-work-sub">
             Verified hardware accelerators, on-device agent runtimes, and high-frequency RF systems with measured benchmarks.
           </p>
@@ -391,42 +405,46 @@ export default function PortfolioHero({
       <AboutSection />
 
       {/* 04 / Contact Section: Recruiter Context, Direct Email, Downloadable Résumé, Verified Profiles & Inquiry Form */}
-      <ContactSection isLight={isLight} onToggleTheme={handleThemeToggle} />
-
-      {/* Centered Liquid Glass Bottom Navigation Dock (Aceternity UI) */}
-      <LiquidGlassBottomNav
-        initialTab={
-          typeof window !== 'undefined'
-            ? window.location.hash === '#contact'
-              ? 'contact'
-              : window.location.hash === '#about'
-              ? 'about'
-              : window.location.hash === '#experience'
-              ? 'experience'
-              : window.location.hash === '#work'
-              ? 'projects'
-              : 'home'
-            : 'home'
-        }
-        onTabChange={(tab) => {
-          if (tab === 'home') {
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-            try {
-              window.history.pushState(null, '', window.location.pathname)
-            } catch {}
-          } else {
-            const targetId = tab === 'projects' ? 'work' : tab
-            const el = document.getElementById(targetId)
-            if (el) {
-              const y = el.getBoundingClientRect().top + window.pageYOffset - 20
-              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
-              try {
-                window.history.pushState(null, '', `#${targetId}`)
-              } catch {}
-            }
-          }
-        }}
-      />
+      <ContactSection />
     </main>
+
+    {/* 3. Contentinfo Landmark: Global Engineering Footer */}
+    <GlobalSiteFooter isLight={isLight} onToggleTheme={handleThemeToggle} />
+
+    {/* 4. Navigation Landmark: Centered Liquid Glass Bottom Navigation Dock */}
+    <LiquidGlassBottomNav
+      initialTab={
+        typeof window !== 'undefined'
+          ? window.location.hash === '#contact'
+            ? 'contact'
+            : window.location.hash === '#about'
+            ? 'about'
+            : window.location.hash === '#experience'
+            ? 'experience'
+            : window.location.hash === '#work'
+            ? 'projects'
+            : 'home'
+          : 'home'
+      }
+      onTabChange={(tab) => {
+        if (tab === 'home') {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          try {
+            window.history.pushState(null, '', window.location.pathname)
+          } catch {}
+        } else {
+          const targetId = tab === 'projects' ? 'work' : tab
+          const el = document.getElementById(targetId)
+          if (el) {
+            const y = el.getBoundingClientRect().top + window.pageYOffset - 20
+            window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+            try {
+              window.history.pushState(null, '', `#${targetId}`)
+            } catch {}
+          }
+        }
+      }}
+    />
+  </div>
   )
 }

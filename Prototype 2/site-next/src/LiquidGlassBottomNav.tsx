@@ -265,8 +265,9 @@ export default function LiquidGlassBottomNav({
 
   return (
     <nav
+      role="navigation"
       className={`liquid-glass-dock-wrapper${!isVisible ? ' is-hidden' : ''}`}
-      aria-label="Quick navigation"
+      aria-label="Quick page navigation"
       aria-hidden={!isVisible}
     >
       {/* Main Liquid Glass Shell */}
