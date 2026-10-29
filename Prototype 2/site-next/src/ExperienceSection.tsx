@@ -68,7 +68,7 @@ export default function ExperienceSection() {
         {/* Section Tag */}
         <div className="section-eyebrow-row">
           <span className="section-eyebrow-tag">02 / TRACK RECORD</span>
-          <span className="section-eyebrow-divider">//</span>
+          <span className="section-eyebrow-divider">·</span>
           <span className="section-eyebrow-text">PROFESSIONAL & RESEARCH EXPERIENCE</span>
         </div>
 

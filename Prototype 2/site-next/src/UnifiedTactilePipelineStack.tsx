@@ -2,8 +2,6 @@ import { useState, useRef } from 'react'
 
 interface StackStage {
   id: string
-  unit: string
-  code: string
   slot: string
   glyph: string
   title: string
@@ -12,65 +10,52 @@ interface StackStage {
   tools: string[]
   verifiedSpec: string
   busLabel: string
-  statusLedColor: string
 }
 
 const STACK_STAGES: StackStage[] = [
   {
     id: 'silicon',
-    unit: 'U1',
-    code: 'RTL-32',
-    slot: 'STAGE 01',
+    slot: 'LAYER 01',
     glyph: '⊞',
     title: 'SILICON & RTL',
     domain: 'Digital Logic & Accelerators',
-    coreLanguages: 'SystemVerilog · Verilog · C++ · RISC-V',
-    tools: ['SystemVerilog', 'Verilog', 'C++', 'RISC-V ISA', 'Vivado', 'Verilator', 'gem5', 'GTKWave'],
-    verifiedSpec: '5-stage RV32I core + 4x4 systolic GEMM accelerator (100% compliance pass)',
-    busLabel: 'BUS_01:GATE_LEVEL',
-    statusLedColor: '#10b981', // emerald
+    coreLanguages: 'RISC-V · SystemVerilog · Verilator · Vivado',
+    tools: ['RISC-V RV32I', 'SystemVerilog', 'Verilog', 'Verilator', 'Vivado', 'Chisel', 'GTKWave', 'gem5'],
+    verifiedSpec: '5-stage RV32I core + 4x4 systolic GEMM accelerator with 100% compliance pass',
+    busLabel: 'LAYER 01 · GATE-LEVEL RTL & ACCELERATORS',
   },
   {
     id: 'low-level',
-    unit: 'U2',
-    code: 'SYS-RT',
-    slot: 'STAGE 02',
+    slot: 'LAYER 02',
     glyph: '⚙',
     title: 'LOW-LEVEL RUNTIMES',
     domain: 'Kernel, OS & Embedded',
-    coreLanguages: 'C · C++20 · Rust · Linux · Assembly',
+    coreLanguages: 'C++20 · Rust · Linux Kernel · Embedded',
     tools: ['C', 'C++20', 'Rust', 'Linux Kernel', 'POSIX', 'FreeRTOS', 'Assembly', 'GDB'],
-    verifiedSpec: 'Zero-copy DMA ring buffers, <1.8μs deterministic IRQ, and lock-free concurrency',
-    busLabel: 'BUS_02:KERNEL_IO',
-    statusLedColor: '#06b6d4', // cyan
+    verifiedSpec: 'Zero-copy DMA ring buffers, <1.8μs deterministic IRQ latency, and lock-free concurrency',
+    busLabel: 'LAYER 02 · KERNEL & EMBEDDED RUNTIMES',
   },
   {
     id: 'ai-agents',
-    unit: 'U3',
-    code: 'AVE-NN',
-    slot: 'STAGE 03',
+    slot: 'LAYER 03',
     glyph: '🧠',
     title: 'AI AGENTS & NPU',
     domain: 'Autonomous Intelligence Systems',
-    coreLanguages: 'Python · C++ · PyTorch · Rust',
-    tools: ['Local LLMs', 'PyTorch', 'ONNX Runtime', 'C++', 'Python', 'Vector Fields', 'Quantization (GGUF)'],
+    coreLanguages: 'Autonomous Agents · NPU Acceleration · PyTorch',
+    tools: ['Autonomous Agent Runtimes', 'Local LLMs', 'PyTorch', 'ONNX Runtime', 'C++', 'Python', 'Quantization (GGUF)'],
     verifiedSpec: 'Sub-40ms on-device agent routing loop, 128-dim vector embeddings, and tool orchestration',
-    busLabel: 'BUS_03:TENSOR_NPU',
-    statusLedColor: '#d7a66e', // titanium gold
+    busLabel: 'LAYER 03 · ON-DEVICE AGENT & NPU ORCHESTRATION',
   },
   {
     id: 'rf-hardware',
-    unit: 'U4',
-    code: 'RF-EM',
-    slot: 'STAGE 04',
+    slot: 'LAYER 04',
     glyph: '📡',
     title: 'RF & PHYSICAL LAYER',
     domain: 'Electromagnetics & Hardware',
-    coreLanguages: 'MATLAB · Python · CST · HFSS',
+    coreLanguages: 'Antenna Arrays · CST Studio · HFSS · PCB',
     tools: ['Antenna Arrays', 'CST Studio', 'Smith Charts', 'VNA S-Parameters', 'HFSS', 'KiCad PCB'],
     verifiedSpec: '5.8 GHz ISM patch array with S11 return loss < -24 dB and 6.2 dBi measured gain',
-    busLabel: 'BUS_04:RF_FRONTEND',
-    statusLedColor: '#f59e0b', // amber
+    busLabel: 'LAYER 04 · HIGH-FREQUENCY EM & PHYSICAL INTERFACE',
   },
 ]
 
@@ -147,21 +132,13 @@ export default function UnifiedTactilePipelineStack() {
                 onKeyDown={(e) => handleKeyDown(e, idx)}
                 className={`tactile-pipeline-card ${isSelected ? 'is-active' : ''}`}
               >
-                {/* Header row: Part number & Status LED */}
+                {/* Header row: Layer designation & glyph */}
                 <div className="pipeline-card-header">
                   <div className="card-header-left">
                     <span className="card-glyph" aria-hidden="true">{stage.glyph}</span>
-                    <span className="card-unit-label">
-                      {stage.unit} // <span className="card-code-highlight">{stage.code}</span>
-                    </span>
+                    <span className="card-unit-label">{stage.slot}</span>
                   </div>
-                  <span
-                    className="card-status-led"
-                    style={{
-                      backgroundColor: stage.statusLedColor,
-                      boxShadow: isSelected ? `0 0 8px ${stage.statusLedColor}` : 'none',
-                    }}
-                  />
+                  <span className={`card-active-indicator ${isSelected ? 'is-active' : ''}`} aria-hidden="true" />
                 </div>
 
                 {/* Title & Core Languages */}
@@ -171,7 +148,7 @@ export default function UnifiedTactilePipelineStack() {
                 </div>
               </button>
 
-              {/* Dataflow Trace Connector: Floating Data Dot ONLY (NO ARROWS) */}
+              {/* Dataflow Trace Connector: Floating Data Dot ONLY */}
               {idx < STACK_STAGES.length - 1 && (
                 <div className="pipeline-trace-bridge" aria-hidden="true">
                   <div className="bridge-track-line" />
@@ -183,7 +160,7 @@ export default function UnifiedTactilePipelineStack() {
         })}
       </div>
 
-      {/* PCB Bus Telemetry Readout (Verified Spec & Generic Tool Evidence) */}
+      {/* Architecture Telemetry & Spec Readout */}
       <div
         id="stack-panel-telemetry"
         role="tabpanel"
@@ -193,27 +170,26 @@ export default function UnifiedTactilePipelineStack() {
       >
         <div className="bus-header-row">
           <div className="bus-id-block">
-            <span className="bus-led-dot" style={{ backgroundColor: current.statusLedColor }} />
-            <span className="bus-id-code">{current.busLabel} //</span>
+            <span className="bus-id-code">{current.busLabel}</span>
           </div>
           <div className="bus-tools-evidence">
-            <span className="tools-lead">STACK EVIDENCE:</span>
+            <span className="tools-lead">CORE TOOLCHAIN:</span>
             <span className="tools-list">{current.tools.join(' · ')}</span>
           </div>
         </div>
 
         <div className="bus-spec-row">
           <div className="spec-content">
-            <span className="spec-tag">VERIFIED SPEC:</span>
+            <span className="spec-tag">VERIFIED ARCHITECTURE BENCHMARK:</span>
             <span className="spec-description">{current.verifiedSpec}</span>
           </div>
           <button
             type="button"
             onClick={handleScrollToWork}
             className="bus-explore-action"
-            title="Jump to engineering projects & artifacts"
+            title="Explore matching engineering projects"
           >
-            EXPLORE SPEC ↓
+            VIEW PROJECTS ↓
           </button>
         </div>
       </div>

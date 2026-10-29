@@ -5,7 +5,7 @@ export default function AboutSection() {
         {/* Section Tag */}
         <div className="section-eyebrow-row">
           <span className="section-eyebrow-tag">03 / PROFESSIONAL PROFILE</span>
-          <span className="section-eyebrow-divider">//</span>
+          <span className="section-eyebrow-divider">·</span>
           <span className="section-eyebrow-text">EDUCATION &amp; SKILLS MATRIX</span>
         </div>
 

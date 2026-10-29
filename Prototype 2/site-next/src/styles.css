@@ -325,9 +325,8 @@ figure {
   transition: opacity 0.8s ease;
 }
 
-[data-theme="light"] .hero-clouds-ambient-wrap,
-.hero-clouds-ambient-wrap.is-active {
-  opacity: 1;
+[data-theme="light"] .hero-clouds-ambient-wrap.is-active {
+  opacity: 0.32;
   pointer-events: none;
 }
 
@@ -958,95 +957,233 @@ html.has-canvas-cursor select {
 .hero-intro { max-width: 35ch; margin: 18px 0 0; color: rgba(236, 233, 226, .64); font-size: 14px; line-height: 1.55; opacity: 0; transform: translateY(10px); transition: opacity .8s ease, transform .8s ease; }
 .hero-intro.is-visible { opacity: 1; transform: none; }
 
-/* Hero Introduction & Role/Contact Cluster */
-.hero-intro-cluster {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.hero-intro-role-contact {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.hero-target-role {
+/* Hero Identity, Narrative & Role Cluster */
+.hero-identity-tag {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #d7a66e;
+  margin-bottom: 12px;
+}
+
+[data-theme="light"] .hero-identity-tag {
+  color: #9c5412;
+}
+
+.identity-lead {
+  color: #d7a66e;
+}
+
+[data-theme="light"] .identity-lead {
+  color: #9c5412;
+}
+
+.identity-sep {
+  opacity: 0.55;
+}
+
+.identity-name {
+  color: #ece9e2;
+  letter-spacing: 0.14em;
+}
+
+[data-theme="light"] .identity-name {
+  color: #121316;
+}
+
+.hero-role-actions-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.hero-target-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  background: rgba(215, 166, 110, 0.08);
+  border: 1px solid rgba(215, 166, 110, 0.3);
+  padding: 6px 14px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+[data-theme="light"] .hero-target-role-badge {
+  background: rgba(156, 84, 18, 0.07);
+  border-color: rgba(156, 84, 18, 0.28);
+}
+
+.role-badge-label {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: #d7a66e;
-  background: rgba(215, 166, 110, 0.08);
-  border: 1px solid rgba(215, 166, 110, 0.3);
-  padding: 6px 12px;
-  border-radius: 999px;
-  user-select: none;
 }
 
-[data-theme="light"] .hero-target-role {
+[data-theme="light"] .role-badge-label {
   color: #9c5412;
-  background: rgba(156, 84, 18, 0.08);
-  border-color: rgba(156, 84, 18, 0.28);
 }
 
-.role-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  animation: pulseGreenLed 2s infinite ease-in-out;
+.role-badge-title {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ece9e2;
 }
 
-@keyframes pulseGreenLed {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.55; transform: scale(0.85); }
+[data-theme="light"] .role-badge-title {
+  color: #121316;
 }
 
-.hero-intro-talk-btn {
+.hero-cta-buttons-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero-cta-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #121316;
-  background: #d7a66e;
-  padding: 6px 14px;
-  border-radius: 999px;
+  padding: 8px 16px;
+  border-radius: 6px;
   text-decoration: none;
-  box-shadow: 0 3px 12px rgba(215, 166, 110, 0.28);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
 }
 
-.hero-intro-talk-btn:hover {
-  background: #e5b985;
-  transform: translateY(-1px);
-  box-shadow: 0 5px 16px rgba(215, 166, 110, 0.35);
+.hero-cta-btn:focus-visible {
+  outline: 2px solid #d7a66e;
+  outline-offset: 2px;
 }
 
-[data-theme="light"] .hero-intro-talk-btn {
+[data-theme="light"] .hero-cta-btn:focus-visible {
+  outline-color: #9c5412;
+}
+
+.hero-cta-primary {
+  background: #d7a66e;
+  color: #121316;
+  border: 1px solid #d7a66e;
+  box-shadow: 0 3px 12px rgba(215, 166, 110, 0.26);
+}
+
+.hero-cta-primary:hover {
+  background: #e5b985;
+  border-color: #e5b985;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(215, 166, 110, 0.36);
+}
+
+[data-theme="light"] .hero-cta-primary {
   background: #9c5412;
   color: #ffffff;
-  box-shadow: 0 3px 12px rgba(156, 84, 18, 0.2);
+  border-color: #9c5412;
+  box-shadow: 0 3px 12px rgba(156, 84, 18, 0.22);
 }
 
-[data-theme="light"] .hero-intro-talk-btn:hover {
+[data-theme="light"] .hero-cta-primary:hover {
   background: #b56417;
-  box-shadow: 0 5px 16px rgba(156, 84, 18, 0.3);
+  border-color: #b56417;
+  box-shadow: 0 5px 16px rgba(156, 84, 18, 0.32);
 }
 
-.hero-technical-selector-wrap {
+.hero-cta-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ece9e2;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.hero-cta-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .hero-cta-secondary {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1c1917;
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .hero-cta-secondary:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.3);
+  color: #000000;
+}
+
+.hero-cta-outline {
+  background: transparent;
+  color: #d7a66e;
+  border: 1px solid rgba(215, 166, 110, 0.35);
+}
+
+.hero-cta-outline:hover {
+  background: rgba(215, 166, 110, 0.1);
+  border-color: #d7a66e;
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .hero-cta-outline {
+  color: #9c5412;
+  border-color: rgba(156, 84, 18, 0.35);
+}
+
+[data-theme="light"] .hero-cta-outline:hover {
+  background: rgba(156, 84, 18, 0.08);
+  border-color: #9c5412;
+}
+
+/* Systems Stack Section: Dedicated Full-Width Architectural Spectrum */
+.systems-stack-section {
+  width: min(100% - 8vw, 1440px);
+  margin: 0 auto;
+  padding: 72px 0 84px;
+  position: relative;
+  z-index: 3;
+}
+
+.systems-stack-container {
   width: 100%;
+}
+
+.systems-stack-heading {
+  font: 400 clamp(28px, 4.2vw, 48px)/1.12 var(--display);
+  letter-spacing: -0.04em;
+  color: #ece9e2;
+  margin: 12px 0 10px;
+}
+
+[data-theme="light"] .systems-stack-heading {
+  color: #121316;
+}
+
+.systems-stack-sub {
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(236, 233, 226, 0.72);
+  margin: 0 0 32px;
+  max-width: 68ch;
+}
+
+[data-theme="light"] .systems-stack-sub {
+  color: rgba(28, 25, 23, 0.78);
 }
 .hero-location { margin: 0 0 25px; }
 .hero-scroll { color: #ece9e2; }
@@ -1520,12 +1657,15 @@ html[data-theme="light"] {
     flex-direction: column;
     width: 100%;
   }
-  .hero-intro-cluster {
-    order: 1;
-    margin-bottom: 22px;
+  .hero-role-actions-cluster {
+    margin-top: 18px;
   }
-  .hero-technical-selector-wrap {
-    order: 2;
+  .hero-cta-buttons-row {
+    gap: 8px;
+  }
+  .hero-cta-btn {
+    padding: 7px 14px;
+    font-size: 11px;
   }
   .hero-column-right {
     order: 3;
@@ -8797,11 +8937,25 @@ html[data-theme="light"] {
   color: #9c5412;
 }
 
-.card-status-led {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  transition: all 0.25s ease;
+.card-active-indicator {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: all 0.22s ease;
+}
+
+[data-theme="light"] .card-active-indicator {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.card-active-indicator.is-active {
+  width: 22px;
+  background: #d7a66e;
+}
+
+[data-theme="light"] .card-active-indicator.is-active {
+  background: #9c5412;
 }
 
 .pipeline-card-body .card-title {
@@ -8923,18 +9077,15 @@ html[data-theme="light"] {
   gap: 6px;
 }
 
-.bus-led-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  animation: busBlink 1.4s infinite ease-in-out;
-}
-
 .bus-id-code {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #10b981;
+  letter-spacing: 0.08em;
+  color: #d7a66e;
+}
+
+[data-theme="light"] .bus-id-code {
+  color: #9c5412;
 }
 
 .bus-tools-evidence {

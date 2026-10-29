@@ -4,7 +4,6 @@ import InteractiveCloudsBackground from './InteractiveCloudsBackground'
 import HandwrittenSignature from './HandwrittenSignature'
 import HeroPortrait from './HeroPortrait'
 import ThemeToggleSwitch from './ThemeToggleSwitch'
-import InteractiveDaylightBubbles from './InteractiveDaylightBubbles'
 import FlowingDotsBackground from './FlowingDotsBackground'
 import LiquidGlassBottomNav from './LiquidGlassBottomNav'
 import ExperienceSection from './ExperienceSection'
@@ -226,9 +225,6 @@ export default function PortfolioHero({
 
         {/* Light Theme: Flowing volumetric 3D clouds background */}
         <InteractiveCloudsBackground isActive={isLight} />
-
-        {/* Light Theme: Interactive daylight buoyancy bubbles (clicks & CTA hovers) */}
-        <InteractiveDaylightBubbles isActive={isLight} />
       </div>
 
       {/* 1. Banner Landmark: Top Site Header */}
@@ -236,7 +232,7 @@ export default function PortfolioHero({
         <a className="hero-logo-signature" href="/" aria-label="Ankush Malothia - Home">
           <HandwrittenSignature />
         </a>
-        <p className="hero-nav-role">HARDWARE ACCELERATION &amp; APPLIED AI</p>
+        <p className="hero-nav-role">SYSTEMS ARCHITECT · HARDWARE &amp; APPLIED AI</p>
         
         {/* Semantic Navigation Landmark for Header Actions */}
         <nav className="hero-nav-actions" role="navigation" aria-label="Primary navigation">
@@ -255,51 +251,94 @@ export default function PortfolioHero({
 
       {/* 2. Main Content Landmark */}
       <main id="main-content" role="main" tabIndex={-1}>
+        {/* ====================================================================
+            HERO STAGE: Establishes Identity, Target Role, and Narrative FIRST
+            ==================================================================== */}
         <section id="hero" className="hero-stage" aria-labelledby="hero-title">
-        <div className="hero-copy hero-copy-left">
-          {/* 1. Hero Introduction Cluster: Headline, Bio & Target Role */}
-          <div className="hero-intro-cluster">
+          <div className="hero-copy hero-copy-left">
+            {/* Identity & Focus Kicker */}
+            <div className="hero-identity-tag">
+              <span className="identity-lead">SYSTEMS ARCHITECT</span>
+              <span className="identity-sep">·</span>
+              <span className="identity-name">ANKUSH MALOTHIA</span>
+            </div>
+
+            {/* Master Headline */}
             <HeroHeadlineReveal onReady={() => setReady(true)} />
+
+            {/* Core Narrative Statement */}
             <p className={`hero-intro${ready ? ' is-visible' : ''}`}>
-              I&apos;m Ankush (Sirosiu). I engineer high-performance systems across the compute stack—bridging digital logic, hardware acceleration, and autonomous intelligence.
+              I engineer high-performance systems across the compute stack—bridging digital logic, hardware acceleration, and autonomous intelligence.
             </p>
-            <div className="hero-intro-role-contact">
-              <span className="hero-target-role">
-                <span className="role-status-dot" aria-hidden="true" />
-                HARDWARE ACCELERATION &amp; APPLIED AI
-              </span>
-              <a href="#contact" className="hero-intro-talk-btn">
-                LET&apos;S TALK <span aria-hidden="true">↗</span>
-              </a>
+
+            {/* Target Role & Primary Action Callouts (Clear & Unambiguous) */}
+            <div className="hero-role-actions-cluster">
+              <div className="hero-target-role-badge">
+                <span className="role-badge-label">TARGET ROLE:</span>
+                <span className="role-badge-title">Hardware Acceleration &amp; Applied AI Systems</span>
+              </div>
+
+              <div className="hero-cta-buttons-row">
+                <a href="#contact" className="hero-cta-btn hero-cta-primary">
+                  LET&apos;S TALK <span aria-hidden="true">↗</span>
+                </a>
+                <a href="#systems-stack" className="hero-cta-btn hero-cta-secondary">
+                  EXPLORE ARCHITECTURE <span aria-hidden="true">↓</span>
+                </a>
+                <a
+                  href="/assets/Ankush_Malothia_Resume.pdf"
+                  download="Ankush_Malothia_Resume.pdf"
+                  className="hero-cta-btn hero-cta-outline"
+                  title="Download Official Résumé (PDF)"
+                >
+                  RÉSUMÉ <span aria-hidden="true">↓</span>
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* 2. Master Blended Stack: Tactile IC Modules + Continuous Pipeline Flow */}
-          <div className="hero-technical-selector-wrap">
+          {/* Right column: Portrait sitting above location & credentials */}
+          <div className="hero-column-right">
+            <HeroPortrait />
+            <div className="hero-copy hero-copy-right">
+              <p className="hero-location">BASED IN INDIA · WORKING WORLDWIDE</p>
+              <a className="hero-scroll" href="#systems-stack">
+                EXPLORE STACK <span aria-hidden="true">↓</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ====================================================================
+            SYSTEMS ARCHITECTURE STAGE: Supports the Story with Measured Depth
+            ==================================================================== */}
+        <section id="systems-stack" className="systems-stack-section" aria-labelledby="stack-heading">
+          <div className="systems-stack-container">
+            <div className="section-eyebrow-row">
+              <span className="section-eyebrow-tag">COMPUTE ARCHITECTURE SPECTRUM</span>
+              <span className="section-eyebrow-divider">·</span>
+              <span className="section-eyebrow-text">PHYSICAL SILICON TO AUTONOMOUS AGENTS</span>
+            </div>
+            <h2 id="stack-heading" className="systems-stack-heading">
+              Technical Stack &amp; Architectural Continuum
+            </h2>
+            <p className="systems-stack-sub">
+              Select an architectural layer to inspect verified hardware specifications, runtime benchmarks, and domain tooling.
+            </p>
             <UnifiedTactilePipelineStack />
           </div>
-        </div>
+        </section>
 
-        {/* Right column: Portrait sitting above location & scroll info */}
-        <div className="hero-column-right">
-          <HeroPortrait />
-          <div className="hero-copy hero-copy-right">
-            <p className="hero-location">BASED IN INDIA<br />WORKING WORLDWIDE</p>
-            <a className="hero-scroll" href="#work">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></a>
-          </div>
-        </div>
-      </section>
+        <section id="work" className="hero-next-section" aria-labelledby="work-heading">
+          {/* Light Theme: Flowing dots architectural blueprint background */}
+          <FlowingDotsBackground isActive={isLight} />
 
-      <section id="work" className="hero-next-section" aria-labelledby="work-heading">
-        {/* Light Theme: Flowing dots architectural blueprint background */}
-        <FlowingDotsBackground isActive={isLight} />
-
-        <div className="hero-next-content">
-          <div className="section-eyebrow-row">
-            <span className="section-eyebrow-tag">01 / SELECTED SYSTEMS</span>
-            <span className="section-eyebrow-divider">//</span>
-            <span className="section-eyebrow-text">ENGINEERING ARTIFACTS &amp; PROJECT STATUS</span>
-          </div>
+          <div className="hero-next-content">
+            <div className="section-eyebrow-row">
+              <span className="section-eyebrow-tag">01 / SELECTED SYSTEMS</span>
+              <span className="section-eyebrow-divider">·</span>
+              <span className="section-eyebrow-text">ENGINEERING ARTIFACTS &amp; PROJECT STATUS</span>
+            </div>
 
           <h2 id="work-heading" className="hero-work-heading">Architected across silicon, runtimes, and autonomous agents.</h2>
           <p className="hero-work-sub">

@@ -126,7 +126,7 @@ export default function ContactSection() {
         {/* Section Tag */}
         <div className="section-eyebrow-row">
           <span className="section-eyebrow-tag">04 / CONTACT &amp; COLLABORATION</span>
-          <span className="section-eyebrow-divider">//</span>
+          <span className="section-eyebrow-divider">·</span>
           <span className="section-eyebrow-text">LET&apos;S TALK</span>
         </div>
 
