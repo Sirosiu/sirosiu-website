@@ -24,11 +24,15 @@ export default function App() {
   }, [isLight])
 
   useEffect(() => {
-    const onPopState = () => {
+    const onLocationChange = () => {
       setPathname(window.location.pathname)
     }
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
+    window.addEventListener('popstate', onLocationChange)
+    window.addEventListener('hashchange', onLocationChange)
+    return () => {
+      window.removeEventListener('popstate', onLocationChange)
+      window.removeEventListener('hashchange', onLocationChange)
+    }
   }, [])
 
   const handleToggleTheme = (next: boolean) => {
@@ -43,20 +47,21 @@ export default function App() {
     const nextPath = path.split('#')[0] || '/'
     setPathname(nextPath)
 
-    if (path.includes('#about') || path === '/about') {
+    const rawHash = path.includes('#') ? path.split('#')[1] : ''
+    const targetId = rawHash || (path === '/about' ? 'about' : path === '/contact' ? 'contact' : '')
+
+    if (targetId && targetId !== 'home') {
       let count = 0
       const syncScroll = () => {
-        const el = document.getElementById('about')
+        const el = document.getElementById(targetId)
         if (el) {
           const rect = el.getBoundingClientRect()
-          if (Math.abs(rect.top - 20) > 40) {
-            const y = rect.top + window.pageYOffset - 20
-            window.scrollTo({ top: Math.max(0, y), behavior: count === 0 ? 'auto' : 'smooth' })
-          }
+          const y = rect.top + window.pageYOffset - 20
+          window.scrollTo({ top: Math.max(0, y), behavior: count === 0 ? 'auto' : 'smooth' })
         }
         count++
         if (count < 8) {
-          setTimeout(syncScroll, 140)
+          setTimeout(syncScroll, 120)
         }
       }
       syncScroll()

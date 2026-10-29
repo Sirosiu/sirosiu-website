@@ -120,33 +120,94 @@ export default function PortfolioHero({
     return () => mql.removeEventListener('change', onSystemThemeChange)
   }, [handleThemeToggle])
 
+  // Deep linking: ensures direct visits (e.g. sirosiu.com/#contact) accurately
+  // align to the targeted section across hydration, font loading, Three.js mounts, and layout reflows
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const rawHash = window.location.hash.replace('#', '')
-    const targetId = rawHash || (window.location.pathname === '/about' ? 'about' : '')
-    if (targetId && targetId !== 'home') {
-      let count = 0
-      let activeTimer: ReturnType<typeof setTimeout> | null = null
 
-      const syncScroll = () => {
-        const el = document.getElementById(targetId)
-        if (el) {
-          const rect = el.getBoundingClientRect()
-          if (Math.abs(rect.top - 20) > 40) {
-            const y = rect.top + window.pageYOffset - 20
-            window.scrollTo({ top: Math.max(0, y), behavior: count === 0 ? 'auto' : 'smooth' })
-          }
-        }
-        count++
-        if (count < 8) {
-          activeTimer = setTimeout(syncScroll, 140)
+    const getTargetIdFromHash = () => {
+      const rawHash = window.location.hash.replace(/^#/, '')
+      if (rawHash && rawHash !== 'home') return rawHash
+      if (window.location.pathname === '/about') return 'about'
+      if (window.location.pathname === '/contact') return 'contact'
+      return null
+    }
+
+    let userInteracted = false
+    const onUserInteract = () => {
+      userInteracted = true
+    }
+    window.addEventListener('wheel', onUserInteract, { passive: true })
+    window.addEventListener('touchstart', onUserInteract, { passive: true })
+    window.addEventListener('pointerdown', onUserInteract, { passive: true })
+    window.addEventListener('keydown', onUserInteract, { passive: true })
+
+    const scrollToTarget = (smooth = false) => {
+      if (userInteracted) return
+      const targetId = getTargetIdFromHash()
+      if (!targetId) return
+
+      const el = document.getElementById(targetId)
+      if (el) {
+        const rect = el.getBoundingClientRect()
+        // If element is not aligned to the top (allowing for 20px headroom)
+        const diff = Math.abs(rect.top - 20)
+        if (diff > 8) {
+          const y = rect.top + window.scrollY - 20
+          window.scrollTo({
+            top: Math.max(0, y),
+            behavior: smooth ? 'smooth' : 'instant',
+          })
         }
       }
+    }
 
-      syncScroll()
-      return () => {
-        if (activeTimer) clearTimeout(activeTimer)
-      }
+    // 1. Attempt immediately upon component mount
+    scrollToTarget(false)
+
+    // 2. Schedule re-alignments throughout the SPA hydration & asset render window
+    const delays = [30, 80, 160, 300, 500, 800, 1200, 1800, 2500]
+    const timerIds = delays.map((ms) => setTimeout(() => scrollToTarget(false), ms))
+
+    // 3. Re-align as soon as custom web fonts have finished downloading
+    if (typeof document !== 'undefined' && document.fonts) {
+      document.fonts.ready.then(() => scrollToTarget(false))
+    }
+
+    // 4. Re-align when window completes loading external images/assets
+    const onLoad = () => scrollToTarget(false)
+    window.addEventListener('load', onLoad)
+
+    // 5. Watch for dynamic layout height changes (e.g. Three.js canvas setup, image reveals)
+    let resizeObs: ResizeObserver | null = null
+    if (typeof ResizeObserver !== 'undefined') {
+      let shifts = 0
+      resizeObs = new ResizeObserver(() => {
+        if (!userInteracted && shifts++ < 20) {
+          scrollToTarget(false)
+        }
+      })
+      resizeObs.observe(document.body)
+    }
+
+    // 6. Handle in-page hash transitions and back/forward browser navigation
+    const onHashChange = () => {
+      userInteracted = false
+      scrollToTarget(true)
+    }
+    window.addEventListener('hashchange', onHashChange)
+    window.addEventListener('popstate', onHashChange)
+
+    return () => {
+      window.removeEventListener('wheel', onUserInteract)
+      window.removeEventListener('touchstart', onUserInteract)
+      window.removeEventListener('pointerdown', onUserInteract)
+      window.removeEventListener('keydown', onUserInteract)
+      window.removeEventListener('load', onLoad)
+      window.removeEventListener('hashchange', onHashChange)
+      window.removeEventListener('popstate', onHashChange)
+      timerIds.forEach(clearTimeout)
+      if (resizeObs) resizeObs.disconnect()
     }
   }, [])
 

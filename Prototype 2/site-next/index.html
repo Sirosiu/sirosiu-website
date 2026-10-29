@@ -12,6 +12,9 @@
     <script>
       (function() {
         try {
+          if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+          }
           var saved = localStorage.getItem('sirosiu-theme');
           var isLight = saved ? (saved === 'light') : window.matchMedia('(prefers-color-scheme: light)').matches;
           document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
