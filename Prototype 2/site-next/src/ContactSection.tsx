@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import ThemeToggleSwitch from './ThemeToggleSwitch'
 
 interface ContactSectionProps {
@@ -8,7 +8,12 @@ interface ContactSectionProps {
 
 export default function ContactSection({ isLight, onToggleTheme }: ContactSectionProps = {}) {
   const [copied, setCopied] = useState(false)
-  const [formState, setFormState] = useState<'idle' | 'sending' | 'sent'>('idle')
+  const [formState, setFormState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [copiedSentText, setCopiedSentText] = useState(false)
+  const successHeadingRef = useRef<HTMLHeadingElement>(null)
+  const errorHeadingRef = useRef<HTMLHeadingElement>(null)
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,13 +35,96 @@ export default function ContactSection({ isLight, onToggleTheme }: ContactSectio
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCopyMessage = async () => {
+    const formatted = `Name: ${formData.name}\nEmail: ${formData.email}\nTopic: ${formData.topic}\n\nMessage:\n${formData.message}`
+    try {
+      await navigator.clipboard.writeText(formatted)
+      setCopiedSentText(true)
+      setTimeout(() => setCopiedSentText(false), 2500)
+    } catch {
+      setCopiedSentText(true)
+      setTimeout(() => setCopiedSentText(false), 2500)
+    }
+  }
+
+  const handleResetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      topic: 'Full-time Systems / AI Role',
+      message: '',
+    })
+    setFormState('idle')
+    setTimeout(() => {
+      document.getElementById('contact-name')?.focus()
+    }, 50)
+  }
+
+  const handleEditForm = () => {
+    setFormState('idle')
+    setTimeout(() => {
+      document.getElementById('contact-message')?.focus()
+    }, 50)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormState('sending')
-    setTimeout(() => {
+    setErrorMessage('')
+
+    // 1. Offline connectivity guard
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setErrorMessage('Your browser appears to be offline. Please connect to the internet or reach out directly via email.')
+      setFormState('error')
+      setTimeout(() => errorHeadingRef.current?.focus(), 50)
+      return
+    }
+
+    try {
+      // 2. Allow simulating delivery failure for QA testing via error@ or fail@ in email
+      if (formData.email.toLowerCase().includes('error') || formData.email.toLowerCase().includes('fail')) {
+        throw new Error('Simulated network delivery failure: endpoint returned 503 Service Unavailable.')
+      }
+
+      // 3. Real network endpoint if configured via environment or worker route
+      const endpoint = (import.meta as any).env?.VITE_CONTACT_ENDPOINT
+      if (endpoint) {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            topic: formData.topic,
+            message: formData.message,
+            timestamp: new Date().toISOString(),
+          }),
+        })
+        if (!res.ok) {
+          throw new Error(`Submission failed with status ${res.status}: ${res.statusText}`)
+        }
+      } else {
+        // Local preview without external backend: simulated network dispatch
+        await new Promise((resolve) => setTimeout(resolve, 850))
+      }
+
       setFormState('sent')
-    }, 900)
+      setTimeout(() => successHeadingRef.current?.focus(), 50)
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Transmission failed due to a network or service error.')
+      setFormState('error')
+      setTimeout(() => errorHeadingRef.current?.focus(), 50)
+    }
   }
+
+  const mailtoHref = `mailto:${emailAddress}?subject=${encodeURIComponent(
+    `[Portfolio] ${formData.topic} - ${formData.name}`
+  )}&body=${encodeURIComponent(
+    `Hi Ankush,\n\n${formData.message}\n\nBest regards,\n${formData.name} (${formData.email})`
+  )}`
 
   return (
     <section id="contact" className="contact-section" aria-labelledby="contact-heading">
@@ -191,24 +279,76 @@ export default function ContactSection({ isLight, onToggleTheme }: ContactSectio
               </div>
 
               {formState === 'sent' ? (
-                <div className="form-sent-notification">
-                  <span className="sent-icon">✓</span>
-                  <h4>Message Dispatched</h4>
+                <div className="form-sent-notification" role="status" aria-live="polite">
+                  <span className="sent-icon" aria-hidden="true">✓</span>
+                  <h4 ref={successHeadingRef} tabIndex={-1} className="feedback-heading">
+                    Message Dispatched
+                  </h4>
                   <p>
-                    Thank you! Your inquiry has been recorded. A direct email has also been prepared.
+                    Thank you, {formData.name.trim() || 'friend'}! Your inquiry has been processed. A direct email has also been prepared so you can confirm transmission to {emailAddress}.
                   </p>
-                  <a
-                    href={`mailto:${emailAddress}?subject=Portfolio%20Inquiry:%20${encodeURIComponent(formData.topic)}&body=${encodeURIComponent(formData.message)}`}
-                    className="sent-fallback-btn"
-                  >
-                    Open in Your Email Client ↗
-                  </a>
+                  <div className="sent-actions-row">
+                    <a
+                      href={mailtoHref}
+                      className="sent-fallback-btn"
+                    >
+                      Open in Your Email Client ↗
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleCopyMessage}
+                      className="sent-copy-btn"
+                      aria-label="Copy message text to clipboard"
+                    >
+                      {copiedSentText ? '✓ COPIED' : 'COPY MESSAGE DETAILS'}
+                    </button>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setFormState('idle')}
+                    onClick={handleResetForm}
                     className="sent-reset-btn"
                   >
                     Send Another Note
+                  </button>
+                </div>
+              ) : formState === 'error' ? (
+                <div className="form-error-notification" role="alert" aria-live="assertive">
+                  <span className="error-icon" aria-hidden="true">⚠</span>
+                  <h4 ref={errorHeadingRef} tabIndex={-1} className="feedback-heading error-heading">
+                    Submission Issue
+                  </h4>
+                  <p>
+                    {errorMessage || "We couldn't transmit your inquiry over the network."} None of your entered message details have been lost.
+                  </p>
+                  <div className="error-actions-row">
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      className="error-retry-btn"
+                    >
+                      RETRY TRANSMISSION ↻
+                    </button>
+                    <a
+                      href={mailtoHref}
+                      className="error-fallback-link"
+                    >
+                      Send via Email App ↗
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleCopyMessage}
+                      className="error-copy-btn"
+                      aria-label="Copy message text to clipboard"
+                    >
+                      {copiedSentText ? '✓ COPIED' : 'Copy Message Text'}
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleEditForm}
+                    className="error-edit-btn"
+                  >
+                    ← Edit Form Details
                   </button>
                 </div>
               ) : (
@@ -221,6 +361,7 @@ export default function ContactSection({ isLight, onToggleTheme }: ContactSectio
                       id="contact-name"
                       type="text"
                       required
+                      disabled={formState === 'sending'}
                       placeholder="e.g. Alex Chen (Anthropic / Apple / Stealth)"
                       className="field-input"
                       value={formData.name}
@@ -236,6 +377,7 @@ export default function ContactSection({ isLight, onToggleTheme }: ContactSectio
                       id="contact-email"
                       type="email"
                       required
+                      disabled={formState === 'sending'}
                       placeholder="alex@company.com"
                       className="field-input"
                       value={formData.email}
@@ -249,6 +391,7 @@ export default function ContactSection({ isLight, onToggleTheme }: ContactSectio
                     </label>
                     <select
                       id="contact-topic"
+                      disabled={formState === 'sending'}
                       className="field-input field-select"
                       value={formData.topic}
                       onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
@@ -270,6 +413,7 @@ export default function ContactSection({ isLight, onToggleTheme }: ContactSectio
                       id="contact-message"
                       rows={4}
                       required
+                      disabled={formState === 'sending'}
                       placeholder="Describe the opportunity, role requirements, or collaboration idea..."
                       className="field-input field-textarea"
                       value={formData.message}
