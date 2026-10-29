@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import InteractiveOceanBackground from './InteractiveOceanBackground'
-import InteractiveCloudsBackground from './InteractiveCloudsBackground'
+import GpgpuCurlNoiseBackground from './GpgpuCurlNoiseBackground'
 import HandwrittenSignature from './HandwrittenSignature'
 import HeroPortrait from './HeroPortrait'
 import ThemeToggleSwitch from './ThemeToggleSwitch'
@@ -216,13 +215,9 @@ export default function PortfolioHero({
         Skip to main content
       </a>
 
-      {/* Decorative 3D Canvases & Particle Layers */}
+      {/* Decorative GPGPU Vector Field Compute Layer */}
       <div aria-hidden="true">
-        {/* Dark Theme: Full-screen ambient interactive 3D ocean background */}
-        <InteractiveOceanBackground isActive={!isLight} />
-
-        {/* Light Theme: Flowing volumetric 3D clouds background */}
-        <InteractiveCloudsBackground isActive={isLight} />
+        <GpgpuCurlNoiseBackground isActive={true} isLight={isLight} />
       </div>
 
       {/* 1. Banner Landmark: Top Site Header */}
