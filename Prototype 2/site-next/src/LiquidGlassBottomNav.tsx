@@ -158,7 +158,6 @@ export default function LiquidGlassBottomNav({
             { id: 'contact', elementId: 'contact' },
             { id: 'about', elementId: 'about' },
             { id: 'experience', elementId: 'experience' },
-            { id: 'projects', elementId: 'work' },
           ]
 
           for (const sec of sectionMap) {
@@ -173,9 +172,9 @@ export default function LiquidGlassBottomNav({
             }
           }
 
-          // Fallback: If above work section, default to home
-          const workEl = document.getElementById('work')
-          if (workEl && workEl.getBoundingClientRect().top > readingLine) {
+          // Fallback: If above experience section, default to home
+          const expEl = document.getElementById('experience')
+          if (expEl && expEl.getBoundingClientRect().top > readingLine) {
             setActiveTab((prev) => (prev !== 'home' ? 'home' : prev))
           }
 

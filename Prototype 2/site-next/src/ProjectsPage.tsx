@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import HandwrittenSignature from './HandwrittenSignature'
 import ThemeToggleSwitch from './ThemeToggleSwitch'
 import InteractiveOceanBackground from './InteractiveOceanBackground'
@@ -22,10 +22,29 @@ export default function ProjectsPage({
   const [activeFilter, setActiveFilter] = useState<string>('ALL')
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
 
+  useEffect(() => {
+    if (!selectedProject) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedProject(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedProject])
+
   const filteredProjects =
     activeFilter === 'ALL'
       ? DEMO_PROJECTS
-      : DEMO_PROJECTS.filter((p) => p.domain.toLowerCase().includes(activeFilter.toLowerCase()))
+      : DEMO_PROJECTS.filter((p) => {
+          if (activeFilter === 'APPLIED AI') {
+            return (
+              p.domain.toLowerCase().includes('applied ai') ||
+              p.domain.toLowerCase().includes('machine learning')
+            )
+          }
+          return p.domain.toLowerCase().includes(activeFilter.toLowerCase())
+        })
 
   return (
     <div className="projects-page-root" data-theme={isLight ? 'light' : 'dark'}>
@@ -80,7 +99,7 @@ export default function ProjectsPage({
         <section className="projects-intro-section">
           <div className="projects-intro-meta">
             <span className="projects-category-pill">01 / REPOSITORY ARCHIVE</span>
-            <span className="projects-count">3 PRODUCTION SYSTEMS</span>
+            <span className="projects-count">{filteredProjects.length} VERIFIED SYSTEMS</span>
           </div>
 
           <h1 className="projects-main-title">
