@@ -4,11 +4,11 @@ import { WorldAudio } from './WorldAudio'
 import './Concept04WorldEntrance.css'
 
 const LOADING_MESSAGES: [number, string][] = [
-  [0, 'That idea you keep coming back to.'],
-  [22, 'You don’t need every answer to begin.'],
-  [48, 'Big ideas become real one decision at a time.'],
-  [74, 'I’m Harshit. Let’s work out your next step.'],
-  [100, 'Bring your idea. Let’s see where it can go.'],
+  [0, 'Scanning cosmic synaptic frequencies...'],
+  [22, 'Synthesizing axon highway & Nodes of Ranvier...'],
+  [48, 'Igniting cortical nebulae & neurotransmitter starfield...'],
+  [74, 'Calibrating action-potential conduction waves...'],
+  [100, 'Cosmic neural continuum ready. Enter the domain.'],
 ]
 
 export const Concept04WorldEntrance: React.FC = () => {
@@ -18,7 +18,7 @@ export const Concept04WorldEntrance: React.FC = () => {
 
   // Loader state
   const [loadPercent, setLoadPercent] = useState<number>(0)
-  const [loadStatus, setLoadStatus] = useState<string>('Finding the first light...')
+  const [loadStatus, setLoadStatus] = useState<string>('Scanning cosmic synaptic frequencies...')
   const [isReady, setIsReady] = useState<boolean>(false)
   const [isDeparting, setIsDeparting] = useState<boolean>(false)
   const [isLoaderHidden, setIsLoaderHidden] = useState<boolean>(false)
@@ -54,12 +54,14 @@ export const Concept04WorldEntrance: React.FC = () => {
         setLoadStatus(msg)
       },
       onReady: () => {
-        // Will be picked up by the timer-based smooth ticker
+        setIsReady(true)
+        setLoadPercent(100)
+        setLoadStatus('Cosmic neural continuum ready. Enter the domain.')
       },
     })
     engineRef.current = engine
 
-    // Smooth progress simulation ensuring user has time to witness the preloader
+    // Paced progress simulation ensuring smooth visual progression
     let currentP = 0
     const interval = setInterval(() => {
       currentP += Math.random() * 8 + 3
@@ -68,10 +70,10 @@ export const Concept04WorldEntrance: React.FC = () => {
         clearInterval(interval)
         setLoadPercent(100)
         setIsReady(true)
-        setLoadStatus('Bring your idea. Let’s see where it can go.')
+        setLoadStatus('Cosmic neural continuum ready. Enter the domain.')
       } else {
         setLoadPercent(Math.floor(currentP))
-        let matchedMsg = 'Finding the first light...'
+        let matchedMsg = 'Scanning cosmic synaptic frequencies...'
         for (let i = LOADING_MESSAGES.length - 1; i >= 0; i--) {
           if (currentP >= LOADING_MESSAGES[i][0]) {
             matchedMsg = LOADING_MESSAGES[i][1]
@@ -93,7 +95,6 @@ export const Concept04WorldEntrance: React.FC = () => {
   const handleStartIntro = useCallback(() => {
     if (!isReady || mode !== 'loading') return
 
-    // Sound start
     audioRef.current?.play().then((playing) => {
       if (playing) setSoundOn(true)
     })
@@ -110,8 +111,8 @@ export const Concept04WorldEntrance: React.FC = () => {
     // Run intro narrative timeline
     const startTime = performance.now()
     const beats: [number, number, string][] = [
-      [1.0, 4.2, 'Some ideas stay with you.'],
-      [4.8, 8.0, 'Let’s see where this one can lead.'],
+      [1.0, 4.2, 'Some thoughts transcend the boundaries of space.'],
+      [4.8, 8.0, 'Step into the neural cosmos. Let’s see where it leads.'],
     ]
 
     let rafId = 0
@@ -121,7 +122,6 @@ export const Concept04WorldEntrance: React.FC = () => {
       const currentBeat = beats.find(([start, end]) => elapsed >= start && elapsed < end)
       if (currentBeat) {
         setIntroLine(currentBeat[2])
-        // Fade in & out easing
         const fadeIn = Math.min(1, (elapsed - currentBeat[0]) / 0.65)
         const fadeOut = Math.min(1, (currentBeat[1] - elapsed) / 0.65)
         setIntroLineOpacity(Math.max(0, Math.min(fadeIn, fadeOut)))
@@ -146,14 +146,12 @@ export const Concept04WorldEntrance: React.FC = () => {
     setIntroLineOpacity(0)
     setVeilClass('cover')
 
-    // Dual mist veil covers the viewport over 850ms
     setTimeout(() => {
       setMode('journey')
       engineRef.current?.setMode('journey')
       window.scrollTo(0, 0)
       setShowScrollCue(true)
 
-      // Veil begins revealing
       setVeilClass('cover reveal')
 
       setTimeout(() => {
@@ -230,7 +228,7 @@ export const Concept04WorldEntrance: React.FC = () => {
         <section
           id="loader"
           className={`c04-loader ${isDeparting ? 'departing' : ''}`}
-          aria-label="Preparing continuous world"
+          aria-label="Preparing cosmic synaptic world"
         >
           <div className="c04-loader-art" aria-hidden="true" />
           <div className="c04-loader-haze" aria-hidden="true" />
@@ -239,7 +237,7 @@ export const Concept04WorldEntrance: React.FC = () => {
           <h2 className="c04-loader-title">
             Every idea starts
             <br />
-            with a little light.
+            with a single synapse.
           </h2>
 
           <div className="c04-loader-bottom">
@@ -326,18 +324,18 @@ export const Concept04WorldEntrance: React.FC = () => {
         </div>
         <div className="c04-scroll-cue-label">
           Scroll down to move forward
-          <span>Explore the continuous domain</span>
+          <span>Traverse the synaptic cosmos</span>
         </div>
       </button>
 
-      {/* JOURNEY CONTINUOUS STAGES */}
+      {/* JOURNEY CONTINUOUS CHAPTER STAGES */}
       {mode === 'journey' && (
         <main className="c04-journey-chapters">
           {/* Chapter 01 */}
           <article className="c04-chapter-card">
             <div className="c04-card-inner">
-              <span className="c04-card-folio">01 / FEELING</span>
-              <h2 className="c04-card-title">Architecture begins where words hesitate.</h2>
+              <span className="c04-card-folio">01 / CONSCIOUSNESS</span>
+              <h2 className="c04-card-title">Architecture begins where neurons fire and thoughts take form.</h2>
               <p className="c04-card-body">
                 The first thing someone asks for isn’t always what they need most.
                 We discover the core tension before building: how systems speak, how data moves,
@@ -352,8 +350,8 @@ export const Concept04WorldEntrance: React.FC = () => {
           {/* Chapter 02 */}
           <article className="c04-chapter-card">
             <div className="c04-card-inner">
-              <span className="c04-card-folio">02 / POSSIBILITY</span>
-              <h2 className="c04-card-title">Transforming high dimensions into living software.</h2>
+              <span className="c04-card-folio">02 / NETWORK</span>
+              <h2 className="c04-card-title">High-dimensional distributed intelligence, synchronized across space.</h2>
               <p className="c04-card-body">
                 From high-throughput distributed microservices to real-time WebGL spatial shaders
                 and self-calibrating neural clusters. Complex systems engineered with effortless elegance.
@@ -367,14 +365,14 @@ export const Concept04WorldEntrance: React.FC = () => {
           {/* Chapter 03 */}
           <article className="c04-chapter-card">
             <div className="c04-card-inner">
-              <span className="c04-card-folio">03 / CLARITY</span>
-              <h2 className="c04-card-title">Precision engineering, zero-latency intuition.</h2>
+              <span className="c04-card-folio">03 / SYNAPSE</span>
+              <h2 className="c04-card-title">Zero-latency transmission, Hodgkin-Huxley precision.</h2>
               <p className="c04-card-body">
-                Every millisecond matters. Raymarched volumetric atmospheres, 60fps buttery physics,
+                Every millisecond matters. Raymarched cortical atmospheres, 60fps buttery physics,
                 and mathematically grounded architectures that scale smoothly across millions of users.
               </p>
               <a href="#explore" className="c04-card-action" onClick={(e) => { e.preventDefault(); handleCueClick(); }}>
-                Continue into the deep ↗
+                Continue down the axon ↗
               </a>
             </div>
           </article>
@@ -382,8 +380,8 @@ export const Concept04WorldEntrance: React.FC = () => {
           {/* Chapter 04 */}
           <article className="c04-chapter-card">
             <div className="c04-card-inner">
-              <span className="c04-card-folio">04 / REALITY</span>
-              <h2 className="c04-card-title">Ready to bring your idea into form?</h2>
+              <span className="c04-card-folio">04 / SINGULARITY</span>
+              <h2 className="c04-card-title">Ready to bring your idea into living form?</h2>
               <p className="c04-card-body">
                 You don’t need an exhaustive plan to begin. Tell me what you want to build or elevate,
                 and we will carve the path together.

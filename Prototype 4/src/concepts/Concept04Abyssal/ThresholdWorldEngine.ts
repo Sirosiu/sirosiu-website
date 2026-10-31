@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export type WorldMode = 'loading' | 'intro' | 'transition' | 'journey'
 
@@ -7,6 +6,15 @@ export interface WorldEngineOptions {
   onLoadProgress?: (percent: number, message: string) => void
   onReady?: () => void
 }
+
+export const COSMIC_SYNAPSE_PALETTE = {
+  obsidianVoid: new THREE.Color(0x020308),
+  abyssalIndigo: new THREE.Color(0x090d24),
+  synapticCyan: new THREE.Color(0x00f0ff),
+  bioViolet: new THREE.Color(0x8b5cf6),
+  somaGold: new THREE.Color(0xffdf7a),
+  membraneSlate: new THREE.Color(0x1e293b),
+} as const
 
 export class ThresholdWorldEngine {
   private container: HTMLElement
@@ -17,32 +25,53 @@ export class ThresholdWorldEngine {
   private rafId = 0
   private isDisposed = false
 
-  // Lights & Atmosphere
+  // Curve and Kinematics
+  private curve!: THREE.CatmullRomCurve3
+  private frenetFrames!: {
+    tangents: THREE.Vector3[]
+    normals: THREE.Vector3[]
+    binormals: THREE.Vector3[]
+  }
+  private totalSplineLength = 1200
+  private splineSegments = 400
+
+  // 3D Meshes & Shader Materials
+  private axonCoreMesh!: THREE.Mesh
+  private axonMaterial!: THREE.ShaderMaterial
+  private myelinInstancedMesh!: THREE.InstancedMesh
+  private dendriteGroup!: THREE.Group
+  private starfieldPoints!: THREE.Points
+  private starfieldMaterial!: THREE.ShaderMaterial
+  private nebulaGroup: THREE.Group = new THREE.Group()
+  private nebulaMaterial!: THREE.ShaderMaterial
+  private nebulaMeshes: THREE.Mesh[] = []
+
+  // Landmark Soma Nuclei
+  private somaLandmarks: Array<{
+    group: THREE.Group
+    coreMesh: THREE.Mesh
+    wireMesh: THREE.Mesh
+    light: THREE.PointLight
+    vesicles: THREE.Points
+    uPos: number
+  }> = []
+
+  // Dynamic Camera Rig & Spike Light
+  private spikeLight!: THREE.PointLight
   private hemiLight!: THREE.HemisphereLight
-  private sunLight!: THREE.DirectionalLight
-  private fillLight!: THREE.DirectionalLight
 
-  // Entities
-  private guideOrbGroup!: THREE.Group
-  private orbLight!: THREE.PointLight
-  private dustPoints!: THREE.Points
-  private guidingThreadMesh: THREE.Mesh | null = null
-  private guidingThreadUniforms: Record<string, THREE.IUniform> = {}
-  private ribbonGroup: THREE.Group = new THREE.Group()
-  private terrainGroup: THREE.Group = new THREE.Group()
-  private mistGroup: THREE.Group = new THREE.Group()
-
-  // State
+  // State Management
   private mode: WorldMode = 'loading'
   private introTime = 0
   private introDuration = 8.5
   private scrollProgress = 0
   private smoothScrollProgress = 0
+  private scrollVelocity = 0
+  private lastScrollProgress = 0
 
-  // Camera tracking vectors
-  private currentLookTarget = new THREE.Vector3(0, 0.7, -3)
-  private desiredLookTarget = new THREE.Vector3(0, 0.7, -3)
-  private drawingBufferSize = new THREE.Vector2()
+  // Look target vectors
+  private currentLookTarget = new THREE.Vector3()
+  private desiredLookTarget = new THREE.Vector3()
 
   private startTime = performance.now()
   private lastFrameTime = performance.now()
@@ -50,7 +79,7 @@ export class ThresholdWorldEngine {
   constructor(container: HTMLElement, options?: WorldEngineOptions) {
     this.container = container
 
-    // 1. Canvas & Renderer
+    // 1. Canvas & WebGL Renderer
     this.canvas = document.createElement('canvas')
     this.canvas.className = 'threshold-world-canvas'
     this.canvas.style.position = 'absolute'
@@ -70,341 +99,537 @@ export class ThresholdWorldEngine {
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight)
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
-    this.renderer.toneMappingExposure = 1.06
-    this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    this.renderer.toneMappingExposure = 1.2
+    this.renderer.setClearColor(COSMIC_SYNAPSE_PALETTE.obsidianVoid, 1.0)
 
-    // 2. Scene & Fog
+    // 2. Scene & Deep Space Cosmic Fog
     this.scene = new THREE.Scene()
-    this.scene.name = 'Continuous Threshold World'
-    this.scene.fog = new THREE.FogExp2('#0d151d', 0.0125)
+    this.scene.name = 'Cosmic-Synaptic Neural Highway'
+    this.scene.background = COSMIC_SYNAPSE_PALETTE.obsidianVoid
+    this.scene.fog = new THREE.FogExp2(0x020308, 0.009)
 
-    // 3. Camera
+    // 3. Camera Setup
     const aspect = this.container.clientWidth / Math.max(1, this.container.clientHeight)
-    this.camera = new THREE.PerspectiveCamera(46, aspect, 0.1, 2500)
+    this.camera = new THREE.PerspectiveCamera(52, aspect, 0.1, 3000)
     this.scene.add(this.camera)
 
-    // Setup initial entities
+    // 4. Build Systems
     this.setupLighting()
-    this.setupGuideOrb()
-    this.setupSpatialDust()
-    this.setupGuidingThread()
-    this.setupProceduralLandscape()
-    this.setupMistBillboards()
-    this.scene.add(this.ribbonGroup)
+    this.setupMasterSpline()
+    this.setupAxonCore()
+    this.setupMyelinNodes()
+    this.setupDendriteArbors()
+    this.setupCosmicStarfield()
+    this.setupCorticalNebulae()
+    this.setupSomaLandmarks()
 
-    // Initial Camera Pose
+    // 5. Initial Pose
     this.updateCameraPose(0, 'loading')
 
-    // Handle Resize
     window.addEventListener('resize', this.handleResize)
 
-    // Asynchronous Asset Loading & Shader Warmup
+    // Warmup shaders
     this.initializeAssets(options)
 
-    // Start Render Loop
+    // Start render loop
     this.animate(performance.now())
   }
 
-  /**
-   * Route equation: continuous curved road winding into deep space
-   */
-  public static routeAt(z: number): number {
-    return (
-      2.8 * Math.sin(-z * 0.049) +
-      1.2 * Math.sin(-z * 0.095) -
-      3.0 * THREE.MathUtils.smoothstep(-z, 150, 189)
-    )
-  }
-
   private setupLighting(): void {
-    // Soft skylight & earth bounce
-    this.hemiLight = new THREE.HemisphereLight('#a9b9ca', '#171919', 0.92)
+    this.hemiLight = new THREE.HemisphereLight(0x00f0ff, 0x090d24, 0.45)
     this.scene.add(this.hemiLight)
 
-    // Warm coastal sunset directional light
-    this.sunLight = new THREE.DirectionalLight('#ffcd94', 2.6)
-    this.sunLight.castShadow = true
-    this.sunLight.shadow.mapSize.set(1024, 1024)
-    this.sunLight.shadow.camera.left = -22
-    this.sunLight.shadow.camera.right = 22
-    this.sunLight.shadow.camera.top = 22
-    this.sunLight.shadow.camera.bottom = -22
-    this.sunLight.shadow.camera.near = 0.5
-    this.sunLight.shadow.camera.far = 120
-    this.sunLight.shadow.bias = -0.0004
-    this.sunLight.shadow.normalBias = 0.035
-    this.scene.add(this.sunLight)
-    this.scene.add(this.sunLight.target)
-
-    // Fill Light
-    this.fillLight = new THREE.DirectionalLight('#c3cbd1', 0.55)
-    this.fillLight.position.set(-14, 18, 12)
-    this.scene.add(this.fillLight)
+    // Traveling action potential spike light
+    this.spikeLight = new THREE.PointLight(0x00f0ff, 4.5, 75, 1.8)
+    this.scene.add(this.spikeLight)
   }
 
-  private setupGuideOrb(): void {
-    this.guideOrbGroup = new THREE.Group()
-    this.guideOrbGroup.name = 'Guide Light Orb'
+  private setupMasterSpline(): void {
+    const waypoints: THREE.Vector3[] = []
+    const controlCount = 28
 
-    // Core glowing sphere
-    const coreGeo = new THREE.SphereGeometry(0.09, 24, 18)
-    const coreMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(3.5, 2.6, 1.2),
-      toneMapped: false,
-    })
-    const coreMesh = new THREE.Mesh(coreGeo, coreMat)
-    this.guideOrbGroup.add(coreMesh)
-
-    // Radial gradient sprite halo
-    const haloCanvas = document.createElement('canvas')
-    haloCanvas.width = 128
-    haloCanvas.height = 128
-    const ctx = haloCanvas.getContext('2d')
-    if (ctx) {
-      const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64)
-      g.addColorStop(0, 'rgba(255, 240, 200, 1)')
-      g.addColorStop(0.12, 'rgba(255, 215, 145, 0.82)')
-      g.addColorStop(0.4, 'rgba(235, 170, 90, 0.18)')
-      g.addColorStop(1, 'rgba(235, 170, 90, 0)')
-      ctx.fillStyle = g
-      ctx.fillRect(0, 0, 128, 128)
+    for (let i = 0; i <= controlCount; i++) {
+      const u = i / controlCount
+      const z = -u * this.totalSplineLength
+      const x = Math.sin(u * Math.PI * 4.0) * 48 + Math.cos(u * Math.PI * 1.5) * 22
+      const y = Math.cos(u * Math.PI * 3.0) * 24 + Math.sin(u * Math.PI * 6.0) * 10
+      waypoints.push(new THREE.Vector3(x, y, z))
     }
-    const haloTex = new THREE.CanvasTexture(haloCanvas)
-    const haloMat = new THREE.SpriteMaterial({
-      map: haloTex,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      toneMapped: false,
-      opacity: 0.88,
-    })
-    const haloSprite = new THREE.Sprite(haloMat)
-    haloSprite.scale.set(3.8, 3.8, 1)
-    this.guideOrbGroup.add(haloSprite)
 
-    // Dynamic point light illuminating ground and mist
-    this.orbLight = new THREE.PointLight('#ffd89c', 4.5, 18, 2)
-    this.guideOrbGroup.add(this.orbLight)
-
-    this.scene.add(this.guideOrbGroup)
+    this.curve = new THREE.CatmullRomCurve3(waypoints, false, 'catmullrom', 0.5)
+    this.frenetFrames = this.curve.computeFrenetFrames(this.splineSegments, false)
   }
 
-  private setupSpatialDust(): void {
-    const dustCount = 850
-    const positions = new Float32Array(dustCount * 3)
+  private setupAxonCore(): void {
+    const tubeGeo = new THREE.TubeGeometry(this.curve, this.splineSegments, 1.8, 16, false)
 
-    let seed = 19711
-    const rnd = () => {
-      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0
-      return seed / 4294967296
-    }
-
-    for (let i = 0; i < dustCount; i++) {
-      const z = 16 - rnd() * 220
-      const x = ThresholdWorldEngine.routeAt(z) + (rnd() - 0.5) * 26
-      const y = -4.5 + rnd() * 14
-      positions[i * 3] = x
-      positions[i * 3 + 1] = y
-      positions[i * 3 + 2] = z
-    }
-
-    const geo = new THREE.BufferGeometry()
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-
-    const mat = new THREE.PointsMaterial({
-      color: '#e3c28e',
-      size: 0.032,
+    this.axonMaterial = new THREE.ShaderMaterial({
       transparent: true,
-      opacity: 0.38,
-      depthWrite: false,
-      sizeAttenuation: true,
-      blending: THREE.AdditiveBlending,
-    })
-
-    this.dustPoints = new THREE.Points(geo, mat)
-    this.scene.add(this.dustPoints)
-  }
-
-  private setupGuidingThread(): void {
-    const segmentCount = 1800
-    const startZ = 16
-    const endZ = -195
-    const roadSurface = -0.98
-
-    const positions: number[] = []
-    const tangents: number[] = []
-    const sides: number[] = []
-    const indices: number[] = []
-
-    for (let i = 0; i <= segmentCount; i++) {
-      const z = startZ + ((endZ - startZ) * i) / segmentCount
-      const x = ThresholdWorldEngine.routeAt(z)
-      const dz = 0.025
-      const dx =
-        (ThresholdWorldEngine.routeAt(z + dz) -
-          ThresholdWorldEngine.routeAt(z - dz)) /
-        (2 * dz)
-
-      for (const side of [-1, 1]) {
-        positions.push(x, roadSurface, z)
-        tangents.push(-dx * 0.05, 0, -0.05)
-        sides.push(side)
-      }
-
-      if (i < segmentCount) {
-        const a = i * 2
-        indices.push(a, a + 1, a + 3, a, a + 3, a + 2)
-      }
-    }
-
-    const geo = new THREE.BufferGeometry()
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
-    geo.setAttribute('tangentPath', new THREE.Float32BufferAttribute(tangents, 3))
-    geo.setAttribute('side', new THREE.Float32BufferAttribute(sides, 1))
-    geo.setIndex(indices)
-    geo.computeBoundingSphere()
-
-    this.guidingThreadUniforms = {
-      viewport: { value: new THREE.Vector2(1, 1) },
-      resolutionScale: { value: 1.0 },
-      intensity: { value: 1.2 },
-    }
-
-    const mat = new THREE.ShaderMaterial({
-      uniforms: this.guidingThreadUniforms,
-      transparent: true,
+      depthWrite: true,
       side: THREE.DoubleSide,
-      depthTest: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      toneMapped: false,
-      vertexShader: `
-        attribute vec3 tangentPath;
-        attribute float side;
-        uniform vec2 viewport;
-        uniform float resolutionScale;
-        varying float vSide;
-        varying float vCore;
-        varying float vHalf;
-        varying float vDepth;
+      uniforms: {
+        uTime: { value: 0 },
+        uScroll: { value: 0 },
+        uVelocity: { value: 0 },
+        uColorSlate: { value: COSMIC_SYNAPSE_PALETTE.membraneSlate },
+        uColorCyan: { value: COSMIC_SYNAPSE_PALETTE.synapticCyan },
+        uColorViolet: { value: COSMIC_SYNAPSE_PALETTE.bioViolet },
+        uColorGold: { value: COSMIC_SYNAPSE_PALETTE.somaGold },
+        uFogColor: { value: COSMIC_SYNAPSE_PALETTE.obsidianVoid },
+        uFogDensity: { value: 0.009 },
+      },
+      vertexShader: /* glsl */ `
+        uniform float uTime;
+        uniform float uScroll;
+        uniform float uVelocity;
+
+        varying vec2 vUv;
+        varying vec3 vViewPosition;
+        varying vec3 vNormalView;
+        varying float vSpikeAmplitude;
+
+        float computeActionPotential(float u, float time, float scroll, float vel) {
+          float phase = fract(u * 22.0 - time * (1.4 + abs(vel) * 2.2) - scroll * 15.0);
+          float depolarization = smoothstep(0.0, 0.06, phase) * exp(-phase * 7.5);
+          return depolarization;
+        }
 
         void main() {
-          vec4 view = modelViewMatrix * vec4(position, 1.0);
-          vec4 clip = projectionMatrix * view;
-          vec4 next = projectionMatrix * modelViewMatrix * vec4(position + tangentPath, 1.0);
-          float w = abs(clip.w) > 0.0001 ? clip.w : 0.0001;
-          float nw = abs(next.w) > 0.0001 ? next.w : 0.0001;
-          vec2 direction = (next.xy / nw - clip.xy / w) * viewport;
-          direction /= max(length(direction), 0.00001);
-          vec2 normal = vec2(-direction.y, direction.x);
-          float distance = max(0.1, -view.z);
-          float core = clamp(viewport.y * 0.021 / distance, 0.58 * resolutionScale, 2.1 * resolutionScale);
-          float halfWidth = core * 6.0;
-          clip.xy += normal * side * halfWidth * 2.0 / viewport * clip.w;
-          vSide = side;
-          vCore = core;
-          vHalf = halfWidth;
-          vDepth = -view.z;
-          gl_Position = clip;
+          vUv = uv;
+
+          float primarySpike = computeActionPotential(uv.x, uTime, uScroll, uVelocity);
+          float harmonic = computeActionPotential(uv.x * 0.5 + 0.25, uTime * 0.7, uScroll, uVelocity);
+          vSpikeAmplitude = clamp(primarySpike + harmonic * 0.45, 0.0, 1.5);
+
+          float radialAngle = uv.y * 6.2831853;
+          float helixRipple = sin(uv.x * 160.0 + radialAngle * 3.0 - uTime * 6.0) * 0.06;
+          float swell = vSpikeAmplitude * (0.32 + min(abs(uVelocity), 2.5) * 0.16) + helixRipple;
+
+          vec3 displacedPos = position + normal * swell;
+
+          vec4 mvPosition = modelViewMatrix * vec4(displacedPos, 1.0);
+          vViewPosition = -mvPosition.xyz;
+          vNormalView = normalize(normalMatrix * normal);
+
+          gl_Position = projectionMatrix * mvPosition;
         }
       `,
-      fragmentShader: `
-        uniform float intensity;
-        varying float vSide;
-        varying float vCore;
-        varying float vHalf;
-        varying float vDepth;
+      fragmentShader: /* glsl */ `
+        precision highp float;
+
+        uniform float uTime;
+        uniform float uVelocity;
+        uniform vec3 uColorSlate;
+        uniform vec3 uColorCyan;
+        uniform vec3 uColorViolet;
+        uniform vec3 uColorGold;
+        uniform vec3 uFogColor;
+        uniform float uFogDensity;
+
+        varying vec2 vUv;
+        varying vec3 vViewPosition;
+        varying vec3 vNormalView;
+        varying float vSpikeAmplitude;
 
         void main() {
-          float lateral = abs(vSide) * vHalf;
-          float core = exp(-pow(lateral / vCore, 2.0));
-          float aura = exp(-pow(lateral / (vCore * 3.0), 2.0));
-          float visibility = smoothstep(0.18, 1.1, vDepth) * (1.0 - smoothstep(110.0, 180.0, vDepth));
-          vec3 colour = vec3(1.0, 0.58, 0.24) * core * 2.1 + vec3(1.0, 0.42, 0.14) * aura * 0.26;
-          gl_FragColor = vec4(colour * intensity, visibility);
+          vec3 N = normalize(vNormalView);
+          vec3 V = normalize(vViewPosition);
+
+          float cosTheta = abs(dot(N, V));
+          float fresnel = pow(1.0 - cosTheta, 2.6);
+          float coreMask = pow(cosTheta, 1.5);
+
+          float angle = vUv.y * 6.2831853;
+          float filaments = pow(0.5 + 0.5 * sin(angle * 8.0 + vUv.x * 120.0 - uTime * 4.0), 3.0);
+          float nodesOfRanvier = smoothstep(0.92, 1.0, sin(vUv.x * 320.0));
+
+          vec3 color = uColorSlate * (0.35 + 0.65 * filaments);
+
+          float cyanDrive = (0.24 + vSpikeAmplitude * 1.85) * (coreMask + filaments * 0.5);
+          color += uColorCyan * cyanDrive;
+
+          float auraPulse = 0.65 + 0.35 * sin(vUv.x * 60.0 - uTime * 3.2);
+          color += uColorViolet * fresnel * (0.9 + vSpikeAmplitude * 1.5 + abs(uVelocity) * 0.4) * auraPulse;
+
+          float crest = smoothstep(0.62, 1.15, vSpikeAmplitude);
+          color += uColorGold * (crest * 1.4 + nodesOfRanvier * vSpikeAmplitude * 0.85);
+
+          float depth = length(vViewPosition);
+          float fogFactor = clamp(1.0 - exp(-uFogDensity * uFogDensity * depth * depth), 0.0, 1.0);
+          color = mix(color, uFogColor, fogFactor);
+
+          float alpha = clamp(0.6 + fresnel * 0.4 + vSpikeAmplitude * 0.4, 0.0, 1.0) * (1.0 - fogFactor * 0.85);
+          gl_FragColor = vec4(color, alpha);
         }
       `,
     })
 
-    this.guidingThreadMesh = new THREE.Mesh(geo, mat)
-    this.guidingThreadMesh.name = 'Guiding Light Thread'
-    this.guidingThreadMesh.frustumCulled = false
-    this.guidingThreadMesh.renderOrder = 2
-    this.scene.add(this.guidingThreadMesh)
+    this.axonCoreMesh = new THREE.Mesh(tubeGeo, this.axonMaterial)
+    this.scene.add(this.axonCoreMesh)
   }
 
-  private setupProceduralLandscape(): void {
-    // Continuous canyon terrain ground mesh
-    const lengthZ = 220
-    const segmentsZ = 160
-    const segmentsX = 40
-    const terrainGeo = new THREE.PlaneGeometry(64, lengthZ, segmentsX, segmentsZ)
-    terrainGeo.rotateX(-Math.PI / 2)
-
-    const pos = terrainGeo.attributes.position
-    for (let i = 0; i < pos.count; i++) {
-      const z = pos.getZ(i) - 90
-      const origX = pos.getX(i)
-      const roadX = ThresholdWorldEngine.routeAt(z)
-
-      const distFromRoad = origX - roadX
-      const absDist = Math.abs(distFromRoad)
-
-      // Road is a flat carved track, with steep cliffs rising on the sides
-      let y = -1.0
-      if (absDist > 2.5) {
-        const cliffRise = Math.pow(Math.min(1.0, (absDist - 2.5) / 18.0), 1.6) * 11.5
-        const noise =
-          Math.sin(z * 0.12 + origX * 0.15) * 1.4 +
-          Math.cos(z * 0.05 + origX * 0.08) * 2.2
-        y += cliffRise + noise
-      } else {
-        // Road surface gentle micro-crowning
-        y += (1.0 - Math.pow(absDist / 2.5, 2.0)) * 0.04
-      }
-
-      pos.setXYZ(i, origX, y, z)
-    }
-
-    terrainGeo.computeVertexNormals()
-
-    const terrainMat = new THREE.MeshStandardMaterial({
-      color: '#28333c',
-      roughness: 0.88,
-      metalness: 0.05,
-      side: THREE.DoubleSide,
+  private setupMyelinNodes(): void {
+    const ringCount = 110
+    const ringGeo = new THREE.TorusGeometry(6.2, 0.16, 12, 48)
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x8b5cf6,
+      transparent: true,
+      opacity: 0.7,
+      blending: THREE.AdditiveBlending,
     })
 
-    const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat)
-    terrainMesh.receiveShadow = true
-    this.terrainGroup.add(terrainMesh)
-    this.scene.add(this.terrainGroup)
+    this.myelinInstancedMesh = new THREE.InstancedMesh(ringGeo, ringMat, ringCount)
+    const dummy = new THREE.Object3D()
+    const rotMatrix = new THREE.Matrix4()
+
+    for (let i = 0; i < ringCount; i++) {
+      const u = (i + 0.5) / ringCount
+      const pos = this.curve.getPointAt(u)
+      const frameIdx = Math.min(Math.floor(u * this.splineSegments), this.splineSegments)
+
+      const T = this.frenetFrames.tangents[frameIdx]
+      const N = this.frenetFrames.normals[frameIdx]
+      const B = this.frenetFrames.binormals[frameIdx]
+
+      rotMatrix.makeBasis(B, N, T)
+      dummy.position.copy(pos)
+      dummy.rotation.setFromRotationMatrix(rotMatrix)
+
+      // Every 5th ring is a wider, intense cyan Node of Ranvier gate
+      const isRanvierNode = i % 5 === 0
+      const scale = isRanvierNode ? 1.45 : 0.95
+      dummy.scale.set(scale, scale, isRanvierNode ? 2.0 : 3.8)
+      dummy.updateMatrix()
+      this.myelinInstancedMesh.setMatrixAt(i, dummy.matrix)
+      this.myelinInstancedMesh.setColorAt(
+        i,
+        new THREE.Color(isRanvierNode ? 0x00f0ff : 0x8b5cf6)
+      )
+    }
+
+    this.myelinInstancedMesh.instanceMatrix.needsUpdate = true
+    if (this.myelinInstancedMesh.instanceColor) {
+      this.myelinInstancedMesh.instanceColor.needsUpdate = true
+    }
+    this.scene.add(this.myelinInstancedMesh)
   }
 
-  private setupMistBillboards(): void {
-    const texLoader = new THREE.TextureLoader()
-    texLoader.load('/textures/dream-cloud.webp', (cloudTex) => {
-      cloudTex.colorSpace = THREE.SRGBColorSpace
-      const mistMat = new THREE.MeshBasicMaterial({
-        map: cloudTex,
+  private setupDendriteArbors(): void {
+    this.dendriteGroup = new THREE.Group()
+    const branchMat = new THREE.MeshBasicMaterial({
+      color: 0x00f0ff,
+      transparent: true,
+      opacity: 0.32,
+      blending: THREE.AdditiveBlending,
+    })
+
+    const ringCount = 110
+    for (let i = 4; i < ringCount; i += 3) {
+      const u = i / ringCount
+      const origin = this.curve.getPointAt(u)
+      const frameIdx = Math.min(Math.floor(u * this.splineSegments), this.splineSegments)
+      const B = this.frenetFrames.binormals[frameIdx]
+      const N = this.frenetFrames.normals[frameIdx]
+      const T = this.frenetFrames.tangents[frameIdx]
+
+      const side = i % 2 === 0 ? 1 : -1
+      const p1 = origin.clone().addScaledVector(B, side * 7.5)
+      const p2 = p1.clone().addScaledVector(B, side * 22).addScaledVector(N, 10).addScaledVector(T, -14)
+      const p3 = p2.clone().addScaledVector(B, side * 32).addScaledVector(N, i % 4 === 0 ? 16 : -12).addScaledVector(T, -26)
+
+      const branchCurve = new THREE.CatmullRomCurve3([origin, p1, p2, p3])
+      const branchGeo = new THREE.TubeGeometry(branchCurve, 24, 0.26, 6, false)
+      this.dendriteGroup.add(new THREE.Mesh(branchGeo, branchMat))
+    }
+
+    this.scene.add(this.dendriteGroup)
+  }
+
+  private setupCosmicStarfield(): void {
+    const count = 2200
+    const [bx, by, bz] = [280, 180, 500]
+
+    const geometry = new THREE.BufferGeometry()
+    const positions = new Float32Array(count * 3)
+    const scales = new Float32Array(count)
+    const phases = new Float32Array(count)
+    const colorSeeds = new Float32Array(count)
+
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3
+      positions[i3] = (Math.random() - 0.5) * bx
+      positions[i3 + 1] = (Math.random() - 0.5) * by
+      positions[i3 + 2] = -Math.random() * bz
+
+      scales[i] = 0.6 + Math.pow(Math.random(), 2.2) * 3.6
+      phases[i] = Math.random() * Math.PI * 2
+      colorSeeds[i] = Math.random()
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    geometry.setAttribute('aScale', new THREE.BufferAttribute(scales, 1))
+    geometry.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1))
+    geometry.setAttribute('aColorSeed', new THREE.BufferAttribute(colorSeeds, 1))
+
+    this.starfieldMaterial = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uCameraZ: { value: 0 },
+        uBoxZ: { value: bz },
+        uVelocity: { value: 0 },
+        uEntranceBoost: { value: 0 },
+        uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 2) },
+        uColorCyan: { value: COSMIC_SYNAPSE_PALETTE.synapticCyan },
+        uColorViolet: { value: COSMIC_SYNAPSE_PALETTE.bioViolet },
+        uColorGold: { value: COSMIC_SYNAPSE_PALETTE.somaGold },
+      },
+      vertexShader: /* glsl */ `
+        attribute float aScale;
+        attribute float aPhase;
+        attribute float aColorSeed;
+
+        uniform float uTime;
+        uniform float uCameraZ;
+        uniform float uBoxZ;
+        uniform float uVelocity;
+        uniform float uEntranceBoost;
+        uniform float uPixelRatio;
+
+        varying float vPhase;
+        varying float vColorSeed;
+        varying float vTwinkle;
+        varying float vDepthFade;
+        varying vec2 vStreakDir;
+        varying float vStreakRatio;
+
+        void main() {
+          vPhase = aPhase;
+          vColorSeed = aColorSeed;
+
+          vec3 pos = position;
+
+          float relZ = mod(pos.z - uCameraZ, uBoxZ) - uBoxZ;
+          pos.z = uCameraZ + relZ;
+
+          pos.x += sin(uTime * 0.65 + aPhase) * 1.5;
+          pos.y += cos(uTime * 0.55 + aPhase * 1.3) * 1.5;
+
+          vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+          float dist = max(-mvPosition.z, 1.0);
+
+          float warpSpeed = clamp(abs(uVelocity) * 1.6 + uEntranceBoost * 4.2, 0.0, 7.0);
+
+          vec4 clipCurr = projectionMatrix * mvPosition;
+          vec4 clipTail = projectionMatrix * (mvPosition + vec4(0.0, 0.0, warpSpeed * 5.0, 0.0));
+          vec2 ndcCurr = clipCurr.xy / max(clipCurr.w, 0.0001);
+          vec2 ndcTail = clipTail.xy / max(clipTail.w, 0.0001);
+          vec2 screenDelta = ndcTail - ndcCurr;
+
+          float deltaLen = length(screenDelta);
+          vStreakDir = (deltaLen > 0.0001) ? (screenDelta / deltaLen) : vec2(0.0, 1.0);
+          vStreakDir.y = -vStreakDir.y;
+
+          vStreakRatio = 1.0 + warpSpeed * 3.0;
+
+          float basePointSize = (aScale * 190.0 / dist) * uPixelRatio;
+          gl_PointSize = clamp(basePointSize * vStreakRatio, 2.0, 130.0);
+
+          vTwinkle = 0.6 + 0.4 * sin(uTime * (2.2 + aScale) + aPhase * 6.2831);
+          float nearFade = smoothstep(2.0, 18.0, dist);
+          float farFade = 1.0 - smoothstep(uBoxZ * 0.75, uBoxZ * 0.98, dist);
+          vDepthFade = nearFade * farFade;
+
+          gl_Position = clipCurr;
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        precision highp float;
+
+        uniform vec3 uColorCyan;
+        uniform vec3 uColorViolet;
+        uniform vec3 uColorGold;
+
+        varying float vPhase;
+        varying float vColorSeed;
+        varying float vTwinkle;
+        varying float vDepthFade;
+        varying vec2 vStreakDir;
+        varying float vStreakRatio;
+
+        void main() {
+          if (vDepthFade <= 0.001) discard;
+
+          vec2 uv = (gl_PointCoord - 0.5) * 2.0;
+
+          vec2 perpDir = vec2(-vStreakDir.y, vStreakDir.x);
+          float along = dot(uv, vStreakDir);
+          float across = dot(uv, perpDir);
+
+          float halfSpan = clamp((vStreakRatio - 1.0) / vStreakRatio, 0.0, 0.88);
+          float clampedAlong = clamp(along, -halfSpan, halfSpan);
+          float dist = length(vec2(along - clampedAlong, across * vStreakRatio));
+
+          float core = exp(-pow(dist * 2.6, 2.0));
+          float halo = exp(-pow(dist * 1.2, 1.8)) * 0.35;
+          float alpha = (core + halo) * vTwinkle * vDepthFade;
+
+          if (alpha <= 0.005) discard;
+
+          vec3 color = uColorCyan;
+          if (vColorSeed > 0.65) color = uColorViolet;
+          else if (vColorSeed > 0.45) color = uColorGold;
+
+          color = mix(color, vec3(1.0), core * 0.6);
+          gl_FragColor = vec4(color, alpha);
+        }
+      `,
+    })
+
+    this.starfieldPoints = new THREE.Points(geometry, this.starfieldMaterial)
+    this.scene.add(this.starfieldPoints)
+  }
+
+  private setupCorticalNebulae(): void {
+    const planeGeo = new THREE.PlaneGeometry(220, 220, 1, 1)
+
+    this.nebulaMaterial = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      uniforms: {
+        uTime: { value: 0 },
+        uColorTeal: { value: COSMIC_SYNAPSE_PALETTE.synapticCyan },
+        uColorViolet: { value: COSMIC_SYNAPSE_PALETTE.bioViolet },
+      },
+      vertexShader: /* glsl */ `
+        uniform float uTime;
+        varying vec2 vUv;
+        varying float vNoiseMod;
+
+        float noise(vec2 p) {
+          return sin(p.x * 1.5 + uTime * 0.2) * cos(p.y * 1.5 - uTime * 0.15);
+        }
+
+        void main() {
+          vUv = uv;
+          vec3 pos = position;
+          float n = noise(pos.xy * 0.02);
+          pos.z += n * 18.0;
+          vNoiseMod = n;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        precision highp float;
+        uniform vec3 uColorTeal;
+        uniform vec3 uColorViolet;
+        uniform float uTime;
+
+        varying vec2 vUv;
+        varying float vNoiseMod;
+
+        void main() {
+          vec2 center = vUv - 0.5;
+          float dist = length(center);
+          float radial = max(0.0, 1.0 - dist * 2.0);
+          radial = pow(radial, 1.8);
+
+          float pattern = sin(vUv.x * 12.0 + uTime * 0.4) * cos(vUv.y * 12.0 - uTime * 0.3);
+          float intensity = smoothstep(0.1, 0.9, radial * (0.6 + 0.4 * pattern + vNoiseMod * 0.3));
+
+          vec3 color = mix(uColorViolet, uColorTeal, vUv.x + vNoiseMod * 0.2);
+          gl_FragColor = vec4(color, intensity * 0.22);
+        }
+      `,
+    })
+
+    const count = 14
+    for (let i = 0; i < count; i++) {
+      const mesh = new THREE.Mesh(planeGeo, this.nebulaMaterial)
+      const z = -60 - (i / count) * 1100
+      const x = (Math.random() - 0.5) * 380
+      const y = (Math.random() - 0.5) * 190 + 20
+      mesh.position.set(x, y, z)
+      mesh.rotation.z = Math.random() * Math.PI
+      const scale = 1.6 + Math.random() * 2.2
+      mesh.scale.set(scale, scale, scale)
+      this.nebulaGroup.add(mesh)
+      this.nebulaMeshes.push(mesh)
+    }
+
+    this.scene.add(this.nebulaGroup)
+  }
+
+  private setupSomaLandmarks(): void {
+    const milestones = [0.15, 0.38, 0.65, 0.88]
+    const coreGeo = new THREE.IcosahedronGeometry(3.6, 1)
+    const coreMat = new THREE.MeshStandardMaterial({
+      color: 0xffdf7a,
+      emissive: 0xffdf7a,
+      emissiveIntensity: 0.9,
+      roughness: 0.2,
+      metalness: 0.8,
+    })
+
+    const wireGeo = new THREE.IcosahedronGeometry(4.8, 2)
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0x00f0ff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.5,
+    })
+
+    milestones.forEach((u) => {
+      const pos = this.curve.getPointAt(u)
+      const group = new THREE.Group()
+      group.position.copy(pos)
+
+      const coreMesh = new THREE.Mesh(coreGeo, coreMat)
+      group.add(coreMesh)
+
+      const wireMesh = new THREE.Mesh(wireGeo, wireMat)
+      group.add(wireMesh)
+
+      const pointLight = new THREE.PointLight(0xffdf7a, 3.0, 55, 2.0)
+      group.add(pointLight)
+
+      const vesicleCount = 45
+      const vGeo = new THREE.BufferGeometry()
+      const vPos = new Float32Array(vesicleCount * 3)
+
+      for (let i = 0; i < vesicleCount; i++) {
+        const angle = (i / vesicleCount) * Math.PI * 2
+        const r = 7.5 + Math.random() * 3.0
+        vPos[i * 3] = Math.cos(angle) * r
+        vPos[i * 3 + 1] = (Math.random() - 0.5) * 3.5
+        vPos[i * 3 + 2] = Math.sin(angle) * r
+      }
+
+      vGeo.setAttribute('position', new THREE.BufferAttribute(vPos, 3))
+      const vMat = new THREE.PointsMaterial({
+        color: 0x00f0ff,
+        size: 0.5,
         transparent: true,
-        opacity: 0.22,
-        depthWrite: false,
+        opacity: 0.85,
         blending: THREE.AdditiveBlending,
       })
+      const vesicles = new THREE.Points(vGeo, vMat)
+      group.add(vesicles)
 
-      for (let i = 0; i < 18; i++) {
-        const z = -i * 12 + (i % 2 === 0 ? 4 : -4)
-        const x = ThresholdWorldEngine.routeAt(z) + (i % 2 === 0 ? 7 : -7)
-        const y = -1.8 + Math.sin(i) * 1.2
+      this.scene.add(group)
 
-        const mistMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 9), mistMat)
-        mistMesh.position.set(x, y, z)
-        mistMesh.rotation.y = (Math.PI / 180) * ((i * 37) % 360)
-        this.mistGroup.add(mistMesh)
-      }
-      this.scene.add(this.mistGroup)
+      this.somaLandmarks.push({
+        group,
+        coreMesh,
+        wireMesh,
+        light: pointLight,
+        vesicles,
+        uPos: u,
+      })
     })
   }
 
@@ -414,73 +639,25 @@ export class ThresholdWorldEngine {
     }
 
     try {
-      report(5, 'Finding the first light')
-      await new Promise((r) => setTimeout(r, 180))
+      report(8, 'Detecting cosmic synaptic signals')
+      await new Promise((r) => setTimeout(r, 160))
 
-      report(22, 'Sculpting the continuous landscape')
-      // Attempt to load GLTF dream ribbons
-      const gltfLoader = new GLTFLoader()
-      try {
-        const gltf = await gltfLoader.loadAsync('/models/dream-ribbons.glb')
-        gltf.scene.traverse((obj) => {
-          if ((obj as THREE.Mesh).isMesh) {
-            const mesh = obj as THREE.Mesh
-            mesh.castShadow = false
-            mesh.receiveShadow = true
-            mesh.material = new THREE.MeshStandardMaterial({
-              color: '#d1c9b9',
-              roughness: 0.55,
-              metalness: 0.08,
-              transparent: true,
-              opacity: 0.85,
-              side: THREE.DoubleSide,
-            })
-          }
-        })
-        this.ribbonGroup.add(gltf.scene)
-      } catch (err) {
-        console.warn('Dream ribbons model fallback to procedural ribbons:', err)
-        this.createProceduralRibbons()
-      }
+      report(30, 'Sculpting axon highway & Nodes of Ranvier')
+      await new Promise((r) => setTimeout(r, 200))
 
-      report(55, 'Unfolding the translucent dream')
-      await new Promise((r) => setTimeout(r, 240))
+      report(60, 'Igniting cortical nebulae & neurotransmitter starfield')
+      await new Promise((r) => setTimeout(r, 220))
 
-      report(78, 'Lighting the world & tuning acoustics')
-      await new Promise((r) => setTimeout(r, 260))
-
-      report(92, 'Preparing textures and GPU shaders')
+      report(85, 'Charging Hodgkin-Huxley action potentials')
       await this.renderer.compileAsync(this.scene, this.camera)
 
-      report(100, 'Bring your idea. Let’s see where it can go.')
+      report(100, 'Cosmic neural continuum ready. Enter the domain.')
       options?.onReady?.()
     } catch (e) {
       console.error('Initialization error:', e)
-      report(100, 'Your journey is ready.')
+      report(100, 'Cosmic neural continuum ready.')
       options?.onReady?.()
     }
-  }
-
-  private createProceduralRibbons(): void {
-    const curvePoints: THREE.Vector3[] = []
-    for (let z = 16; z >= -180; z -= 3) {
-      const rx = ThresholdWorldEngine.routeAt(z)
-      curvePoints.push(
-        new THREE.Vector3(rx + Math.sin(z * 0.06) * 4.5, 1.8 + Math.cos(z * 0.04) * 1.5, z)
-      )
-    }
-    const curve = new THREE.CatmullRomCurve3(curvePoints)
-    const tubeGeo = new THREE.TubeGeometry(curve, 140, 0.28, 8, false)
-    const tubeMat = new THREE.MeshStandardMaterial({
-      color: '#e2cfb4',
-      roughness: 0.4,
-      metalness: 0.15,
-      transparent: true,
-      opacity: 0.82,
-      side: THREE.DoubleSide,
-    })
-    const ribbonMesh = new THREE.Mesh(tubeGeo, tubeMat)
-    this.ribbonGroup.add(ribbonMesh)
   }
 
   public setMode(mode: WorldMode): void {
@@ -496,47 +673,46 @@ export class ThresholdWorldEngine {
 
   public updateCameraPose(tIntro: number, mode: WorldMode): void {
     if (mode === 'loading') {
-      // Floating preloader vantage pose
-      const t = (performance.now() - this.startTime) * 0.0006
-      const z = 14.0 + Math.sin(t * 0.7) * 0.25
-      const x = ThresholdWorldEngine.routeAt(z) + Math.cos(t * 0.5) * 0.35
-      const y = 2.85 + Math.sin(t * 0.9) * 0.12
+      const t = (performance.now() - this.startTime) * 0.0007
+      const u = 0.001
+      const spinePoint = this.curve.getPointAt(u)
+      const tangent = this.curve.getTangentAt(u)
 
-      this.camera.position.set(x, y, z)
-      this.desiredLookTarget.set(
-        ThresholdWorldEngine.routeAt(z - 17),
-        0.7,
-        z - 17
-      )
-      this.camera.fov = 44.0
+      const cameraX = spinePoint.x + Math.sin(t * 0.8) * 2.5
+      const cameraY = spinePoint.y + 4.8 + Math.cos(t * 0.6) * 1.2
+      const cameraZ = spinePoint.z + 18.0
+
+      this.camera.position.set(cameraX, cameraY, cameraZ)
+      this.desiredLookTarget.copy(spinePoint).addScaledVector(tangent, 35)
+      this.camera.fov = 46.0
     } else if (mode === 'intro') {
-      // Forward Fly-Through interpolation
-      // Smooth cubic acceleration into the world
-      const u = tIntro * tIntro * (3 - 2 * tIntro)
-      const z = THREE.MathUtils.lerp(14.0, 5.0, u)
-      const x = ThresholdWorldEngine.routeAt(z)
-      const y = THREE.MathUtils.lerp(2.85, 2.2, u)
+      // Forward Fly-Through along the curved neural axon
+      // Accelerates smoothly from u = 0.001 to u = 0.05
+      const uFlight = tIntro * tIntro * (3 - 2 * tIntro)
+      const uSpline = THREE.MathUtils.lerp(0.001, 0.052, uFlight)
 
-      this.camera.position.set(x, y, z)
-      this.desiredLookTarget.set(
-        ThresholdWorldEngine.routeAt(z - 17),
-        0.65,
-        z - 17
-      )
-      this.camera.fov = THREE.MathUtils.lerp(45.0, 55.0, u)
+      const spinePoint = this.curve.getPointAt(uSpline)
+      const tangent = this.curve.getTangentAt(uSpline)
+      const normal = this.frenetFrames.normals[Math.min(Math.floor(uSpline * this.splineSegments), this.splineSegments)]
+
+      const cameraPos = spinePoint.clone().addScaledVector(normal, THREE.MathUtils.lerp(4.8, 2.8, uFlight))
+      this.camera.position.copy(cameraPos)
+      this.desiredLookTarget.copy(spinePoint).addScaledVector(tangent, 40)
+      this.camera.fov = THREE.MathUtils.lerp(46.0, 58.0, uFlight)
     } else if (mode === 'transition' || mode === 'journey') {
-      // Continuous Journey Pose driven by scroll
-      const z = THREE.MathUtils.lerp(5.0, -178.0, this.smoothScrollProgress)
-      const x = ThresholdWorldEngine.routeAt(z)
-      const ahead = z - 17.0
-      const targetX = ThresholdWorldEngine.routeAt(ahead)
+      // Journey Mode driven by scroll: u from 0.05 to 0.96
+      const uSpline = THREE.MathUtils.lerp(0.052, 0.96, this.smoothScrollProgress)
+      const spinePoint = this.curve.getPointAt(uSpline)
+      const tangent = this.curve.getTangentAt(uSpline)
+      const normal = this.frenetFrames.normals[Math.min(Math.floor(uSpline * this.splineSegments), this.splineSegments)]
 
-      this.camera.position.set(x, 2.2, z)
-      this.desiredLookTarget.set(targetX, 0.65, ahead)
+      const cameraPos = spinePoint.clone().addScaledVector(normal, 2.8)
+      this.camera.position.copy(cameraPos)
+      this.desiredLookTarget.copy(spinePoint).addScaledVector(tangent, 45)
       this.camera.fov = 55.0
     }
 
-    this.currentLookTarget.lerp(this.desiredLookTarget, 0.12)
+    this.currentLookTarget.lerp(this.desiredLookTarget, 0.14)
     this.camera.lookAt(this.currentLookTarget)
     this.camera.updateProjectionMatrix()
   }
@@ -547,50 +723,76 @@ export class ThresholdWorldEngine {
 
     const dt = Math.min((now - this.lastFrameTime) / 1000, 0.1)
     this.lastFrameTime = now
+    const timeSec = (now - this.startTime) / 1000
 
-    // Smooth Scroll Easing
+    // Compute velocity
+    const progressDelta = this.scrollProgress - this.lastScrollProgress
+    this.lastScrollProgress = this.scrollProgress
+    this.scrollVelocity += (progressDelta / Math.max(dt, 0.001) - this.scrollVelocity) * 0.15
+
+    // Smooth scroll easing
     this.smoothScrollProgress += (this.scrollProgress - this.smoothScrollProgress) * (1 - Math.exp(-dt * 4.5))
 
-    // Handle Intro Mode Timing
     let introT = 0
+    let entranceBoost = 0
     if (this.mode === 'intro') {
       this.introTime += dt
       introT = THREE.MathUtils.clamp(this.introTime / this.introDuration, 0, 1)
+      entranceBoost = Math.sin(introT * Math.PI) * 1.5
     }
 
-    // Camera Pose Updates
+    // Camera Kinematics
     this.updateCameraPose(introT, this.mode)
 
-    // Guide Orb Position (leads ahead of camera along the road)
-    const orbLeadZ = Math.max(-190, this.camera.position.z - (this.mode === 'journey' ? 26 : 14))
-    const orbX = ThresholdWorldEngine.routeAt(orbLeadZ)
-    const orbY = -0.7 + Math.sin(now * 0.002) * 0.12
-    this.guideOrbGroup.position.set(orbX, orbY, orbLeadZ)
-
-    // Sun target tracking
-    this.sunLight.target.position.set(this.camera.position.x, -1, this.camera.position.z - 12)
-    this.sunLight.position.set(
-      this.camera.position.x + 8,
-      16,
-      this.camera.position.z - 36
-    )
-
-    // Update Guiding Thread Viewport Uniforms
-    if (this.guidingThreadMesh && this.guidingThreadUniforms.viewport) {
-      this.renderer.getDrawingBufferSize(this.drawingBufferSize)
-      this.guidingThreadUniforms.viewport.value.copy(this.drawingBufferSize)
-      this.guidingThreadUniforms.resolutionScale.value = Math.min(
-        this.renderer.getPixelRatio(),
-        1.75
-      )
+    // Update Axon Shaders
+    if (this.axonMaterial) {
+      this.axonMaterial.uniforms.uTime.value = timeSec
+      this.axonMaterial.uniforms.uScroll.value = this.smoothScrollProgress
+      this.axonMaterial.uniforms.uVelocity.value = this.scrollVelocity + (this.mode === 'intro' ? 1.8 : 0)
     }
 
-    // Dust gentle floating
-    if (this.dustPoints) {
-      this.dustPoints.rotation.y = now * 0.00008
+    // Update Cosmic Starfield Shaders & Warp Streaks
+    if (this.starfieldMaterial) {
+      this.starfieldMaterial.uniforms.uTime.value = timeSec
+      this.starfieldMaterial.uniforms.uCameraZ.value = this.camera.position.z
+      this.starfieldMaterial.uniforms.uVelocity.value = this.scrollVelocity
+      this.starfieldMaterial.uniforms.uEntranceBoost.value = entranceBoost
     }
 
-    // Render Scene
+    // Update Cortical Nebulae
+    if (this.nebulaMaterial) {
+      this.nebulaMaterial.uniforms.uTime.value = timeSec
+      this.nebulaMeshes.forEach((m, idx) => {
+        m.rotation.z += idx % 2 === 0 ? 0.0003 : -0.0003
+      })
+    }
+
+    // Update Spike Light (travels ahead of camera along the curve)
+    const currentUSpline = this.mode === 'loading'
+      ? 0.015
+      : this.mode === 'intro'
+      ? THREE.MathUtils.lerp(0.01, 0.065, introT)
+      : THREE.MathUtils.lerp(0.065, 0.98, this.smoothScrollProgress)
+
+    const spikePoint = this.curve.getPointAt(Math.min(1.0, currentUSpline + 0.02))
+    this.spikeLight.position.copy(spikePoint).add(new THREE.Vector3(0, 2.5, 0))
+
+    // Update Landmark Soma Nuclei
+    this.somaLandmarks.forEach((landmark) => {
+      landmark.coreMesh.rotation.x = timeSec * 0.4
+      landmark.coreMesh.rotation.y = timeSec * 0.5
+      landmark.wireMesh.rotation.y = -timeSec * 0.35
+      landmark.vesicles.rotation.y = timeSec * 0.6
+
+      const landmarkZ = landmark.group.position.z
+      const dist = Math.abs(this.camera.position.z - landmarkZ)
+      const arrivalFlare = Math.max(0.0, 1.0 - dist / 55.0)
+
+      landmark.light.intensity = 2.5 + arrivalFlare * 9.5
+      const scale = 1.0 + Math.sin(timeSec * 3.0) * 0.08 + arrivalFlare * 0.4
+      landmark.coreMesh.scale.set(scale, scale, scale)
+    })
+
     this.renderer.render(this.scene, this.camera)
   }
 

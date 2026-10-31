@@ -467,12 +467,12 @@ export const CONCEPT_META = {
     palette: ['#090a0f', '#12141e', '#0066ff', '#e0e7ff', '#ffffff'],
   },
   4: {
-    id: 'continuous-world',
+    id: 'cosmic-synapse',
     number: '04',
-    name: 'Continuous World',
-    personality: 'GeorgeDo cinematic entrance, forward camera dolly, atmospheric veil, continuous 3D domain',
-    aesthetic: 'Atmospheric Obsidian (#090d12) • Ethereal Guiding Light • Cloud Mist Veil • Forward Camera Fly-Through',
-    palette: ['#090d12', '#14212a', '#ffd89c', '#e3c28e', '#f3efe7'],
+    name: 'Cosmic Synapse',
+    personality: 'Celestial neural cosmos, Hodgkin-Huxley axon conduction highway, Nodes of Ranvier portals, Soma star-nuclei',
+    aesthetic: 'Deep Space Obsidian (#020308) • Synaptic Cyan (#00f0ff) • Bio-Electric Violet (#8b5cf6) • Soma Gold (#ffdf7a)',
+    palette: ['#020308', '#090d24', '#00f0ff', '#8b5cf6', '#ffdf7a'],
   },
   5: {
     id: 'quantum-terminal',
