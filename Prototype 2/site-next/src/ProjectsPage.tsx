@@ -121,6 +121,9 @@ export default function ProjectsPage({
               p.domain.toLowerCase().includes('machine learning')
             )
           }
+          if (activeFilter === 'CREATIVE ENGINEERING') {
+            return p.domain.toLowerCase().includes('creative')
+          }
           return p.domain.toLowerCase().includes(activeFilter.toLowerCase())
         })
 
@@ -192,7 +195,7 @@ export default function ProjectsPage({
 
           {/* Domain Filter Pills with aria-pressed */}
           <div className="projects-filter-bar" role="group" aria-label="Filter projects by engineering domain">
-            {['ALL', 'APPLIED AI', 'COMPUTER ARCHITECTURE', 'RF ENGINEERING'].map((filter) => (
+            {['ALL', 'APPLIED AI', 'COMPUTER ARCHITECTURE', 'RF ENGINEERING', 'CREATIVE ENGINEERING'].map((filter) => (
               <button
                 key={filter}
                 type="button"

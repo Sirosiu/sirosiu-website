@@ -218,4 +218,41 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     coverGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.15))',
     icon: '📡',
   },
+  {
+    id: 'sirosiu-website',
+    index: '06',
+    title: 'sirosiu.com: Systems Engineering & Portfolio Platform',
+    tagline: 'Tactile compute portfolio with GPGPU curl noise field, 3D procedural silicon wafer lithography, and accessible architecture continuum.',
+    domain: 'Creative Engineering',
+    domainCode: 'SYS-WEB-06',
+    status: 'Built',
+    repoStatus: 'public',
+    builtScope: 'Three.js GPGPU particle physics with device-tier adaptivity, procedural 28nm IC wafer die, Aceternity 3D card tilt, accessible WCAG AA contrast, and zero-overflow fluid layouts.',
+    plannedScope: 'Interactive WebAssembly gem5 execution trace player and WebGPU compute pipeline.',
+    summary:
+      'The engineering portfolio and systems architecture platform powering sirosiu.com. Designed as a high-density, tactile technical interface bridging physical silicon design to autonomous agent runtimes. Features custom GPGPU curl noise vector fields, interactive 3D Damascene IC wafer lithography, WCAG AA compliant light/dark optics, and zero-layout-shift telemetry.',
+    architectureHighlight:
+      'Custom Three.js GPGPU particle physics with device-tier adaptivity (16k to 4k particles), procedural QR die shaders, accessible focus-trapped dialogs, and sub-16ms frame budget execution.',
+    metrics: [
+      { label: 'FRAME BUDGET', value: '60 FPS' },
+      { label: 'GPGPU PARTICLES', value: '16,384' },
+      { label: 'ACCESSIBILITY', value: 'WCAG AA' },
+      { label: 'CONTRAST RATIO', value: '7.2 : 1' },
+    ],
+    tags: ['React', 'TypeScript', 'Three.js', 'GPGPU Shaders', 'Vite', 'WebAudio', 'WCAG AA', 'Aceternity 3D'],
+    repoUrl: 'https://github.com/Sirosiu/sirosiu-website',
+    demoUrl: 'https://sirosiu.com',
+    contributions: [
+      'Architected custom Three.js GPGPU vector field simulating Manhattan integrated circuit routing traces behind hero layers.',
+      'Designed and rendered procedural 3D silicon wafer die with damascene copper interconnects, bump contacts, and etched QR lithography.',
+      'Implemented full WCAG AA accessibility compliance including semantic contrast ratios (up to 7.2:1), focus-trapped dialogs, and keyboard tab navigation.',
+      'Engineered fluid responsive layouts with zero horizontal scroll overflow across all viewports from 320px foldables to ultrawide desktop monitors.',
+    ],
+    outcomes: [
+      'Zero layout shift, 60 FPS deterministic render performance, and seamless theme synchronization without canvas flicker.',
+      '100% public open-source codebase on GitHub with automated verification testing.',
+    ],
+    coverGradient: 'linear-gradient(135deg, rgba(215, 166, 110, 0.22), rgba(56, 189, 248, 0.2))',
+    icon: '⚡',
+  },
 ]
