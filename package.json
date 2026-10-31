@@ -7,6 +7,8 @@
     "dev": "npm --prefix \"Prototype 2/site-next\" run dev",
     "preview": "npm --prefix \"Prototype 2/site-next\" run preview",
     "dev:p3": "npm --prefix \"Prototype 3\" run dev",
-    "build:p3": "npm --prefix \"Prototype 3\" run build"
+    "build:p3": "npm --prefix \"Prototype 3\" run build",
+    "dev:p4": "npm --prefix \"Prototype 4\" run dev",
+    "build:p4": "npm --prefix \"Prototype 4\" run build"
   }
 }
