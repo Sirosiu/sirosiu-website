@@ -1,0 +1,581 @@
+/* Concept 04: Technical Styles */
+[data-concept="technical"] {
+  --tc-bg: #f8fafc;
+  --tc-bg-surface: #ffffff;
+  --tc-bg-surface-elevated: #f1f5f9;
+  --tc-text-primary: #0f172a;
+  --tc-text-secondary: #334155;
+  --tc-text-muted: #64748b;
+  --tc-orange: #ea580c;
+  --tc-orange-soft: rgba(234, 88, 12, 0.08);
+  --tc-cyan: #0284c7;
+  --tc-border: #cbd5e1;
+  --tc-border-light: #e2e8f0;
+  --tc-grid: rgba(148, 163, 184, 0.15);
+
+  background-color: var(--tc-bg);
+  color: var(--tc-text-primary);
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+[data-concept="technical"] * {
+  box-sizing: border-box;
+}
+
+/* CAD Grid Pattern */
+[data-concept="technical"] .technical-viewport {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-image:
+    linear-gradient(to right, var(--tc-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--tc-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: center top;
+}
+
+.technical-container {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+  .technical-container {
+    padding: 0 1rem;
+  }
+}
+
+.technical-studies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .technical-studies-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.technical-header {
+  position: sticky;
+  top: 56px;
+  z-index: 40;
+  background-color: rgba(248, 250, 252, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--tc-border);
+}
+
+.technical-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 68px;
+}
+
+.technical-brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--tc-text-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.technical-brand-chip {
+  background: var(--tc-orange);
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.technical-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.technical-nav-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--tc-text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.technical-nav-link:hover {
+  color: var(--tc-orange);
+}
+
+.technical-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--tc-text-primary);
+  color: #fff;
+  padding: 0.55rem 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+
+.technical-contact-btn:hover {
+  background: var(--tc-orange);
+}
+
+@media (max-width: 900px) {
+  .technical-nav {
+    display: none;
+  }
+}
+
+/* Technical Hero */
+.technical-hero {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--tc-border);
+}
+
+.technical-hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.technical-hero-grid > *,
+.technical-philosophy-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .technical-study-card,
+  .tech-diagram-card {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .technical-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+.technical-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--tc-orange);
+  background: var(--tc-orange-soft);
+  border: 1px solid rgba(234, 88, 12, 0.3);
+  padding: 0.35rem 0.8rem;
+  margin-bottom: 1.75rem;
+  max-width: 100%;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.technical-headline {
+  font-size: clamp(1.75rem, 4.5vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.75rem;
+  word-break: break-word;
+}
+
+@media (max-width: 500px) {
+  .technical-header-inner .technical-contact-btn {
+    display: none;
+  }
+}
+
+.technical-writing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  background: #fff;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--tc-border);
+  border-radius: 3px;
+  text-decoration: none;
+  color: inherit;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .technical-writing-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem;
+  }
+}
+
+.technical-supporting {
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  line-height: 1.65;
+  color: var(--tc-text-secondary);
+  max-width: 600px;
+  margin-bottom: 2.5rem;
+}
+
+/* Architecture Schematic Diagram Card */
+.tech-diagram-card {
+  background: var(--tc-bg-surface);
+  border: 1px solid var(--tc-border);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  padding: 1.75rem;
+  border-radius: 4px;
+}
+
+.tech-diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--tc-border-light);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+}
+
+.tech-diagram-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tech-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--tc-orange);
+  border-radius: 50%;
+}
+
+.tech-schematic-code {
+  font-weight: 600;
+  color: var(--tc-text-primary);
+}
+
+.tech-schematic-status {
+  color: var(--tc-text-muted);
+}
+
+.tech-nodes-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.tech-node-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--tc-bg-surface-elevated);
+  border: 1px solid var(--tc-border-light);
+  padding: 1rem 1.25rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tech-node-btn:hover {
+  border-color: var(--tc-orange);
+  background: #fff;
+}
+
+.tech-node-btn.is-selected {
+  border-color: var(--tc-orange);
+  background: #fff;
+  box-shadow: inset 3px 0 0 var(--tc-orange);
+}
+
+.tech-node-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--tc-text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.tech-node-status {
+  color: var(--tc-cyan);
+  font-weight: 600;
+}
+
+.tech-node-label {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  color: var(--tc-text-primary);
+}
+
+.tech-node-spec {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--tc-text-secondary);
+  margin: 0;
+}
+
+.tech-flow-connector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 18px;
+  color: var(--tc-text-muted);
+}
+
+.tech-inspector-panel {
+  background: var(--tc-bg);
+  border: 1px solid var(--tc-border-light);
+  padding: 1.25rem;
+  border-radius: 3px;
+}
+
+.tech-inspector-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  margin-bottom: 0.75rem;
+}
+
+.tech-inspector-tag {
+  color: var(--tc-orange);
+  font-weight: 600;
+}
+
+.tech-inspector-id {
+  color: var(--tc-text-secondary);
+}
+
+.tech-subsystems-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 540px) {
+  .tech-subsystems-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tech-subsystem-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  border: 1px solid var(--tc-border-light);
+  padding: 0.45rem 0.65rem;
+  border-radius: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+}
+
+.pill-index {
+  color: var(--tc-cyan);
+  font-weight: 600;
+}
+
+/* Technical Sections */
+.technical-section {
+  padding: 5.5rem 0;
+  border-bottom: 1px solid var(--tc-border);
+}
+
+.technical-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--tc-text-primary);
+  padding-bottom: 1rem;
+  margin-bottom: 3.5rem;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .technical-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+.technical-philosophy-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .technical-philosophy-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.technical-section-title {
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Engineering Case Studies (Structured Tabs) */
+.technical-studies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .technical-studies-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.technical-study-card {
+  background: var(--tc-bg-surface);
+  border: 1px solid var(--tc-border);
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.technical-study-card:hover {
+  border-color: var(--tc-orange);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.tech-study-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.tech-study-code {
+  color: var(--tc-orange);
+  font-weight: 600;
+}
+
+.tech-study-status {
+  background: var(--tc-bg-surface-elevated);
+  padding: 0.15rem 0.5rem;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.tech-study-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.tech-study-tagline {
+  font-size: 0.9rem;
+  color: var(--tc-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* 4 Structured Case Study Blocks */
+.tech-spec-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--tc-bg);
+  border: 1px solid var(--tc-border-light);
+  padding: 1.25rem;
+  border-radius: 3px;
+  margin-bottom: 1.5rem;
+  font-size: 0.825rem;
+  flex-grow: 1;
+}
+
+.tech-spec-item strong {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--tc-text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.tech-spec-item p {
+  margin: 0;
+  color: var(--tc-text-secondary);
+  line-height: 1.5;
+}
+
+.tech-study-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  border-top: 1px solid var(--tc-border-light);
+  padding-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tech-metric-box {
+  background: var(--tc-bg-surface-elevated);
+  padding: 0.5rem 0.75rem;
+  border-radius: 2px;
+}
+
+.tech-metric-box span:first-child {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--tc-text-muted);
+}
+
+.tech-metric-box span:last-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--tc-text-primary);
+}
+
+/* Lab & Capabilities */
+.technical-lab-row {
+  display: grid;
+  grid-template-columns: 0.2fr 1fr 0.3fr;
+  align-items: baseline;
+  gap: 2rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--tc-border-light);
+}
+
+@media (max-width: 768px) {
+  .technical-lab-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+/* Footer */
+.technical-footer {
+  padding: 4.5rem 0 6rem;
+  border-top: 1px solid var(--tc-border);
+  background: var(--tc-bg-surface);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--tc-text-muted);
+}

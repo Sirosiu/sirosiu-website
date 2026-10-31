@@ -1,0 +1,476 @@
+/* Concept 03: Experimental Styles */
+[data-concept="experimental"] {
+  --ex-bg: #080811;
+  --ex-bg-surface: #0f101d;
+  --ex-bg-card: #141527;
+  --ex-cobalt: #3b82f6;
+  --ex-lime: #a3e635;
+  --ex-coral: #f43f5e;
+  --ex-text-primary: #ffffff;
+  --ex-text-secondary: #94a3b8;
+  --ex-text-muted: #64748b;
+  --ex-border: rgba(59, 130, 246, 0.2);
+  --ex-border-lime: rgba(163, 230, 53, 0.3);
+  --ex-border-coral: rgba(244, 63, 94, 0.3);
+
+  background-color: var(--ex-bg);
+  color: var(--ex-text-primary);
+  font-family: 'Syne', 'Space Grotesk', -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+[data-concept="experimental"] * {
+  box-sizing: border-box;
+}
+
+.experimental-container {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+  .experimental-container {
+    padding: 0 1rem;
+  }
+}
+
+.experimental-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .experimental-projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.experimental-header {
+  position: sticky;
+  top: 56px;
+  z-index: 40;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(8, 8, 17, 0.85);
+  border-bottom: 1px solid var(--ex-border);
+}
+
+.experimental-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 72px;
+}
+
+.experimental-logo {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.experimental-logo-tag {
+  font-size: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: linear-gradient(90deg, var(--ex-cobalt), var(--ex-lime));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 600;
+}
+
+.experimental-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.experimental-nav-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--ex-text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.experimental-nav-link:hover {
+  color: var(--ex-lime);
+}
+
+.experimental-btn-neon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--ex-lime);
+  color: var(--ex-lime);
+  padding: 0.5rem 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.25s ease;
+}
+
+@media (max-width: 480px) {
+  .experimental-btn-neon {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.7rem;
+  }
+}
+
+.experimental-btn-neon:hover {
+  background: var(--ex-lime);
+  color: #080811;
+  box-shadow: 0 0 20px rgba(163, 230, 53, 0.4);
+}
+
+@media (max-width: 900px) {
+  .experimental-nav {
+    display: none;
+  }
+}
+
+/* Hero Section */
+.experimental-hero {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--ex-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.experimental-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .experimental-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+.experimental-hero-grid > *,
+.experimental-manifesto-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.experimental-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--ex-cobalt);
+  padding: 0.35rem 0.8rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid var(--ex-border);
+  border-radius: 999px;
+  margin-bottom: 1.75rem;
+  max-width: 100%;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.experimental-headline {
+  font-size: clamp(1.75rem, 4.8vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.75rem;
+  word-break: break-word;
+}
+
+@media (max-width: 500px) {
+  .experimental-header-inner .experimental-btn-neon {
+    display: none;
+  }
+}
+
+.experimental-writing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  background: var(--ex-bg-surface);
+  padding: 1.75rem 2rem;
+  border: 1px solid var(--ex-border);
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .experimental-writing-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem;
+  }
+}
+
+.experimental-headline .text-gradient {
+  background: linear-gradient(135deg, #fff 30%, var(--ex-lime) 75%, var(--ex-cobalt) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.experimental-supporting {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  line-height: 1.65;
+  color: var(--ex-text-secondary);
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+}
+
+/* Generative Canvas Box */
+.experimental-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background: radial-gradient(circle at center, rgba(30, 27, 75, 0.4) 0%, transparent 70%);
+  border: 1px solid var(--ex-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.experimental-canvas-target {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 640px) {
+  .experimental-card,
+  .experimental-interactive-box {
+    padding: 1.25rem;
+  }
+}
+
+.experimental-canvas-hud {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--ex-text-muted);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .experimental-canvas-container {
+    height: 350px;
+  }
+}
+
+/* Sections Common */
+.experimental-section {
+  padding: 6rem 0;
+  border-bottom: 1px solid var(--ex-border);
+}
+
+.experimental-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3.5rem;
+  border-bottom: 1px solid var(--ex-border);
+  padding-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .experimental-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+.experimental-section-title {
+  font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+  font-weight: 800;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* Interactive Projects Grid */
+.experimental-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .experimental-projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.experimental-card {
+  background: var(--ex-bg-surface);
+  border: 1px solid var(--ex-border);
+  border-radius: 8px;
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.experimental-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--ex-cobalt), var(--ex-lime), var(--ex-coral));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.experimental-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--ex-lime);
+  box-shadow: 0 12px 30px rgba(163, 230, 53, 0.08);
+}
+
+.experimental-card:hover::before {
+  opacity: 1;
+}
+
+.experimental-card-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--ex-lime);
+  margin-bottom: 1rem;
+}
+
+.experimental-card-title {
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 0.75rem;
+}
+
+.experimental-card-desc {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  color: var(--ex-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
+  flex-grow: 1;
+}
+
+.experimental-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.experimental-metric-item span:first-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--ex-text-muted);
+  display: block;
+}
+
+.experimental-metric-item span:last-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ex-cobalt);
+}
+
+/* Lab Explorations */
+.experimental-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.75rem;
+}
+
+.experimental-lab-card {
+  background: var(--ex-bg-card);
+  border: 1px solid var(--ex-border);
+  border-radius: 6px;
+  padding: 1.75rem;
+}
+
+/* About Manifesto */
+.experimental-manifesto-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .experimental-manifesto-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+.experimental-manifesto-p {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: var(--ex-text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.experimental-interactive-box {
+  background: var(--ex-bg-card);
+  border: 1px solid var(--ex-border);
+  padding: 2.5rem;
+  border-radius: 8px;
+  position: relative;
+}
+
+.experimental-interactive-box::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--ex-cobalt), var(--ex-coral));
+  z-index: -1;
+  opacity: 0.2;
+}
+
+/* Footer */
+.experimental-footer {
+  padding: 5rem 0 6rem;
+  border-top: 1px solid var(--ex-border);
+}
+
+.experimental-footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--ex-text-muted);
+}
