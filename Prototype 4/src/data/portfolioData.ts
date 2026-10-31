@@ -467,12 +467,12 @@ export const CONCEPT_META = {
     palette: ['#090a0f', '#12141e', '#0066ff', '#e0e7ff', '#ffffff'],
   },
   4: {
-    id: 'abyssal-bioluminescence',
+    id: 'continuous-world',
     number: '04',
-    name: 'Abyssal Deep',
-    personality: 'Hadal trench, siphonophore bioluminescence, marine snow drift',
-    aesthetic: 'Abyssal Indigo (#020617) • Bathypelagic Glow • Emerald & Cyan Lucidity • Siphonophore Pulses',
-    palette: ['#020617', '#0f172a', '#10b981', '#06b6d4', '#f8fafc'],
+    name: 'Continuous World',
+    personality: 'GeorgeDo cinematic entrance, forward camera dolly, atmospheric veil, continuous 3D domain',
+    aesthetic: 'Atmospheric Obsidian (#090d12) • Ethereal Guiding Light • Cloud Mist Veil • Forward Camera Fly-Through',
+    palette: ['#090d12', '#14212a', '#ffd89c', '#e3c28e', '#f3efe7'],
   },
   5: {
     id: 'quantum-terminal',

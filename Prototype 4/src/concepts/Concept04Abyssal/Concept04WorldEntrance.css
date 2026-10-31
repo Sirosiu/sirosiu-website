@@ -1,0 +1,525 @@
+/* ==========================================================================
+   Concept 04 — Continuous World Entrance (Inspired by GeorgeDo)
+   ========================================================================== */
+
+.concept04-world-root {
+  position: relative;
+  width: 100%;
+  min-height: 500vh; /* Provides continuous scroll room for journey mode */
+  background: #090d12;
+  color: #f3efe7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* 3D WebGL Canvas Layer */
+.threshold-canvas-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   PRELOADER OVERLAY (#loader)
+   ========================================================================== */
+
+.c04-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(at 50% 47%, rgba(36, 48, 57, 0.42), transparent 44%),
+              linear-gradient(rgba(11, 18, 28, 0.92), rgba(11, 18, 28, 0.98));
+  text-align: center;
+  padding: 24px;
+  overflow: hidden;
+  opacity: 1;
+  filter: blur(0px);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.c04-loader.departing {
+  opacity: 0;
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+.c04-loader.hidden-loader {
+  display: none !important;
+}
+
+/* Luminous Artwork & Haze in Loader */
+.c04-loader-art {
+  position: absolute;
+  inset: -2%;
+  z-index: -2;
+  background: url("/textures/loading-dream.webp") center 52% / cover no-repeat;
+  animation: 14s ease-in-out infinite alternate loader-breath;
+  opacity: 0.65;
+}
+
+@keyframes loader-breath {
+  0% { transform: scale(1) translateY(0); opacity: 0.55; }
+  50% { transform: scale(1.04) translateY(-10px); opacity: 0.75; }
+  100% { transform: scale(1) translateY(0); opacity: 0.55; }
+}
+
+.c04-loader-haze {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(rgba(8, 17, 27, 0.15), transparent 45%, rgba(8, 17, 27, 0.65) 100%);
+}
+
+/* Loader Typography */
+.c04-loader-name {
+  position: absolute;
+  top: 5svh;
+  left: 0;
+  width: 100%;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(240, 229, 211, 0.75);
+}
+
+.c04-loader-title {
+  position: absolute;
+  top: 14svh;
+  left: 6%;
+  right: 6%;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(24px, 3.2vw, 44px);
+  line-height: 1.6;
+  letter-spacing: 0.18em;
+  color: rgb(244, 236, 223);
+  text-shadow: rgba(255, 244, 212, 0.28) 0 0 24px;
+}
+
+/* Bottom Progress Track & Enter CTA */
+.c04-loader-bottom {
+  position: absolute;
+  bottom: 6svh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 86vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.c04-loader-number {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 200;
+  font-size: clamp(48px, 6.5vw, 76px);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  color: rgb(240, 229, 211);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.c04-loader-number small {
+  font-size: 0.38em;
+  margin-left: 8px;
+  font-weight: 300;
+  color: rgba(240, 229, 211, 0.7);
+}
+
+.c04-loader-track {
+  height: 1.5px;
+  width: 78%;
+  margin: 18px auto 18px;
+  background: rgba(233, 223, 204, 0.18);
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative;
+}
+
+.c04-loader-fill {
+  display: block;
+  height: 100%;
+  background: rgb(237, 198, 143);
+  box-shadow: rgb(233, 180, 108) 0 0 10px, rgba(233, 180, 108, 0.45) 0 0 24px;
+  transition: width 0.35s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+.c04-loader-status {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: rgba(230, 225, 215, 0.85);
+  margin: 0 0 18px;
+  min-height: 20px;
+}
+
+.c04-enter-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 36px;
+  min-width: 250px;
+  border: 1px solid rgba(237, 221, 189, 0.6);
+  border-radius: 50px;
+  background: rgba(24, 34, 46, 0.45);
+  backdrop-filter: blur(8px);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #f4ece0;
+  cursor: pointer;
+  transition: opacity 0.5s, background 0.3s, transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 0 20px rgba(233, 180, 108, 0.15);
+}
+
+.c04-enter-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.c04-enter-btn:not(:disabled):hover {
+  background: rgba(214, 182, 123, 0.18);
+  border-color: rgba(237, 221, 189, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(233, 180, 108, 0.35);
+}
+
+.c04-loader-contact {
+  margin-top: 18px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(220, 210, 195, 0.8);
+  text-decoration: none;
+  transition: color 0.25s;
+}
+
+.c04-loader-contact:hover {
+  color: #fcd34d;
+}
+
+.c04-loader-small {
+  margin-top: 16px;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  color: rgba(160, 170, 175, 0.7);
+}
+
+/* ==========================================================================
+   INTRO FLY-THROUGH OVERLAY (#intro)
+   ========================================================================== */
+
+.c04-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.c04-intro-overlay.hidden {
+  display: none !important;
+}
+
+/* Top bar during intro & journey */
+.c04-topbar {
+  position: fixed;
+  top: 24px;
+  left: 32px;
+  right: 32px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: auto;
+}
+
+.c04-top-btn {
+  background: rgba(18, 27, 36, 0.55);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(230, 215, 190, 0.25);
+  color: #efe8dc;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.25s, border-color 0.25s, transform 0.2s;
+}
+
+.c04-top-btn:hover {
+  background: rgba(230, 215, 190, 0.15);
+  border-color: rgba(230, 215, 190, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Center Poetic Narrative Lines */
+.c04-intro-line {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(22px, 3.4vw, 42px);
+  letter-spacing: 0.14em;
+  text-align: center;
+  color: #f7eee2;
+  text-shadow: rgba(232, 183, 121, 0.38) 0 0 20px;
+  max-width: 82vw;
+  line-height: 1.5;
+  pointer-events: none;
+  transition: opacity 0.65s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ==========================================================================
+   THE CLOUD VEIL (#worldVeil)
+   ========================================================================== */
+
+.c04-world-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  background: #101921;
+  transition: opacity 0.85s, visibility 0.85s;
+  overflow: hidden;
+}
+
+.c04-world-veil.cover {
+  visibility: visible;
+  opacity: 1;
+}
+
+.c04-world-veil.cover.reveal {
+  opacity: 0;
+  transition: opacity 1.4s, visibility 1.4s;
+}
+
+.c04-world-veil i {
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(at 26% 54%, rgba(208, 196, 172, 0.72), transparent 44%),
+              radial-gradient(at 72% 36%, rgba(111, 129, 136, 0.88), transparent 48%);
+  filter: blur(38px);
+  transform: translateX(-24%);
+  transition: transform 2.2s;
+}
+
+.c04-world-veil i:nth-child(2) {
+  transform: translateX(24%) rotate(180deg);
+  opacity: 0.65;
+}
+
+.c04-world-veil.cover i {
+  transform: translateX(12%);
+}
+
+.c04-world-veil.cover i:nth-child(2) {
+  transform: translateX(-12%) rotate(180deg);
+}
+
+/* ==========================================================================
+   JOURNEY MODE & SCROLL CUE
+   ========================================================================== */
+
+.c04-scroll-cue {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(60px, 12svh, 110px);
+  z-index: 18;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 28px;
+  color: rgb(243, 239, 231);
+  transform: translateX(-50%) translateY(8px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.6s, transform 0.6s, visibility 0.6s;
+  cursor: pointer;
+  background: rgba(14, 21, 28, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(230, 215, 190, 0.2);
+  border-radius: 40px;
+  text-shadow: rgb(8, 14, 22) 0 2px 14px;
+}
+
+.c04-scroll-cue.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.c04-scroll-cue:hover {
+  background: rgba(24, 33, 44, 0.65);
+  border-color: rgba(230, 215, 190, 0.5);
+}
+
+.c04-scroll-cue-icon {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 36px;
+  border: 1px solid rgba(232, 213, 179, 0.7);
+  border-radius: 18px;
+  background: linear-gradient(rgba(16, 23, 34, 0.1), rgba(16, 23, 34, 0.35));
+  box-shadow: rgba(232, 183, 121, 0.15) 0 0 16px;
+}
+
+.c04-scroll-cue-trace {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 2px;
+  height: 7px;
+  border-radius: 2px;
+  background: rgb(242, 213, 167);
+  transform: translateX(-50%);
+  animation: 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite scroll-gesture;
+  box-shadow: rgba(232, 183, 121, 0.5) 0 0 8px;
+}
+
+@keyframes scroll-gesture {
+  0% { opacity: 0; transform: translate(-50%, 0); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, 14px); }
+}
+
+.c04-scroll-cue-chevron {
+  position: absolute;
+  width: 14px;
+  height: 8px;
+  left: 3px;
+  bottom: -13px;
+  fill: none;
+  stroke: rgb(231, 212, 179);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: 2.4s ease-in-out infinite scroll-chevron;
+}
+
+@keyframes scroll-chevron {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(3px); }
+}
+
+.c04-scroll-cue-label {
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.c04-scroll-cue-label span {
+  display: block;
+  font-size: 7.5px;
+  color: rgba(197, 199, 197, 0.8);
+  letter-spacing: 0.15em;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   FLOATING JOURNEY CHAPTER STAGES
+   ========================================================================== */
+
+.c04-journey-chapters {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  pointer-events: none;
+}
+
+.c04-chapter-card {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 max(24px, 12vw);
+  pointer-events: none;
+}
+
+.c04-card-inner {
+  max-width: 540px;
+  background: rgba(11, 17, 24, 0.45);
+  backdrop-filter: blur(12px);
+  padding: 36px 44px;
+  border-radius: 20px;
+  border: 1px solid rgba(232, 213, 179, 0.15);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+
+.c04-card-folio {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #edc68f;
+  margin-bottom: 14px;
+}
+
+.c04-card-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 3.2vw, 36px);
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  line-height: 1.35;
+  color: #f7eee2;
+  margin: 0 0 16px;
+}
+
+.c04-card-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(220, 215, 205, 0.85);
+  margin-bottom: 24px;
+}
+
+.c04-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  background: rgba(237, 198, 143, 0.12);
+  border: 1px solid rgba(237, 198, 143, 0.4);
+  border-radius: 30px;
+  color: #f4ece0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.c04-card-action:hover {
+  background: rgba(237, 198, 143, 0.25);
+  border-color: rgba(237, 198, 143, 0.8);
+  transform: translateY(-2px);
+}

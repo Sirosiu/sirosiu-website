@@ -23,7 +23,7 @@ export const App: React.FC = () => {
     } catch (e) {
       // ignore
     }
-    return 1 // Default to Concept 01 (Cosmic Horizon)
+    return 4 // Default to Concept 04 (Continuous World Entrance)
   })
 
   // Global Butter-Smooth Lenis Scroll Engine
