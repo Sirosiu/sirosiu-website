@@ -5,8 +5,8 @@ import { ConceptSwitcher } from './components/ConceptSwitcher'
 import { Concept01Cosmic } from './concepts/Concept01Cosmic/Concept01Cosmic'
 import { Concept02Synaptic } from './concepts/Concept02Synaptic/Concept02Synaptic'
 import { Concept03Lusion } from './concepts/Concept03Lusion/Concept03Lusion'
-import { Concept04Swiss } from './concepts/Concept04Swiss/Concept04Swiss'
-import { Concept05Laser } from './concepts/Concept05Laser/Concept05Laser'
+import { Concept04Abyssal } from './concepts/Concept04Abyssal/Concept04Abyssal'
+import { Concept05Quantum } from './concepts/Concept05Quantum/Concept05Quantum'
 import './App.css'
 
 export const App: React.FC = () => {
@@ -88,8 +88,8 @@ export const App: React.FC = () => {
         {activeConcept === 1 && <Concept01Cosmic />}
         {activeConcept === 2 && <Concept02Synaptic />}
         {activeConcept === 3 && <Concept03Lusion />}
-        {activeConcept === 4 && <Concept04Swiss />}
-        {activeConcept === 5 && <Concept05Laser />}
+        {activeConcept === 4 && <Concept04Abyssal />}
+        {activeConcept === 5 && <Concept05Quantum />}
       </main>
     </div>
   )
