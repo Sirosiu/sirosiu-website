@@ -557,3 +557,174 @@
     text-align: center;
   }
 }
+
+
+/* ==========================================================================
+   COSMIC OBSERVATORY HUD & CONTROL DOCK (CONCEPT 01 ELEVATION)
+   ========================================================================== */
+
+.cosmic-hud-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.cosmic-hud-corner {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  color: rgba(226, 232, 240, 0.45);
+  line-height: 1.5;
+  background: rgba(3, 4, 8, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cosmic-hud-tl {
+  top: 4.8rem;
+  left: 1.5rem;
+}
+
+.cosmic-hud-tr {
+  top: 4.8rem;
+  right: 1.5rem;
+  text-align: right;
+}
+
+.cosmic-hud-bl {
+  bottom: 1.5rem;
+  left: 1.5rem;
+}
+
+.cosmic-hud-br {
+  bottom: 1.5rem;
+  right: 1.5rem;
+  text-align: right;
+}
+
+.cosmic-hud-value {
+  color: var(--scrolly-accent, #f59e0b);
+  font-weight: 600;
+}
+
+/* Floating Palette & Sound Controls Dock */
+.cosmic-controls-dock {
+  position: fixed;
+  top: 4.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(8, 10, 16, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  z-index: 45;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+.cosmic-palette-group {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding-right: 0.5rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cosmic-palette-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.cosmic-palette-btn:hover {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cosmic-palette-btn.is-active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--scrolly-accent, #f59e0b);
+  box-shadow: 0 0 12px var(--scrolly-accent-glow, rgba(245, 158, 11, 0.4));
+  font-weight: 700;
+}
+
+.cosmic-swatch-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.cosmic-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cosmic-audio-btn:hover {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cosmic-audio-btn.is-active {
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.cosmic-audio-eq-canvas {
+  width: 28px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Mobile Adjustments for Cosmic Dock */
+@media (max-width: 860px) {
+  .cosmic-hud-tl,
+  .cosmic-hud-tr {
+    display: none;
+  }
+  .cosmic-controls-dock {
+    top: 3.8rem;
+    padding: 0.25rem 0.45rem;
+    max-width: 95vw;
+    overflow-x: auto;
+  }
+  .cosmic-palette-btn {
+    font-size: 0.62rem;
+    padding: 0.2rem 0.45rem;
+  }
+}
