@@ -1,0 +1,763 @@
+/* ==========================================================================
+   CONCEPT 03: LUSION LIQUID (PROTOTYPE 4)
+   Organic Visco-Elastic Fluid Morph, Tactile Elasticity & 60FPS Micro-Kinetics
+   ========================================================================== */
+
+:root {
+  --lusion-bg: #090a0f;
+  --lusion-surface: rgba(18, 20, 30, 0.72);
+  --lusion-border: rgba(255, 255, 255, 0.08);
+  --lusion-border-glow: rgba(0, 102, 255, 0.35);
+  --lusion-text: #f8fafc;
+  --lusion-text-muted: #94a3b8;
+  --lusion-blue: #0066ff;
+  --lusion-blue-glow: rgba(0, 102, 255, 0.25);
+  --lusion-font-display: 'Syne', sans-serif;
+  --lusion-font-body: 'Inter', sans-serif;
+  --lusion-font-mono: 'JetBrains Mono', monospace;
+}
+
+.lusion-root {
+  background-color: var(--lusion-bg);
+  color: var(--lusion-text);
+  font-family: var(--lusion-font-body);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: clip;
+  width: 100%;
+}
+
+/* Background Fluid Gel Canvas */
+.lusion-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Floating Fluid Telemetry Bar */
+.lusion-hud-fixed {
+  position: fixed;
+  top: 3.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1320px, 94vw);
+  background: rgba(14, 16, 26, 0.8);
+  border: 1px solid var(--lusion-border);
+  backdrop-filter: blur(16px);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.4rem;
+  z-index: 20;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.72rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+.lusion-hud-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lusion-hud-label {
+  font-size: 0.6rem;
+  color: var(--lusion-text-muted);
+  letter-spacing: 0.08em;
+}
+
+.lusion-mono-blue {
+  color: var(--lusion-blue);
+}
+
+.lusion-mono-white {
+  color: #fff;
+}
+
+.lusion-audio-btn {
+  background: rgba(0, 102, 255, 0.12);
+  border: 1px solid rgba(0, 102, 255, 0.35);
+  color: #60a5fa;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.68rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lusion-audio-btn:hover,
+.lusion-audio-btn.is-active {
+  background: var(--lusion-blue);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 16px var(--lusion-blue-glow);
+}
+
+/* Hero Section */
+.lusion-hero-section {
+  position: relative;
+  z-index: 5;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rem 2rem 4rem;
+  text-align: center;
+}
+
+.lusion-hero-container {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.lusion-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.75rem;
+  color: #60a5fa;
+  letter-spacing: 0.14em;
+  padding: 6px 16px;
+  background: rgba(0, 102, 255, 0.08);
+  border: 1px solid rgba(0, 102, 255, 0.25);
+  border-radius: 999px;
+}
+
+.lusion-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--lusion-blue);
+  box-shadow: 0 0 10px var(--lusion-blue);
+  animation: lusion-pulse 2s infinite ease-in-out;
+}
+
+@keyframes lusion-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.5; }
+}
+
+.lusion-hero-title {
+  font-family: var(--lusion-font-display);
+  font-size: clamp(2.8rem, 7.5vw, 6.2rem);
+  font-weight: 800;
+  line-height: 1.02;
+  text-transform: uppercase;
+  transition: transform 0.1s linear, opacity 0.1s linear;
+}
+
+.lusion-text-gradient {
+  background: linear-gradient(135deg, #ffffff, #60a5fa 50%, #0066ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lusion-hero-lead {
+  max-width: 720px;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.65;
+  color: #cbd5e1;
+  font-weight: 300;
+}
+
+.lusion-scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.lusion-scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--lusion-blue), transparent);
+  animation: lusion-drop 2s infinite ease-in-out;
+}
+
+@keyframes lusion-drop {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  50.1% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+.lusion-scroll-text {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.65rem;
+  color: var(--lusion-text-muted);
+  letter-spacing: 0.16em;
+}
+
+/* Sections General */
+.lusion-section {
+  position: relative;
+  z-index: 5;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+}
+
+.lusion-section-header {
+  margin-bottom: 3.5rem;
+  max-width: 720px;
+}
+
+.lusion-eyebrow {
+  display: inline-block;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.72rem;
+  color: #60a5fa;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.65rem;
+}
+
+.lusion-section-header h2 {
+  font-family: var(--lusion-font-display);
+  font-size: clamp(2.2rem, 4.8vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.lusion-section-header h2 span {
+  color: #60a5fa;
+}
+
+.lusion-section-header p {
+  color: var(--lusion-text-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+/* Projects Grid */
+.lusion-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 2rem;
+}
+
+.lusion-project-card {
+  background: var(--lusion-surface);
+  border: 1px solid var(--lusion-border);
+  backdrop-filter: blur(14px);
+  border-radius: 16px;
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.lusion-project-card:hover,
+.lusion-project-card.is-focused {
+  border-color: var(--lusion-border-glow);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 24px var(--lusion-blue-glow);
+}
+
+.lusion-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lusion-card-idx {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.68rem;
+  color: var(--lusion-text-muted);
+  letter-spacing: 0.12em;
+}
+
+.lusion-domain-pill {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.65rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(0, 102, 255, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(0, 102, 255, 0.3);
+}
+
+.lusion-project-title {
+  font-family: var(--lusion-font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.lusion-project-tagline {
+  font-size: 0.92rem;
+  color: var(--lusion-text-muted);
+  line-height: 1.5;
+}
+
+.lusion-metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--lusion-border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.lusion-metric-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lusion-metric-label {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.6rem;
+  color: var(--lusion-text-muted);
+}
+
+.lusion-metric-value {
+  font-family: var(--lusion-font-mono);
+  font-size: 1.05rem;
+  color: #60a5fa;
+}
+
+.lusion-project-summary {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+  flex: 1;
+}
+
+.lusion-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--lusion-border);
+}
+
+.lusion-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.lusion-tag-chip {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  color: var(--lusion-text-muted);
+}
+
+.lusion-inspect-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.72rem;
+  color: #60a5fa;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.lusion-inspect-btn:hover {
+  transform: translateX(3px);
+}
+
+/* Viscosity Lab Section */
+.lusion-glass-slab {
+  background: var(--lusion-surface);
+  border: 1px solid var(--lusion-border-glow);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+}
+
+.lusion-lab-header {
+  max-width: 680px;
+  margin-bottom: 2.5rem;
+}
+
+.lusion-lab-header h2 {
+  font-family: var(--lusion-font-display);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.lusion-lab-header h2 span {
+  color: #60a5fa;
+}
+
+.lusion-lab-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.lusion-sliders-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.lusion-sliders-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.8rem;
+  color: var(--lusion-text-muted);
+}
+
+.lusion-sliders-row input[type='range'] {
+  width: 100%;
+  accent-color: var(--lusion-blue);
+  cursor: pointer;
+}
+
+.lusion-impulse-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.lusion-impulse-btn {
+  background: rgba(0, 102, 255, 0.16);
+  border: 1px solid var(--lusion-blue);
+  color: #93c5fd;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lusion-impulse-btn:hover {
+  background: var(--lusion-blue);
+  color: #fff;
+  box-shadow: 0 0 20px var(--lusion-blue-glow);
+}
+
+.lusion-lab-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--lusion-border);
+  border-radius: 12px;
+}
+
+.lusion-lab-metrics div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lusion-lab-metrics span {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.65rem;
+  color: var(--lusion-text-muted);
+}
+
+.lusion-lab-metrics strong {
+  font-family: var(--lusion-font-mono);
+  font-size: 1.25rem;
+}
+
+/* Capabilities Grid */
+.lusion-capabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.lusion-capability-card {
+  background: var(--lusion-surface);
+  border: 1px solid var(--lusion-border);
+  border-radius: 14px;
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.lusion-cap-num {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.7rem;
+  color: #60a5fa;
+}
+
+.lusion-capability-card h4 {
+  font-family: var(--lusion-font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.lusion-capability-card p {
+  font-size: 0.85rem;
+  color: var(--lusion-text-muted);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.lusion-cap-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.lusion-skill-pill {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+}
+
+/* Footer */
+.lusion-footer {
+  border-top: 1px solid var(--lusion-border);
+  background: #06070a;
+  padding: 5rem 2rem;
+  position: relative;
+  z-index: 5;
+}
+
+.lusion-footer-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+.lusion-footer-left h2 {
+  font-family: var(--lusion-font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0.5rem 0 1rem;
+}
+
+.lusion-footer-left p {
+  color: var(--lusion-text-muted);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.lusion-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.lusion-btn-blue {
+  background: var(--lusion-blue);
+  color: #fff;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.lusion-btn-blue:hover {
+  background: #2563eb;
+  box-shadow: 0 0 20px var(--lusion-blue-glow);
+}
+
+.lusion-btn-outline {
+  background: transparent;
+  border: 1px solid var(--lusion-border);
+  color: #fff;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.78rem;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.lusion-btn-outline:hover {
+  border-color: #fff;
+}
+
+.lusion-stamp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-family: var(--lusion-font-mono);
+  font-size: 0.7rem;
+  color: var(--lusion-text-muted);
+}
+
+/* Modal */
+.lusion-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.lusion-modal-card {
+  background: #0f121d;
+  border: 1px solid var(--lusion-border-glow);
+  border-radius: 18px;
+  width: min(840px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9);
+}
+
+.lusion-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.lusion-modal-header h3 {
+  font-family: var(--lusion-font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-top: 0.35rem;
+}
+
+.lusion-modal-close {
+  background: transparent;
+  border: 1px solid var(--lusion-border);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lusion-modal-section h4 {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.75rem;
+  color: #60a5fa;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+
+.lusion-modal-section p {
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.lusion-modal-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+.lusion-modal-stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--lusion-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lusion-modal-stat span {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.62rem;
+  color: var(--lusion-text-muted);
+}
+
+.lusion-modal-stat strong {
+  font-family: var(--lusion-font-mono);
+  font-size: 1.1rem;
+  color: #60a5fa;
+}
+
+.lusion-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--lusion-border);
+  padding-top: 1.25rem;
+}
+
+.lusion-modal-hint {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.7rem;
+  color: var(--lusion-text-muted);
+}
+
+.lusion-modal-link {
+  font-family: var(--lusion-font-mono);
+  font-size: 0.75rem;
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+/* Responsiveness */
+@media (max-width: 860px) {
+  .lusion-hud-fixed {
+    top: 3.2rem;
+    font-size: 0.62rem;
+    padding: 0.4rem 0.8rem;
+  }
+  .lusion-hud-cell:nth-child(2),
+  .lusion-hud-cell:nth-child(3) {
+    display: none;
+  }
+  .lusion-projects-grid {
+    grid-template-columns: 1fr;
+  }
+  .lusion-glass-slab {
+    padding: 2rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .lusion-hero-section {
+    padding-top: 7rem;
+  }
+  .lusion-hud-fixed {
+    display: none;
+  }
+}
