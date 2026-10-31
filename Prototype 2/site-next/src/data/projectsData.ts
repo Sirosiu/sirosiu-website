@@ -221,7 +221,7 @@ export const DEMO_PROJECTS: ProjectItem[] = [
   {
     id: 'sirosiu-website',
     index: '06',
-    title: 'sirosiu.com: Systems Engineering & Portfolio Platform',
+    title: 'Portfolio Website',
     tagline: 'Tactile compute portfolio with GPGPU curl noise field, 3D procedural silicon wafer lithography, and accessible architecture continuum.',
     domain: 'Creative Engineering',
     domainCode: 'SYS-WEB-06',
