@@ -237,6 +237,14 @@ export const Concept04Technical: React.FC = () => {
     setSelectedNode(node);
   };
 
+  const handleInspectSpec = (code: string) => {
+    setFilterCode(code);
+    const target = document.getElementById('c4-specs');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const displayedSpecs =
     filterCode === 'ALL'
       ? SPEC_SHEETS
@@ -318,7 +326,16 @@ export const Concept04Technical: React.FC = () => {
                           <h2 className="c4-node-title">{node.label}</h2>
                           <span className="c4-node-sub">{node.sublabel}</span>
                         </div>
-                        <div className="c4-node-ref-tag">REF: {node.connectedProjectCode}</div>
+                        <span
+                          className="c4-node-ref-tag"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleInspectSpec(node.connectedProjectCode);
+                          }}
+                          title="Jump to verified engineering spec sheet"
+                        >
+                          REF: {node.connectedProjectCode} ↗
+                        </span>
                       </div>
                     </button>
 
@@ -372,7 +389,14 @@ export const Concept04Technical: React.FC = () => {
             <div className="c4-probe-body">
               <div className="c4-probe-title-row">
                 <h3>{selectedNode.label}</h3>
-                <span className="c4-cyan-pill">{selectedNode.connectedProjectCode}</span>
+                <button
+                  type="button"
+                  onClick={() => handleInspectSpec(selectedNode.connectedProjectCode)}
+                  className="c4-cyan-pill c4-probe-link-btn"
+                  title="Cross-probe into Verified Spec Sheet"
+                >
+                  {selectedNode.connectedProjectCode} [VIEW SPEC →]
+                </button>
               </div>
 
               <div className="c4-probe-kv-grid">

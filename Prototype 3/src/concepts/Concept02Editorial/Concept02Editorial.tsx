@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './EditorialStyles.css';
 
 interface EditorialArticle {
@@ -151,6 +151,21 @@ const FEATURE_STORIES: EditorialArticle[] = [
 
 export const Concept02Editorial: React.FC = () => {
   const [activeFootnote, setActiveFootnote] = useState<string>('FN.01');
+  const [selectedCitation, setSelectedCitation] = useState<{
+    id: string;
+    text: string;
+    title: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedCitation(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <div className="c2-editorial-root">
@@ -347,7 +362,15 @@ export const Concept02Editorial: React.FC = () => {
                 <button
                   type="button"
                   className="c2-footnote-trigger"
-                  onClick={() => setActiveFootnote(story.footnoteId)}
+                  onClick={() => {
+                    setActiveFootnote(story.footnoteId);
+                    setSelectedCitation({
+                      id: story.footnoteId,
+                      text: story.footnoteText,
+                      title: story.title,
+                    });
+                  }}
+                  title={`Inspect citation [${story.footnoteId}]`}
                 >
                   [{story.footnoteId}]
                 </button>
@@ -554,6 +577,32 @@ export const Concept02Editorial: React.FC = () => {
           CONCEPT 02 — EUROPEAN EDITORIAL MONOGRAPH // ALL RIGHTS RESERVED © 2026
         </div>
       </footer>
+
+      {/* Interactive Academic Footnote / Citation Drawer */}
+      {selectedCitation && (
+        <aside
+          className="c2-citation-drawer"
+          role="dialog"
+          aria-label="Citation Reference"
+          aria-modal="false"
+        >
+          <div className="c2-citation-inner">
+            <div className="c2-citation-head">
+              <span className="c2-mono-vermilion">CITATIO // [{selectedCitation.id}]</span>
+              <span className="c2-citation-ref">{selectedCitation.title}</span>
+              <button
+                type="button"
+                className="c2-citation-close-btn"
+                onClick={() => setSelectedCitation(null)}
+                aria-label="Close citation"
+              >
+                DISMISS [ESC]
+              </button>
+            </div>
+            <p className="c2-citation-body">{selectedCitation.text}</p>
+          </div>
+        </aside>
+      )}
     </div>
   );
 };

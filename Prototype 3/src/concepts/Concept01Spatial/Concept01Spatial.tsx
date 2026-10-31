@@ -395,13 +395,13 @@ export const Concept01Spatial: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
 
-    const clock = new THREE.Clock();
+    const startTime = performance.now();
     let frameId = 0;
     let tick = 0;
 
     const animate = () => {
       frameId = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
+      const elapsed = (performance.now() - startTime) * 0.001;
       tick++;
 
       // Heavy 400kg inertial damping

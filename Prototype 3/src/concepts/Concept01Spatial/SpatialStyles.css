@@ -381,6 +381,16 @@
   align-items: start;
 }
 
+@media (min-width: 960px) {
+  .c1-work-split {
+    grid-template-columns: 380px minmax(0, 1fr);
+  }
+  .c1-project-dossier {
+    position: sticky;
+    top: 4.5rem;
+  }
+}
+
 .c1-project-list {
   display: flex;
   flex-direction: column;

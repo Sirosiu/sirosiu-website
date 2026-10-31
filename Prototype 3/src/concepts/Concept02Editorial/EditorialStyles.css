@@ -73,6 +73,12 @@
   z-index: 25;
 }
 
+@media (max-width: 860px) {
+  .c2-masthead {
+    position: relative;
+  }
+}
+
 .c2-masthead-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
@@ -133,6 +139,26 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
   border-bottom: 2px solid var(--c2-rule-major);
+}
+
+@media (min-width: 1080px) {
+  .c2-cover-spread {
+    grid-template-columns: 220px minmax(0, 1.8fr) minmax(320px, 1.1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .c2-cover-spread {
+    grid-template-columns: 1fr;
+  }
+  .c2-cover-spine {
+    border-right: none;
+    border-bottom: 1px solid var(--c2-rule-major);
+  }
+  .c2-cover-main {
+    border-right: none;
+    border-bottom: 1px solid var(--c2-rule-major);
+  }
 }
 
 .c2-cover-spine {
@@ -308,6 +334,26 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
   border-bottom: 1px solid var(--c2-rule-major);
+}
+
+@media (min-width: 1080px) {
+  .c2-folio-spread {
+    grid-template-columns: 220px minmax(0, 1.8fr) minmax(280px, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .c2-folio-spread {
+    grid-template-columns: 1fr;
+  }
+  .c2-folio-margin {
+    border-right: none;
+    border-bottom: 1px solid var(--c2-rule-minor);
+  }
+  .c2-folio-article {
+    border-right: none;
+    border-bottom: 1px solid var(--c2-rule-minor);
+  }
 }
 
 .c2-folio-margin {
@@ -671,4 +717,74 @@
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.1em;
+}
+
+/* Academic Footnote / Citation Drawer */
+.c2-citation-drawer {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  max-width: 480px;
+  width: calc(100% - 3rem);
+  background: var(--c2-paper-warm);
+  border: 2px solid var(--c2-vermilion);
+  box-shadow: 0 16px 40px rgba(20, 19, 18, 0.22);
+  padding: 1.25rem 1.5rem;
+  z-index: 100;
+  animation: c2SlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes c2SlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.c2-citation-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--c2-rule-minor);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.c2-citation-ref {
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--c2-ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+}
+
+.c2-citation-close-btn {
+  background: none;
+  border: 1px solid var(--c2-rule-minor);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  color: var(--c2-ink);
+  transition: all 0.15s ease;
+}
+
+.c2-citation-close-btn:hover {
+  background: var(--c2-vermilion);
+  color: #fff;
+  border-color: var(--c2-vermilion);
+}
+
+.c2-citation-body {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--c2-ink);
+  line-height: 1.45;
 }

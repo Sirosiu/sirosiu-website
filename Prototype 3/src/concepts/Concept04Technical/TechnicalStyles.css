@@ -286,6 +286,26 @@
   padding: 0.2rem 0.55rem;
   background: var(--c4-graphite);
   color: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.c4-node-ref-tag:hover {
+  background: var(--c4-cyan);
+  color: #0b0d13;
+}
+
+.c4-probe-link-btn {
+  background: rgba(2, 132, 199, 0.15);
+  border: 1px solid var(--c4-cyan);
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.c4-probe-link-btn:hover {
+  background: var(--c4-cyan);
+  color: #0b0d13;
 }
 
 .c4-bus-connector {

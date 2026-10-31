@@ -377,8 +377,14 @@ export const Concept03Experimental: React.FC = () => {
       ctx.fillRect(0, 0, width, height);
     };
 
+    const onPointerLeave = () => {
+      pointer.active = false;
+      pointer.down = false;
+    };
+
     canvas.addEventListener('pointermove', onPointerMove, { passive: true });
     canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointerleave', onPointerLeave);
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('resize', onResize);
 
@@ -525,6 +531,7 @@ export const Concept03Experimental: React.FC = () => {
       cancelAnimationFrame(rafId);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointerleave', onPointerLeave);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('resize', onResize);
     };
