@@ -20,7 +20,7 @@ export const App: React.FC = () => {
     } catch (e) {
       // ignore
     }
-    return 1
+    return 3
   })
 
   const handleSelectConcept = (id: ConceptId) => {
