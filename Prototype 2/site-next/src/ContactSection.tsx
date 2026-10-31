@@ -1,6 +1,11 @@
 import React, { useState, useRef } from 'react'
+import SiliconQrDie from './SiliconQrDie'
 
-export default function ContactSection() {
+interface ContactSectionProps {
+  isLight?: boolean
+}
+
+export default function ContactSection({ isLight = false }: ContactSectionProps = {}) {
   const [copied, setCopied] = useState(false)
   const [formState, setFormState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [deliveryMethod, setDeliveryMethod] = useState<'endpoint' | 'mailto'>('endpoint')
@@ -184,7 +189,7 @@ export default function ContactSection() {
           {/* Left Column: Direct Connections & Resume */}
           <div className="contact-info-column">
             {/* Direct Email Card */}
-            <div className="contact-channel-card primary-channel">
+            <div className="contact-channel-card primary-channel spotlight-card" data-eda-tag="[COMPOSE MAIL ↗]">
               <div className="channel-icon-wrap">
                 <span className="channel-glyph">✉</span>
               </div>
@@ -217,7 +222,7 @@ export default function ContactSection() {
             </div>
 
             {/* Official Resume Card */}
-            <div className="contact-channel-card resume-channel">
+            <div className="contact-channel-card resume-channel spotlight-card" data-eda-tag="[VIEW RÉSUMÉ ↗]">
               <div className="channel-icon-wrap resume-icon">
                 <span className="channel-glyph">📄</span>
               </div>
@@ -233,6 +238,7 @@ export default function ContactSection() {
                   href="/assets/Ankush_Malothia_Resume.pdf"
                   download="Ankush_Malothia_Resume.pdf"
                   className="resume-download-btn"
+                  data-eda-tag="[DOWNLOAD PDF ↓]"
                 >
                   DOWNLOAD PDF ↓
                 </a>
@@ -241,14 +247,41 @@ export default function ContactSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="resume-preview-btn"
+                  data-eda-tag="[OPEN IN NEW TAB ↗]"
                 >
                   VIEW ↗
                 </a>
               </div>
             </div>
 
+            {/* 3D Silicon QR Wafer Die Mechanic */}
+            <div className="contact-silicon-die-card spotlight-card">
+              <div className="silicon-card-header">
+                <span className="silicon-status-badge">SILICON LITHOGRAPHY // 28nm IC DIE</span>
+                <span className="silicon-status-tag">SYSTEMS BUS</span>
+              </div>
+              <SiliconQrDie isLight={isLight} />
+              <div className="silicon-card-footer">
+                <div className="silicon-info-col">
+                  <span className="silicon-footer-lead">ETCHED DAMASCENE MATRIX</span>
+                  <span className="silicon-footer-sub">
+                    Interactive 3D substrate with procedural QR lithography. Drag or tilt to inspect wafer reflections.
+                  </span>
+                </div>
+                <a
+                  href="/assets/Ankush_Malothia_Resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="silicon-action-btn"
+                  data-eda-tag="[VERIFY DIE PAYLOAD ↗]"
+                >
+                  VERIFY DIE ↗
+                </a>
+              </div>
+            </div>
+
             {/* Verified Profiles */}
-            <div className="contact-socials-card">
+            <div className="contact-socials-card spotlight-card">
               <span className="socials-title">VERIFIED PROFILES & REPOSITORIES</span>
               <div className="socials-links-grid">
                 <a
@@ -256,6 +289,7 @@ export default function ContactSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="social-profile-link"
+                  data-eda-tag="[OPEN GITHUB ↗]"
                 >
                   <div className="social-link-left">
                     <span className="social-brand">GitHub</span>
@@ -269,6 +303,7 @@ export default function ContactSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="social-profile-link"
+                  data-eda-tag="[OPEN LINKEDIN ↗]"
                 >
                   <div className="social-link-left">
                     <span className="social-brand">LinkedIn</span>
@@ -282,6 +317,7 @@ export default function ContactSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="social-profile-link"
+                  data-eda-tag="[OPEN X/TWITTER ↗]"
                 >
                   <div className="social-link-left">
                     <span className="social-brand">X / Twitter</span>
@@ -295,7 +331,7 @@ export default function ContactSection() {
 
           {/* Right Column: Direct Message Form */}
           <div className="contact-form-column">
-            <div className="contact-form-card">
+            <div className="contact-form-card spotlight-card">
               <div className="form-card-header">
                 <span className="form-chip">TRANSMIT INQUIRY</span>
                 <h3 className="form-card-title">Send a Direct Message</h3>

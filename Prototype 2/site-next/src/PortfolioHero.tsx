@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import GpgpuCurlNoiseBackground from './GpgpuCurlNoiseBackground'
+import HeroGpgpuCanvas from './HeroGpgpuCanvas'
 import HandwrittenSignature from './HandwrittenSignature'
 import HeroPortrait from './HeroPortrait'
 import ThemeToggleSwitch from './ThemeToggleSwitch'
@@ -215,14 +215,14 @@ export default function PortfolioHero({
         Skip to main content
       </a>
 
-      {/* Decorative GPGPU Vector Field Compute Layer */}
+      {/* Decorative GPGPU Vector Field Particle Layer (Gyro-Manhattan IC Routing) */}
       <div aria-hidden="true">
-        <GpgpuCurlNoiseBackground isActive={true} isLight={isLight} />
+        <HeroGpgpuCanvas isActive={true} isLight={isLight} />
       </div>
 
       {/* 1. Banner Landmark: Top Site Header */}
       <header className="hero-nav" role="banner">
-        <a className="hero-logo-signature" href="/" aria-label="Ankush Malothia - Home">
+        <a className="hero-logo-signature" href="/" aria-label="Ankush Malothia - Home" data-eda-tag="[HOME // TOP]">
           <HandwrittenSignature />
         </a>
         <p className="hero-nav-role">SYSTEMS ARCHITECT · HARDWARE &amp; APPLIED AI</p>
@@ -234,11 +234,19 @@ export default function PortfolioHero({
             download="Ankush_Malothia_Resume.pdf"
             className="hero-nav-resume-btn"
             title="Download Official Résumé (PDF)"
+            data-eda-tag="[RÉSUMÉ PDF ↓]"
           >
             RÉSUMÉ <span aria-hidden="true">↓</span>
           </a>
-          <ThemeToggleSwitch isLight={isLight} onToggle={handleThemeToggle} />
-          <a href="#contact" className="hero-nav-talk" title="Jump to direct contact inquiry">
+          <div data-eda-tag="[SWITCH THEME]">
+            <ThemeToggleSwitch isLight={isLight} onToggle={handleThemeToggle} />
+          </div>
+          <a
+            href="#contact"
+            className="hero-nav-talk"
+            title="Jump to direct contact inquiry"
+            data-eda-tag="[CONNECT ↗]"
+          >
             <span className="talk-label-full">LET&apos;S TALK <span aria-hidden="true">↗</span></span>
             <span className="talk-label-compact" aria-hidden="true">TALK ↗</span>
           </a>
@@ -321,7 +329,7 @@ export default function PortfolioHero({
             <p className="systems-stack-sub">
               Select an architectural layer to inspect verified hardware specifications, runtime benchmarks, and domain tooling.
             </p>
-            <UnifiedTactilePipelineStack />
+            <UnifiedTactilePipelineStack isLight={isLight} />
           </div>
         </section>
 
@@ -332,7 +340,7 @@ export default function PortfolioHero({
       <AboutSection />
 
       {/* 04 / Contact Section: Recruiter Context, Direct Email, Downloadable Résumé, Verified Profiles & Inquiry Form */}
-      <ContactSection />
+      <ContactSection isLight={isLight} />
     </main>
 
     {/* 3. Contentinfo Landmark: Global Engineering Footer */}

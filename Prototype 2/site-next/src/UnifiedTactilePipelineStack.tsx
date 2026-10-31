@@ -10,6 +10,7 @@ interface StackStage {
   tools: string[]
   verifiedSpec: string
   busLabel: string
+  zOffsetPx: number
 }
 
 const STACK_STAGES: StackStage[] = [
@@ -23,6 +24,7 @@ const STACK_STAGES: StackStage[] = [
     tools: ['RISC-V RV32I', 'SystemVerilog', 'Verilog', 'Verilator', 'Vivado', 'Chisel', 'GTKWave', 'gem5'],
     verifiedSpec: '5-stage RV32I core + 4x4 systolic GEMM accelerator with 100% compliance pass',
     busLabel: 'LAYER 01 · GATE-LEVEL RTL & ACCELERATORS',
+    zOffsetPx: 0,
   },
   {
     id: 'low-level',
@@ -34,6 +36,7 @@ const STACK_STAGES: StackStage[] = [
     tools: ['C', 'C++20', 'Rust', 'Linux Kernel', 'POSIX', 'FreeRTOS', 'Assembly', 'GDB'],
     verifiedSpec: 'Zero-copy DMA ring buffers, <1.8μs deterministic IRQ latency, and lock-free concurrency',
     busLabel: 'LAYER 02 · KERNEL & EMBEDDED RUNTIMES',
+    zOffsetPx: 36,
   },
   {
     id: 'ai-agents',
@@ -45,6 +48,7 @@ const STACK_STAGES: StackStage[] = [
     tools: ['Autonomous Agent Runtimes', 'Local LLMs', 'PyTorch', 'ONNX Runtime', 'C++', 'Python', 'Quantization (GGUF)'],
     verifiedSpec: 'Sub-40ms on-device agent routing loop, 128-dim vector embeddings, and tool orchestration',
     busLabel: 'LAYER 03 · ON-DEVICE AGENT & NPU ORCHESTRATION',
+    zOffsetPx: 72,
   },
   {
     id: 'rf-hardware',
@@ -56,13 +60,40 @@ const STACK_STAGES: StackStage[] = [
     tools: ['Antenna Arrays', 'CST Studio', 'Smith Charts', 'VNA S-Parameters', 'HFSS', 'KiCad PCB'],
     verifiedSpec: '5.8 GHz ISM patch array with S11 return loss < -24 dB and 6.2 dBi measured gain',
     busLabel: 'LAYER 04 · HIGH-FREQUENCY EM & PHYSICAL INTERFACE',
+    zOffsetPx: 108,
   },
 ]
 
-export default function UnifiedTactilePipelineStack() {
+interface UnifiedTactilePipelineStackProps {
+  isLight?: boolean
+}
+
+export default function UnifiedTactilePipelineStack({}: UnifiedTactilePipelineStackProps = {}) {
   const [activeStage, setActiveStage] = useState(0)
+  const [isExploded, setIsExploded] = useState(false)
   const current = STACK_STAGES[activeStage]
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const stageRef = useRef<HTMLDivElement>(null)
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = stageRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const nx = (e.clientX - rect.left) / rect.width - 0.5
+    const ny = (e.clientY - rect.top) / rect.height - 0.5
+
+    // Hardware-accelerated direct CSS variable mutation avoids React re-renders
+    el.style.setProperty('--stack-rot-y', `${nx * 14}deg`)
+    el.style.setProperty('--stack-rot-x', `${-ny * 12}deg`)
+  }
+
+  const handlePointerLeave = () => {
+    const el = stageRef.current
+    if (!el) return
+    el.style.setProperty('--stack-rot-y', '0deg')
+    el.style.setProperty('--stack-rot-x', '0deg')
+    setIsExploded(false)
+  }
 
   const handleScrollToWork = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -105,19 +136,28 @@ export default function UnifiedTactilePipelineStack() {
   }
 
   return (
-    <div className="unified-stack-pipeline">
+    <div
+      ref={stageRef}
+      className={`unified-stack-pipeline compute-stack-perspective ${isExploded ? 'is-exploded' : ''}`}
+      data-eda-tag="[INSPECT BUS]"
+      onPointerEnter={() => setIsExploded(true)}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+    >
       {/* Sequential Pipeline of Tactile Hardware ICs */}
       <div
-        className="pipeline-ic-rail"
+        className="pipeline-ic-rail compute-stack-body"
         role="tablist"
         aria-label="Technical Stack Architecture"
         aria-orientation="horizontal"
       >
         {STACK_STAGES.map((stage, idx) => {
           const isSelected = activeStage === idx
+          const zDepth = isExploded ? stage.zOffsetPx : (isSelected ? 18 : stage.zOffsetPx * 0.12)
+
           return (
             <div key={stage.id} className="pipeline-node-segment">
-              {/* Tactile IC Module Card */}
+              {/* Tactile IC Module Card with Aceternity 3D Card Depth */}
               <button
                 ref={(el) => {
                   tabRefs.current[idx] = el
@@ -128,9 +168,17 @@ export default function UnifiedTactilePipelineStack() {
                 aria-controls="stack-panel-telemetry"
                 aria-selected={isSelected}
                 tabIndex={isSelected ? 0 : -1}
-                onClick={() => setActiveStage(idx)}
+                onClick={() => {
+                  setActiveStage(idx)
+                  setIsExploded(true)
+                }}
+                onFocus={() => setIsExploded(true)}
+                onBlur={() => setIsExploded(false)}
                 onKeyDown={(e) => handleKeyDown(e, idx)}
-                className={`tactile-pipeline-card ${isSelected ? 'is-active' : ''}`}
+                className={`tactile-pipeline-card spotlight-card compute-tier-layer ${isSelected ? 'is-active' : ''}`}
+                style={{
+                  '--tier-z': `${zDepth}px`,
+                } as React.CSSProperties}
               >
                 {/* Header row: Layer designation & glyph */}
                 <div className="pipeline-card-header">
@@ -165,7 +213,7 @@ export default function UnifiedTactilePipelineStack() {
         id="stack-panel-telemetry"
         role="tabpanel"
         aria-labelledby={`stack-tab-${current.id}`}
-        className="pipeline-telemetry-bus"
+        className="pipeline-telemetry-bus spotlight-card"
         tabIndex={0}
       >
         <div className="bus-header-row">
@@ -188,6 +236,7 @@ export default function UnifiedTactilePipelineStack() {
             onClick={handleScrollToWork}
             className="bus-explore-action"
             title="Explore matching engineering projects"
+            data-eda-tag="[EXPLORE WORK ↓]"
           >
             VIEW PROJECTS ↓
           </button>

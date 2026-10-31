@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import PortfolioHero from './PortfolioHero'
 import ProjectsPage from './ProjectsPage'
-import CanvasCursor from './CanvasCursor'
+import EdaPointerController from './EdaPointerController'
 import OceanSandbox from './OceanSandbox'
 
 const getInitialThemeIsLight = (): boolean => {
@@ -79,7 +79,7 @@ export default function App() {
     return (
       <>
         <OceanSandbox onBack={() => navigate('/portfolio-1')} />
-        <CanvasCursor />
+        <EdaPointerController />
       </>
     )
   }
@@ -97,7 +97,7 @@ export default function App() {
           isLight={isLight}
           onToggleTheme={handleToggleTheme}
         />
-        <CanvasCursor />
+        <EdaPointerController />
       </>
     )
   }
@@ -109,7 +109,7 @@ export default function App() {
         onToggleTheme={handleToggleTheme}
         onNavigate={navigate}
       />
-      <CanvasCursor />
+      <EdaPointerController />
     </>
   )
 }
