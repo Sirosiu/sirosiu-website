@@ -1,184 +1,356 @@
-import React, { useEffect, useRef } from 'react'
-import * as THREE from 'three'
+import React, { useEffect, useRef, useState } from 'react'
+
+interface TelemetryData {
+  meanVelocity: string
+  vorticity: string
+  fps: number
+  mode: string
+}
 
 export const GenerativeCanvas: React.FC = () => {
-  const mountRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [telemetry, setTelemetry] = useState<TelemetryData>({
+    meanVelocity: '1.84',
+    vorticity: '1.420',
+    fps: 60,
+    mode: 'HARMONIC CURL (∇·v = 0)',
+  })
+  const [activePreset, setActivePreset] = useState<'laminar' | 'turbulent' | 'quantum'>('turbulent')
+  const modeRef = useRef(activePreset)
 
   useEffect(() => {
-    const container = mountRef.current
+    modeRef.current = activePreset
+  }, [activePreset])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const container = canvas.parentElement
     if (!container) return
 
-    const scene = new THREE.Scene()
-    const width = container.clientWidth || 600
-    const height = container.clientHeight || 500
+    const ctx = canvas.getContext('2d', { alpha: false })
+    if (!ctx) return
 
-    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100)
-    camera.position.set(0, 0, 18)
+    let width = (canvas.width = container.clientWidth || 600)
+    let height = (canvas.height = container.clientHeight || 500)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
-    renderer.setSize(width, height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    container.appendChild(renderer.domElement)
-
-    // Particle Count & Buffers
-    const particleCount = 2800
-    const positions = new Float32Array(particleCount * 3)
-    const originalPositions = new Float32Array(particleCount * 3)
-    const velocities = new Float32Array(particleCount * 3)
-    const colors = new Float32Array(particleCount * 3)
-
-    // Palette: Electric Cobalt, Acid Lime, Vivid Coral
-    const colorA = new THREE.Color(0x3b82f6) // Cobalt
-    const colorB = new THREE.Color(0xa3e635) // Acid Lime
-    const colorC = new THREE.Color(0xf43f5e) // Coral
-
-    for (let i = 0; i < particleCount; i++) {
-      const i3 = i * 3
-      // Torus / Vortex distribution
-      const u = Math.random() * Math.PI * 2
-      const v = Math.random() * Math.PI * 2
-      const r = 7 + (Math.random() - 0.5) * 3
-      const tubeR = 2.5 + (Math.random() - 0.5) * 1.5
-
-      const x = (r + tubeR * Math.cos(v)) * Math.cos(u)
-      const y = (r + tubeR * Math.cos(v)) * Math.sin(u)
-      const z = tubeR * Math.sin(v)
-
-      positions[i3] = x
-      positions[i3 + 1] = y
-      positions[i3 + 2] = z
-
-      originalPositions[i3] = x
-      originalPositions[i3 + 1] = y
-      originalPositions[i3 + 2] = z
-
-      velocities[i3] = (Math.random() - 0.5) * 0.02
-      velocities[i3 + 1] = (Math.random() - 0.5) * 0.02
-      velocities[i3 + 2] = (Math.random() - 0.5) * 0.02
-
-      // Color interpolation
-      const t = Math.random()
-      const pColor = t < 0.5 ? colorA.clone().lerp(colorB, t * 2) : colorB.clone().lerp(colorC, (t - 0.5) * 2)
-      colors[i3] = pColor.r
-      colors[i3 + 1] = pColor.g
-      colors[i3 + 2] = pColor.b
+    const PARTICLE_COUNT = 2200
+    interface Particle {
+      x: number
+      y: number
+      px: number
+      py: number
+      speed: number
+      life: number
+    }
+    const particles: Particle[] = []
+    const pointer = {
+      x: width / 2,
+      y: height / 2,
+      vx: 0,
+      vy: 0,
+      active: false,
+      isAttracting: false,
     }
 
-    const geometry = new THREE.BufferGeometry()
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-
-    // Create a circular particle texture
-    const canvas = document.createElement('canvas')
-    canvas.width = 32
-    canvas.height = 32
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16)
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)')
-      gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)')
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, 32, 32)
-    }
-    const particleTexture = new THREE.CanvasTexture(canvas)
-
-    const material = new THREE.PointsMaterial({
-      size: 0.28,
-      vertexColors: true,
-      map: particleTexture,
-      transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    })
-
-    const pointCloud = new THREE.Points(geometry, material)
-    scene.add(pointCloud)
-
-    // Mouse Tracking for Interactive Flow
-    let mouseX = 0
-    let mouseY = 0
-    let targetMouseX = 0
-    let targetMouseY = 0
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect()
-      mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1
-      mouseY = -(((e.clientY - rect.top) / rect.height) * 2 - 1)
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-
-    let animationFrameId: number
-    let clock = new THREE.Clock()
-
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate)
-      const time = clock.getElapsedTime()
-
-      targetMouseX += (mouseX * 4 - targetMouseX) * 0.05
-      targetMouseY += (mouseY * 4 - targetMouseY) * 0.05
-
-      // Rotate whole cloud
-      pointCloud.rotation.z = time * 0.08
-      pointCloud.rotation.y = time * 0.05 + targetMouseX * 0.15
-      pointCloud.rotation.x = targetMouseY * 0.15
-
-      const pos = geometry.attributes.position.array as Float32Array
-
-      // Animate individual particles with harmonic curl perturbation
-      for (let i = 0; i < particleCount; i++) {
-        const i3 = i * 3
-        const ox = originalPositions[i3]
-        const oy = originalPositions[i3 + 1]
-        const oz = originalPositions[i3 + 2]
-
-        const angle = time * 0.3 + (i % 50) * 0.1
-        const wave = Math.sin(angle) * 0.4
-
-        pos[i3] = ox + Math.cos(angle * 0.7) * wave + (targetMouseX * 0.2)
-        pos[i3 + 1] = oy + Math.sin(angle * 0.8) * wave + (targetMouseY * 0.2)
-        pos[i3 + 2] = oz + Math.cos(angle * 0.5) * wave
+    // Fast pseudo-simplex trigonometric harmonic potential field
+    function potentialField(x: number, y: number, t: number) {
+      const mode = modeRef.current
+      if (mode === 'laminar') {
+        const s1 = 0.0018
+        const s2 = 0.0042
+        return (
+          Math.sin(x * s1 + t * 0.4) * Math.cos(y * s1 - t * 0.3) +
+          0.3 * Math.sin(x * s2 - y * s2 + t * 0.6)
+        )
+      } else if (mode === 'quantum') {
+        const s1 = 0.0045
+        const s2 = 0.009
+        return (
+          Math.sin(x * s1 * 1.5 + t * 1.2) * Math.cos(y * s1 * 0.8 - t * 0.9) +
+          0.6 * Math.sin((x + y) * s2 + t * 1.4) +
+          0.2 * Math.cos(Math.hypot(x - width / 2, y - height / 2) * 0.015 - t * 2.0)
+        )
+      } else {
+        // Turbulent curl (default)
+        const s1 = 0.0028
+        const s2 = 0.0065
+        return (
+          Math.sin(x * s1 + t * 0.7) * Math.cos(y * s1 - t * 0.5) +
+          0.5 * Math.sin(x * s2 - y * s2 + t * 1.1)
+        )
       }
-
-      geometry.attributes.position.needsUpdate = true
-      renderer.render(scene, camera)
     }
 
-    animate()
+    // Analytical finite-difference Curl derivation for ∇·v = 0
+    function getCurl(x: number, y: number, t: number) {
+      const eps = 1.5
+      const dPsiDy = (potentialField(x, y + eps, t) - potentialField(x, y - eps, t)) / (2 * eps)
+      const dPsiDx = (potentialField(x + eps, y, t) - potentialField(x - eps, y, t)) / (2 * eps)
+      const multiplier = modeRef.current === 'laminar' ? 320 : modeRef.current === 'quantum' ? 520 : 420
+      return { vx: dPsiDy * multiplier, vy: -dPsiDx * multiplier }
+    }
+
+    // Initialize particle cloud
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const px = Math.random() * width
+      const py = Math.random() * height
+      particles.push({
+        x: px,
+        y: py,
+        px: px,
+        py: py,
+        speed: 0,
+        life: Math.random() * 100,
+      })
+    }
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      const nx = e.clientX - rect.left
+      const ny = e.clientY - rect.top
+      pointer.vx = (nx - pointer.x) * 0.8
+      pointer.vy = (ny - pointer.y) * 0.8
+      pointer.x = nx
+      pointer.y = ny
+      pointer.active = true
+    }
+
+    const handlePointerDown = () => {
+      pointer.isAttracting = true
+    }
+
+    const handlePointerUp = () => {
+      pointer.isAttracting = false
+    }
+
+    const handlePointerLeave = () => {
+      pointer.active = false
+      pointer.isAttracting = false
+    }
+
+    canvas.addEventListener('pointermove', handlePointerMove)
+    canvas.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('pointerup', handlePointerUp)
+    canvas.addEventListener('pointerleave', handlePointerLeave)
 
     const handleResize = () => {
       if (!container) return
-      const newWidth = container.clientWidth
-      const newHeight = container.clientHeight
-      camera.aspect = newWidth / newHeight
-      camera.updateProjectionMatrix()
-      renderer.setSize(newWidth, newHeight)
+      width = canvas.width = container.clientWidth
+      height = canvas.height = container.clientHeight
+      ctx.fillStyle = '#080811'
+      ctx.fillRect(0, 0, width, height)
     }
 
     window.addEventListener('resize', handleResize)
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('resize', handleResize)
-      cancelAnimationFrame(animationFrameId)
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement)
+    let t = 0
+    let reqId: number
+    let lastTime = performance.now()
+    let frameCount = 0
+    let currentFps = 60
+
+    // Initial background wipe
+    ctx.fillStyle = '#080811'
+    ctx.fillRect(0, 0, width, height)
+
+    function step(now: number) {
+      reqId = requestAnimationFrame(step)
+      if (!ctx) return
+      t += 0.012
+
+      // FPS Calculation
+      frameCount++
+      if (now - lastTime >= 1000) {
+        currentFps = frameCount
+        frameCount = 0
+        lastTime = now
       }
-      renderer.dispose()
-      geometry.dispose()
-      material.dispose()
-      particleTexture.dispose()
+
+      // Trail decay in deep midnight abyss (#080811) with frame accumulation persistence
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.fillStyle = 'rgba(8, 8, 17, 0.08)'
+      ctx.fillRect(0, 0, width, height)
+
+      // Additive bloom for intersecting kinetic trajectories
+      ctx.globalCompositeOperation = 'lighter'
+      let totalEnergy = 0
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const p = particles[i]
+        p.px = p.x
+        p.py = p.y
+
+        const curl = getCurl(p.x, p.y, t)
+        let vx = curl.vx
+        let vy = curl.vy
+
+        // Cursor Vortex Singularity
+        if (pointer.active) {
+          const dx = p.x - pointer.x
+          const dy = p.y - pointer.y
+          const distSq = dx * dx + dy * dy
+          const radiusSq = pointer.isAttracting ? 90000 : 48000
+          if (distSq < radiusSq && distSq > 4) {
+            const force = (1 - distSq / radiusSq) * (pointer.isAttracting ? 7.5 : 4.5)
+            if (pointer.isAttracting) {
+              // Gravitational attraction well + tight spin
+              vx += (-dx * 0.08 - dy * 0.06) * force
+              vy += (-dy * 0.08 + dx * 0.06) * force
+            } else {
+              // Tangential swirl + cursor momentum injection
+              vx += (-dy * 0.04 + pointer.vx * 0.35) * force
+              vy += (dx * 0.04 + pointer.vy * 0.35) * force
+            }
+          }
+        }
+
+        p.x += vx
+        p.y += vy
+        p.speed = Math.hypot(vx, vy)
+        totalEnergy += p.speed
+
+        // Wrap bounds cleanly without sudden discontinuities
+        if (p.x < 0) {
+          p.x = width
+          p.px = width
+        } else if (p.x > width) {
+          p.x = 0
+          p.px = 0
+        }
+        if (p.y < 0) {
+          p.y = height
+          p.py = height
+        } else if (p.y > height) {
+          p.y = 0
+          p.py = 0
+        }
+
+        // Velocity-mapped Chromatic Dispersion
+        if (p.speed > 3.2) {
+          // High kinetic energy: Acid Lime (#a3e635) + Coral (#f43f5e) chromatic sub-pixel split
+          ctx.strokeStyle = 'rgba(244, 63, 94, 0.55)'
+          ctx.lineWidth = 1.2
+          ctx.beginPath()
+          ctx.moveTo(p.px - 1.2, p.py)
+          ctx.lineTo(p.x - 1.2, p.y)
+          ctx.stroke()
+
+          ctx.strokeStyle = 'rgba(163, 230, 53, 0.85)'
+          ctx.lineWidth = 1.4
+          ctx.beginPath()
+          ctx.moveTo(p.px, p.py)
+          ctx.lineTo(p.x, p.y)
+          ctx.stroke()
+        } else {
+          // Laminar flow: Electric Cobalt (#3b82f6)
+          ctx.strokeStyle = 'rgba(59, 130, 246, 0.42)'
+          ctx.lineWidth = 1.0
+          ctx.beginPath()
+          ctx.moveTo(p.px, p.py)
+          ctx.lineTo(p.x, p.y)
+          ctx.stroke()
+        }
+      }
+
+      pointer.vx *= 0.88
+      pointer.vy *= 0.88
+
+      // Throttled live telemetry state update
+      if (Math.random() < 0.12) {
+        const meanV = totalEnergy / PARTICLE_COUNT
+        const vort = Math.hypot(pointer.vx, pointer.vy) * 0.12 + (modeRef.current === 'quantum' ? 2.14 : 1.42)
+        setTelemetry({
+          meanVelocity: meanV.toFixed(2),
+          vorticity: vort.toFixed(3),
+          fps: currentFps,
+          mode:
+            modeRef.current === 'laminar'
+              ? 'LAMINAR HARMONIC'
+              : modeRef.current === 'quantum'
+              ? 'QUANTUM SINGULARITY'
+              : 'DIVERGENCE-FREE CURL (∇·v = 0)',
+        })
+      }
+    }
+
+    reqId = requestAnimationFrame(step)
+
+    return () => {
+      cancelAnimationFrame(reqId)
+      canvas.removeEventListener('pointermove', handlePointerMove)
+      canvas.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('pointerup', handlePointerUp)
+      canvas.removeEventListener('pointerleave', handlePointerLeave)
+      window.removeEventListener('resize', handleResize)
     }
   }, [])
 
   return (
-    <div className="experimental-canvas-container" aria-hidden="true">
-      <div className="experimental-canvas-target" ref={mountRef} />
+    <div className="experimental-canvas-container" aria-label="Interactive Divergence-Free Curl Noise Fluid Advection Engine">
+      <canvas ref={canvasRef} className="experimental-canvas-target" />
+
+      {/* Top HUD Telemetry Bar */}
+      <div className="experimental-canvas-top-bar">
+        <div className="ex-hud-indicator">
+          <span className="ex-hud-dot" />
+          <span className="ex-hud-status">ADVECTION ENGINE // LIVE</span>
+        </div>
+        <div className="ex-hud-mode-pills">
+          <button
+            type="button"
+            className={`ex-mode-btn ${activePreset === 'laminar' ? 'active' : ''}`}
+            onClick={() => setActivePreset('laminar')}
+          >
+            LAMINAR
+          </button>
+          <button
+            type="button"
+            className={`ex-mode-btn ${activePreset === 'turbulent' ? 'active' : ''}`}
+            onClick={() => setActivePreset('turbulent')}
+          >
+            TURBULENT
+          </button>
+          <button
+            type="button"
+            className={`ex-mode-btn ${activePreset === 'quantum' ? 'active' : ''}`}
+            onClick={() => setActivePreset('quantum')}
+          >
+            QUANTUM
+          </button>
+        </div>
+      </div>
+
+      {/* Floating HUD Telemetry Matrix */}
       <div className="experimental-canvas-hud">
-        <span>PARTICLES: 2,800 • FLOW: HARMONIC CURL</span>
-        <span>RGB: COBALT / ACID LIME / CORAL</span>
+        <div className="ex-telemetry-col">
+          <span className="ex-hud-label">SIMULATION SPEC</span>
+          <span className="ex-hud-value">2,200 FILAMENTS • {telemetry.mode}</span>
+        </div>
+        <div className="ex-telemetry-metrics">
+          <div className="ex-metric-cell">
+            <span className="ex-metric-label">MEAN VELOCITY</span>
+            <span className="ex-metric-num">{telemetry.meanVelocity} px/f</span>
+          </div>
+          <div className="ex-metric-cell">
+            <span className="ex-metric-label">VORTICITY ω</span>
+            <span className="ex-metric-num">{telemetry.vorticity} rad/s</span>
+          </div>
+          <div className="ex-metric-cell">
+            <span className="ex-metric-label">THROUGHPUT</span>
+            <span className="ex-metric-num">{telemetry.fps} FPS</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Interaction Instruction Overlay */}
+      <div className="ex-interaction-hint">
+        <span>POINTER TO INJECT VORTEX • HOLD CLICK FOR GRAVITATIONAL SINK</span>
+      </div>
+
+      {/* Watermark Signature Stamp */}
+      <div className="ex-watermark-stamp">
+        SIROSIU // EXPERIMENTAL STUDIO // ADVECTION FIELD v3.4
       </div>
     </div>
   )
