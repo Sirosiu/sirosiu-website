@@ -1,19 +1,29 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import {
   PORTFOLIO_PROJECTS,
   ENGINEERING_CAPABILITIES,
   SITE_METADATA,
   ProjectItem,
 } from '../../data/portfolioData'
+import { SwissCurtainEngine } from './SwissCurtainEngine'
+import { ProjectSchematicVisualizer } from '../../components/ProjectSchematicVisualizer'
 import './SwissStyles.css'
 
 export const Concept04Swiss: React.FC = () => {
+  const swissRootRef = useRef<HTMLDivElement | null>(null)
   const [scrollY, setScrollY] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [activeProject, setActiveProject] = useState<ProjectItem>(PORTFOLIO_PROJECTS[0])
   const [dossierOpen, setDossierOpen] = useState(false)
   const [fontSizeScale, setFontSizeScale] = useState<number>(100)
   const [editorialKerning, setEditorialKerning] = useState<number>(0)
+
+  // Mount Swiss Editorial Word-by-Word & Curtain Engine
+  useEffect(() => {
+    if (!swissRootRef.current) return
+    const engine = new SwissCurtainEngine(swissRootRef.current)
+    return () => engine.dispose()
+  }, [])
 
   // Track scroll position
   useEffect(() => {
@@ -38,7 +48,7 @@ export const Concept04Swiss: React.FC = () => {
   const words = useMemo(() => manifestoParagraph.split(' '), [manifestoParagraph])
 
   return (
-    <div className="swiss-root">
+    <div ref={swissRootRef} className="swiss-root">
       {/* Floating Monograph Reading Telemetry Header */}
       <div className="swiss-hud-fixed">
         <div className="swiss-hud-cell">
@@ -77,6 +87,40 @@ export const Concept04Swiss: React.FC = () => {
             Engineering <em>discipline</em> at the edge of computation.
           </h1>
 
+          <div
+            className="swiss-author-row"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 16,
+              margin: '20px 0 28px 0',
+              padding: '6px 16px',
+              border: '1px solid #e4e4e7',
+              background: '#fcfcfc',
+              borderRadius: 4,
+            }}
+          >
+            <img
+              src="/assets/images/sirosiu-portrait.webp"
+              alt="Ankush Malothia (Sirosiu)"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1px solid #18181b',
+              }}
+            />
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#18181b', fontFamily: 'serif' }}>
+                Ankush Malothia (Sirosiu)
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#71717a', fontFamily: 'var(--swiss-font-mono)' }}>
+                Author &bull; First-Principles Systems Architect &bull; Silicon &bull; RF
+              </div>
+            </div>
+          </div>
+
           <div className="swiss-hero-columns">
             <div className="swiss-hero-col-left">
               <span className="swiss-dropcap">S</span>
@@ -107,28 +151,8 @@ export const Concept04Swiss: React.FC = () => {
       <section className="swiss-manifesto-section">
         <div className="swiss-manifesto-container">
           <span className="swiss-eyebrow">FIRST PRINCIPLES // ARCHITECTURAL AXIOM</span>
-          <div className="swiss-word-scrub-box">
-            {words.map((word, idx) => {
-              // Calculate word reveal threshold
-              const wordRatio = idx / words.length
-              const startProg = 0.12 + wordRatio * 0.22
-              const isRevealed = scrollProgress >= startProg
-              const opacity = isRevealed ? 1 : Math.max(0.08, (scrollProgress - startProg + 0.04) * 12)
-              const translateY = isRevealed ? 0 : Math.max(0, (startProg - scrollProgress) * 40)
-
-              return (
-                <span
-                  key={idx}
-                  className={`swiss-scrub-word ${isRevealed ? 'is-lit' : ''}`}
-                  style={{
-                    opacity,
-                    transform: `translateY(${translateY}px)`,
-                  }}
-                >
-                  {word}{' '}
-                </span>
-              )
-            })}
+          <div className="swiss-word-scrub-box" data-swiss-text>
+            {manifestoParagraph}
           </div>
         </div>
       </section>
@@ -199,13 +223,20 @@ export const Concept04Swiss: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="swiss-plate-right">
+                <div className="swiss-plate-right" data-swiss-plate>
                   <div className="swiss-plate-diagram">
                     <div className="swiss-diag-header">
                       <span>FIGURE 0{idx + 1}.A</span>
                       <span>SYSTEM TOPOLOGY // {proj.domain}</span>
                     </div>
                     <div className="swiss-diag-content">
+                      {/* Architectural Vector Schematic */}
+                      <ProjectSchematicVisualizer
+                        id={proj.id as any}
+                        accentColor="#dc2626"
+                        secondaryColor="#18181b"
+                        style={{ width: '100%', height: 180, borderRadius: 4, margin: '8px 0 14px 0' }}
+                      />
                       <div className="swiss-diag-highlight">{proj.architectureHighlight}</div>
                       <div className="swiss-diag-tags">
                         {proj.tags.map((t, tIdx) => (
@@ -372,6 +403,14 @@ export const Concept04Swiss: React.FC = () => {
             </div>
 
             <div className="swiss-modal-body">
+              {/* High-Resolution Architectural Vector Schematic */}
+              <ProjectSchematicVisualizer
+                id={activeProject.id as any}
+                accentColor="#dc2626"
+                secondaryColor="#18181b"
+                style={{ width: '100%', height: 220, borderRadius: 4, marginBottom: 20 }}
+              />
+
               <div className="swiss-modal-section">
                 <h4>PROBLEM CONSTRAINTS &amp; ARCHITECTURAL BOTTLENECK</h4>
                 <p>{activeProject.problemStatement || activeProject.summary}</p>

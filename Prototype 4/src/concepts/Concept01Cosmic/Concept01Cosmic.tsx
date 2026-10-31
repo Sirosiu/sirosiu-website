@@ -6,10 +6,13 @@ import {
   SITE_METADATA,
   ProjectItem,
 } from '../../data/portfolioData'
+import { KerrBlackHoleEngine } from './KerrBlackHoleEngine'
+import { ProjectSchematicVisualizer } from '../../components/ProjectSchematicVisualizer'
 import './CosmicStyles.css'
 
 export const Concept01Cosmic: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const webglRef = useRef<HTMLDivElement | null>(null)
+  const engineRef = useRef<KerrBlackHoleEngine | null>(null)
   const [scrollY, setScrollY] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [scrollVelocity, setScrollVelocity] = useState(0)
@@ -22,6 +25,22 @@ export const Concept01Cosmic: React.FC = () => {
   const audioCtxRef = useRef<AudioContext | null>(null)
   const droneGainRef = useRef<GainNode | null>(null)
   const droneOscRef = useRef<OscillatorNode | null>(null)
+
+  // Mount 60fps Kerr Black Hole WebGL Raymarching Engine
+  useEffect(() => {
+    if (!webglRef.current) return
+    const engine = new KerrBlackHoleEngine({
+      container: webglRef.current,
+      spin: 0.94,
+      inclination: 1.35,
+    })
+    engineRef.current = engine
+
+    return () => {
+      engine.dispose()
+      engineRef.current = null
+    }
+  }, [])
 
   // Track scroll position & velocity
   useEffect(() => {
@@ -111,180 +130,6 @@ export const Concept01Cosmic: React.FC = () => {
     }
   }, [scrollProgress, scrollVelocity, audioActive])
 
-  // 60FPS Celestial Starfield & Gravitational Lens Canvas
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    let animationFrameId: number
-    let width = (canvas.width = window.innerWidth)
-    let height = (canvas.height = window.innerHeight)
-
-    const handleResize = () => {
-      width = canvas.width = window.innerWidth
-      height = canvas.height = window.innerHeight
-    }
-    window.addEventListener('resize', handleResize)
-
-    // Star cluster definition
-    interface Star {
-      x: number
-      y: number
-      z: number
-      size: number
-      baseColor: string
-      spectralType: 'O' | 'B' | 'A' | 'G' | 'M'
-    }
-
-    const starCount = 950
-    const stars: Star[] = []
-    const spectralColors = {
-      O: '#93c5fd',
-      B: '#bfdbfe',
-      A: '#f8fafc',
-      G: '#fef08a',
-      M: '#f87171',
-    }
-
-    for (let i = 0; i < starCount; i++) {
-      const types: ('O' | 'B' | 'A' | 'G' | 'M')[] = ['O', 'B', 'A', 'G', 'M']
-      const spec = types[Math.floor(Math.random() * types.length)]
-      stars.push({
-        x: (Math.random() - 0.5) * width * 2,
-        y: (Math.random() - 0.5) * height * 2,
-        z: Math.random() * 1000 + 1,
-        size: Math.random() * 1.5 + 0.4,
-        baseColor: spectralColors[spec],
-        spectralType: spec,
-      })
-    }
-
-    let angle = 0
-
-    const render = () => {
-      angle += 0.003 + scrollVelocity * 0.0008
-
-      // Deep void clear with cosmic accretion persistence
-      ctx.fillStyle = 'rgba(3, 3, 7, 0.25)'
-      ctx.fillRect(0, 0, width, height)
-
-      const centerX = width * 0.5
-      const centerY = height * (0.42 + scrollProgress * 0.16)
-      const currentRadius = schwarzschildRadius * (1 + scrollVelocity * 0.02)
-
-      // 1. Render Gravitational Accretion Disk (Background Half)
-      ctx.save()
-      ctx.translate(centerX, centerY)
-      ctx.rotate(angle * 0.6)
-
-      const gradDiskBack = ctx.createRadialGradient(0, 0, currentRadius * 0.8, 0, 0, currentRadius * 3.4)
-      gradDiskBack.addColorStop(0, 'rgba(0, 0, 0, 0.95)')
-      gradDiskBack.addColorStop(0.3, 'rgba(245, 158, 11, 0.45)')
-      gradDiskBack.addColorStop(0.65, 'rgba(180, 83, 9, 0.18)')
-      gradDiskBack.addColorStop(1, 'rgba(3, 3, 7, 0)')
-
-      ctx.fillStyle = gradDiskBack
-      ctx.beginPath()
-      ctx.ellipse(0, 0, currentRadius * 3.4, currentRadius * 1.15, 0.22, Math.PI, Math.PI * 2)
-      ctx.fill()
-      ctx.restore()
-
-      // 2. Render Starfield with Relativistic Light Deflection
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i]
-
-        // Warp star depth by scroll speed
-        star.z -= 0.6 + scrollVelocity * 0.15
-        if (star.z <= 1) {
-          star.z = 1000
-          star.x = (Math.random() - 0.5) * width * 2
-          star.y = (Math.random() - 0.5) * height * 2
-        }
-
-        const k = 400 / star.z
-        let px = star.x * k + centerX
-        let py = star.y * k + centerY
-
-        // Einstein Gravitational Lensing Deflection Vector
-        const dx = px - centerX
-        const dy = py - centerY
-        const distSq = dx * dx + dy * dy
-        const dist = Math.sqrt(distSq)
-
-        if (dist > 1.0) {
-          // Relativistic bending angle theta ~ 4GM / (c^2 * r)
-          const deflection = (currentRadius * currentRadius * 4.2) / (distSq + 1200)
-          px += (dx / dist) * deflection
-          py += (dy / dist) * deflection
-        }
-
-        // Draw star if within viewport bounds
-        if (px >= 0 && px <= width && py >= 0 && py <= height) {
-          const depthAlpha = Math.min(1, (1000 - star.z) / 750)
-          const starRadius = Math.max(0.6, star.size * k * 0.45)
-
-          ctx.fillStyle = star.baseColor
-          ctx.globalAlpha = depthAlpha * (0.6 + Math.sin(angle * 3 + i) * 0.3)
-          ctx.beginPath()
-          ctx.arc(px, py, starRadius, 0, Math.PI * 2)
-          ctx.fill()
-        }
-      }
-      ctx.globalAlpha = 1.0
-
-      // 3. Render Event Horizon Shadow (Black Hole Singularity)
-      ctx.save()
-      ctx.translate(centerX, centerY)
-
-      // Event horizon core shadow
-      const horizonGrad = ctx.createRadialGradient(0, 0, currentRadius * 0.2, 0, 0, currentRadius)
-      horizonGrad.addColorStop(0, '#000000')
-      horizonGrad.addColorStop(0.85, '#010103')
-      horizonGrad.addColorStop(1, 'rgba(245, 158, 11, 0.4)')
-
-      ctx.fillStyle = horizonGrad
-      ctx.beginPath()
-      ctx.arc(0, 0, currentRadius, 0, Math.PI * 2)
-      ctx.fill()
-
-      // Photon Sphere Ring (Einstein Ring Glow)
-      ctx.strokeStyle = 'rgba(254, 240, 138, 0.85)'
-      ctx.lineWidth = 1.5 + scrollVelocity * 0.1
-      ctx.shadowColor = '#f59e0b'
-      ctx.shadowBlur = 18 + scrollVelocity * 2
-      ctx.beginPath()
-      ctx.arc(0, 0, currentRadius * 1.08, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.shadowBlur = 0
-
-      // 4. Accretion Disk (Foreground Half)
-      ctx.rotate(angle * 0.6)
-      const gradDiskFront = ctx.createRadialGradient(0, 0, currentRadius * 0.8, 0, 0, currentRadius * 3.4)
-      gradDiskFront.addColorStop(0, 'rgba(0, 0, 0, 0.95)')
-      gradDiskFront.addColorStop(0.35, 'rgba(251, 191, 36, 0.55)')
-      gradDiskFront.addColorStop(0.7, 'rgba(217, 119, 6, 0.22)')
-      gradDiskFront.addColorStop(1, 'rgba(3, 3, 7, 0)')
-
-      ctx.fillStyle = gradDiskFront
-      ctx.beginPath()
-      ctx.ellipse(0, 0, currentRadius * 3.4, currentRadius * 1.15, 0.22, 0, Math.PI)
-      ctx.fill()
-
-      ctx.restore()
-
-      animationFrameId = requestAnimationFrame(render)
-    }
-
-    render()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [schwarzschildRadius, scrollProgress, scrollVelocity])
-
   // Calculated celestial scrub coordinates
   const raHours = Math.floor(18 + scrollProgress * 5) % 24
   const raMins = Math.floor((scrollProgress * 60) % 60)
@@ -295,8 +140,8 @@ export const Concept01Cosmic: React.FC = () => {
 
   return (
     <div className="cosmic-root">
-      {/* 60FPS Interactive Celestial Background Canvas */}
-      <canvas ref={canvasRef} className="cosmic-canvas" aria-hidden="true" />
+      {/* 60FPS Interactive Relativistic Kerr Black Hole WebGL Canvas */}
+      <div ref={webglRef} className="cosmic-canvas" aria-hidden="true" />
 
       {/* Floating Celestial Telemetry HUD (Fixed Header) */}
       <div className="cosmic-hud-fixed">
@@ -361,6 +206,41 @@ export const Concept01Cosmic: React.FC = () => {
             and high-craft digital products. Scroll to explore orbital mission dossiers.
           </p>
 
+          <div
+            className="cosmic-author-chip"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 14,
+              margin: '18px 0 24px 0',
+              background: 'rgba(255, 255, 255, 0.04)',
+              backdropFilter: 'blur(12px)',
+              padding: '6px 18px',
+              borderRadius: 999,
+              border: '1px solid rgba(245, 158, 11, 0.25)',
+            }}
+          >
+            <img
+              src="/assets/images/sirosiu-portrait.webp"
+              alt="Ankush Malothia (Sirosiu)"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1.5px solid #f59e0b',
+              }}
+            />
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#f8fafc' }}>
+                Ankush Malothia (Sirosiu)
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontFamily: 'var(--cosmic-font-mono)' }}>
+                Hardware Acceleration &bull; RF Electromagnetics &bull; Edge Intelligence
+              </div>
+            </div>
+          </div>
+
           <div className="cosmic-scroll-indicator">
             <span className="cosmic-scroll-line" />
             <span className="cosmic-scroll-text">SCROLL TO COLLAPSE HORIZON ↓</span>
@@ -399,6 +279,14 @@ export const Concept01Cosmic: React.FC = () => {
 
                 <h3 className="cosmic-mission-title">{proj.title}</h3>
                 <p className="cosmic-mission-tagline">{proj.tagline}</p>
+
+                {/* Interactive Reactive Project Schematic */}
+                <ProjectSchematicVisualizer
+                  id={proj.id as any}
+                  accentColor="#f59e0b"
+                  secondaryColor="#38bdf8"
+                  style={{ width: '100%', height: 160, borderRadius: 8, margin: '14px 0' }}
+                />
 
                 <div className="cosmic-metric-row">
                   {proj.metrics.slice(0, 2).map((m, mIdx) => (
@@ -564,6 +452,14 @@ export const Concept01Cosmic: React.FC = () => {
             </div>
 
             <div className="cosmic-modal-body">
+              {/* High-Resolution Interactive Circuit / Physics Schematic */}
+              <ProjectSchematicVisualizer
+                id={activeProject.id as any}
+                accentColor="#f59e0b"
+                secondaryColor="#38bdf8"
+                style={{ width: '100%', height: 220, borderRadius: 8, marginBottom: 20 }}
+              />
+
               <div className="cosmic-modal-section">
                 <h4>PHYSICAL PROBLEM STATEMENT</h4>
                 <p>{activeProject.problemStatement || activeProject.summary}</p>

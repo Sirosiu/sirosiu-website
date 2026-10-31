@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
+import Lenis from 'lenis'
 import { CONCEPT_META, ConceptId } from './data/portfolioData'
 import { ConceptSwitcher } from './components/ConceptSwitcher'
 import { Concept01Cosmic } from './concepts/Concept01Cosmic/Concept01Cosmic'
@@ -9,6 +10,7 @@ import { Concept05Laser } from './concepts/Concept05Laser/Concept05Laser'
 import './App.css'
 
 export const App: React.FC = () => {
+  const lenisRef = useRef<Lenis | null>(null)
   const [activeConcept, setActiveConcept] = useState<ConceptId>(() => {
     try {
       const urlParams = new URLSearchParams(window.location.search)
@@ -24,6 +26,32 @@ export const App: React.FC = () => {
     return 1 // Default to Concept 01 (Cosmic Horizon)
   })
 
+  // Global Butter-Smooth Lenis Scroll Engine
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1.05,
+      touchMultiplier: 1.4,
+    })
+    lenisRef.current = lenis
+
+    let frameId: number
+    function raf(time: number) {
+      lenis.raf(time)
+      frameId = requestAnimationFrame(raf)
+    }
+
+    frameId = requestAnimationFrame(raf)
+
+    return () => {
+      cancelAnimationFrame(frameId)
+      lenis.destroy()
+      lenisRef.current = null
+    }
+  }, [activeConcept])
+
   const handleSelectConcept = (id: ConceptId) => {
     setActiveConcept(id)
     try {
@@ -34,7 +62,11 @@ export const App: React.FC = () => {
     } catch (e) {
       // ignore
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: false, duration: 0.8 })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   // Update page title dynamically

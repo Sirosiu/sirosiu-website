@@ -39,6 +39,12 @@
   z-index: 1;
 }
 
+.cosmic-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
 /* Floating Celestial Telemetry HUD */
 .cosmic-hud-fixed {
   position: fixed;

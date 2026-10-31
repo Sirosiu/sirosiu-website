@@ -5,10 +5,13 @@ import {
   SITE_METADATA,
   ProjectItem,
 } from '../../data/portfolioData'
+import { SynapticArborEngine } from './SynapticArborEngine'
+import { ProjectSchematicVisualizer } from '../../components/ProjectSchematicVisualizer'
 import './SynapticStyles.css'
 
 export const Concept02Synaptic: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const arborRef = useRef<HTMLDivElement | null>(null)
+  const engineRef = useRef<SynapticArborEngine | null>(null)
   const [scrollY, setScrollY] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [scrollVelocity, setScrollVelocity] = useState(0)
@@ -21,6 +24,18 @@ export const Concept02Synaptic: React.FC = () => {
   const audioCtxRef = useRef<AudioContext | null>(null)
   const binauralLeftRef = useRef<OscillatorNode | null>(null)
   const binauralRightRef = useRef<OscillatorNode | null>(null)
+
+  // Mount 60fps Dendritic Arborization Engine with Action Potential Propagation
+  useEffect(() => {
+    if (!arborRef.current) return
+    const engine = new SynapticArborEngine(arborRef.current)
+    engineRef.current = engine
+
+    return () => {
+      engine.dispose()
+      engineRef.current = null
+    }
+  }, [])
 
   // Track scroll position & calculate EEG brainwave band
   useEffect(() => {
@@ -137,184 +152,10 @@ export const Concept02Synaptic: React.FC = () => {
     }
   }, [activeBand, audioActive])
 
-  // 60FPS Neural Connectome & Synaptic Spikes Canvas
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    let animationFrameId: number
-    let width = (canvas.width = window.innerWidth)
-    let height = (canvas.height = window.innerHeight)
-
-    const handleResize = () => {
-      width = canvas.width = window.innerWidth
-      height = canvas.height = window.innerHeight
-    }
-    window.addEventListener('resize', handleResize)
-
-    // Neural Node Definition
-    interface NeuroNode {
-      id: number
-      x: number
-      y: number
-      baseX: number
-      baseY: number
-      radius: number
-      membraneV: number // mV
-      firing: boolean
-      region: string
-    }
-
-    interface Synapse {
-      from: number
-      to: number
-      weight: number
-      actionPotentialPos: number // 0 to 1
-      active: boolean
-    }
-
-    const nodeCount = 52
-    const nodes: NeuroNode[] = []
-    const synapses: Synapse[] = []
-
-    const regions = ['PFC', 'HIPPOCAMPUS', 'V1_VISUAL', 'THALAMUS', 'CLAUSTRUM', 'AMYGDALA']
-
-    for (let i = 0; i < nodeCount; i++) {
-      const ang = (i / nodeCount) * Math.PI * 2
-      const r = Math.min(width, height) * (0.22 + (i % 3) * 0.12)
-      const bx = width * 0.5 + Math.cos(ang) * r
-      const by = height * 0.48 + Math.sin(ang) * r * 0.85
-
-      nodes.push({
-        id: i,
-        x: bx,
-        y: by,
-        baseX: bx,
-        baseY: by,
-        radius: Math.random() * 2.5 + 2.0,
-        membraneV: -70,
-        firing: false,
-        region: regions[i % regions.length],
-      })
-    }
-
-    // Connect nodes into dense synaptic graph
-    for (let i = 0; i < nodeCount; i++) {
-      for (let j = i + 1; j < nodeCount; j++) {
-        const dx = nodes[i].baseX - nodes[j].baseX
-        const dy = nodes[i].baseY - nodes[j].baseY
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < Math.min(width, height) * 0.28) {
-          synapses.push({
-            from: i,
-            to: j,
-            weight: Math.random() * 0.8 + 0.2,
-            actionPotentialPos: Math.random(),
-            active: true,
-          })
-        }
-      }
-    }
-
-    let time = 0
-
-    const render = () => {
-      time += 0.016 + scrollVelocity * 0.002
-
-      // Clear with synaptic bioluminescent persistence
-      ctx.fillStyle = 'rgba(6, 6, 12, 0.28)'
-      ctx.fillRect(0, 0, width, height)
-
-      const agonistIntensity = neuroAgonistGain / 100
-
-      // Update and Draw Synaptic Axons
-      for (let i = 0; i < synapses.length; i++) {
-        const syn = synapses[i]
-        const nA = nodes[syn.from]
-        const nB = nodes[syn.to]
-
-        // Advance action potential spike
-        syn.actionPotentialPos += 0.008 * (1 + scrollVelocity * 0.15 + agonistIntensity * 0.5)
-        if (syn.actionPotentialPos > 1.0) {
-          syn.actionPotentialPos = 0
-          nB.membraneV = 30 // Depolarization spike
-          nB.firing = true
-        }
-
-        // Draw axon pathway
-        const alpha = 0.12 + Math.sin(time * 2 + i) * 0.06 + agonistIntensity * 0.15
-        ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`
-        ctx.lineWidth = syn.weight * 1.2
-        ctx.beginPath()
-        ctx.moveTo(nA.x, nA.y)
-
-        // Entoptic psychedelic curvature during high velocity/agonist gain
-        if (agonistIntensity > 0.5) {
-          const midX = (nA.x + nB.x) * 0.5 + Math.sin(time * 4 + i) * 16 * agonistIntensity
-          const midY = (nA.y + nB.y) * 0.5 + Math.cos(time * 4 + i) * 16 * agonistIntensity
-          ctx.quadraticCurveTo(midX, midY, nB.x, nB.y)
-        } else {
-          ctx.lineTo(nB.x, nB.y)
-        }
-        ctx.stroke()
-
-        // Draw moving Action Potential vesicle spike
-        const spkX = nA.x + (nB.x - nA.x) * syn.actionPotentialPos
-        const spkY = nA.y + (nB.y - nA.y) * syn.actionPotentialPos
-
-        ctx.fillStyle = syn.actionPotentialPos > 0.5 ? '#06b6d4' : '#8b5cf6'
-        ctx.shadowColor = '#06b6d4'
-        ctx.shadowBlur = 8
-        ctx.beginPath()
-        ctx.arc(spkX, spkY, 1.8 + agonistIntensity * 1.5, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.shadowBlur = 0
-      }
-
-      // Update and Draw Cortical Nodes (Somas)
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i]
-
-        // Repolarize towards resting potential -70mV
-        if (node.membraneV > -70) {
-          node.membraneV -= 1.8
-        } else {
-          node.firing = false
-        }
-
-        // Slight organic oscillation
-        node.x = node.baseX + Math.sin(time + i) * 6 * (1 + scrollVelocity * 0.05)
-        node.y = node.baseY + Math.cos(time * 0.8 + i) * 6 * (1 + scrollVelocity * 0.05)
-
-        // Draw node soma
-        const isDepolarized = node.membraneV > -20
-        ctx.fillStyle = isDepolarized ? '#06b6d4' : '#f8fafc'
-        ctx.shadowColor = isDepolarized ? '#06b6d4' : '#8b5cf6'
-        ctx.shadowBlur = isDepolarized ? 16 : 4
-
-        ctx.beginPath()
-        ctx.arc(node.x, node.y, node.radius * (isDepolarized ? 1.4 : 1.0), 0, Math.PI * 2)
-        ctx.fill()
-        ctx.shadowBlur = 0
-      }
-
-      animationFrameId = requestAnimationFrame(render)
-    }
-
-    render()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [neuroAgonistGain, scrollProgress, scrollVelocity])
-
   return (
     <div className="synaptic-root">
-      {/* 60FPS Interactive Connectome Background Canvas */}
-      <canvas ref={canvasRef} className="synaptic-canvas" aria-hidden="true" />
+      {/* 60FPS Interactive Dendritic Arborization Background Canvas */}
+      <div ref={arborRef} className="synaptic-canvas" aria-hidden="true" />
 
       {/* Fixed Neuro-Telemetry & EEG Resonance Bar */}
       <div className="synaptic-hud-fixed">
@@ -379,6 +220,41 @@ export const Concept02Synaptic: React.FC = () => {
             Scroll to traverse cortical layers and synaptic clusters.
           </p>
 
+          <div
+            className="synaptic-author-chip"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 14,
+              margin: '18px 0 24px 0',
+              background: 'rgba(255, 255, 255, 0.04)',
+              backdropFilter: 'blur(12px)',
+              padding: '6px 18px',
+              borderRadius: 999,
+              border: '1px solid rgba(139, 92, 246, 0.35)',
+            }}
+          >
+            <img
+              src="/assets/images/sirosiu-portrait.webp"
+              alt="Ankush Malothia (Sirosiu)"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1.5px solid #8b5cf6',
+              }}
+            />
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#f8fafc' }}>
+                Ankush Malothia (Sirosiu)
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#a78bfa', fontFamily: 'monospace' }}>
+                Neuromorphic Systems &bull; GNN &bull; Quantized Edge Intelligence
+              </div>
+            </div>
+          </div>
+
           <div className="synaptic-scroll-indicator">
             <span className="synaptic-scroll-line" />
             <span className="synaptic-scroll-text">SCROLL TO PROPAGATE ACTION POTENTIALS ↓</span>
@@ -415,6 +291,14 @@ export const Concept02Synaptic: React.FC = () => {
 
                 <h3 className="synaptic-cluster-title">{proj.title}</h3>
                 <p className="synaptic-cluster-tagline">{proj.tagline}</p>
+
+                {/* Interactive Reactive Project Schematic */}
+                <ProjectSchematicVisualizer
+                  id={proj.id as any}
+                  accentColor="#06b6d4"
+                  secondaryColor="#8b5cf6"
+                  style={{ width: '100%', height: 160, borderRadius: 8, margin: '14px 0' }}
+                />
 
                 <div className="synaptic-metric-row">
                   {proj.metrics.slice(0, 2).map((m, mIdx) => (
@@ -582,6 +466,14 @@ export const Concept02Synaptic: React.FC = () => {
             </div>
 
             <div className="synaptic-modal-body">
+              {/* High-Resolution Interactive Circuit / Physics Schematic */}
+              <ProjectSchematicVisualizer
+                id={activeProject.id as any}
+                accentColor="#06b6d4"
+                secondaryColor="#8b5cf6"
+                style={{ width: '100%', height: 220, borderRadius: 8, marginBottom: 20 }}
+              />
+
               <div className="synaptic-modal-section">
                 <h4>PHYSIOLOGICAL PROBLEM STATEMENT</h4>
                 <p>{activeProject.problemStatement || activeProject.summary}</p>

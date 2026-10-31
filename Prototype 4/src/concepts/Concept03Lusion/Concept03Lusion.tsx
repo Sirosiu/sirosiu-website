@@ -5,10 +5,13 @@ import {
   SITE_METADATA,
   ProjectItem,
 } from '../../data/portfolioData'
+import { GelatinousFluidEngine } from './LusionLiquidEngine'
+import { ProjectSchematicVisualizer } from '../../components/ProjectSchematicVisualizer'
 import './LusionStyles.css'
 
 export const Concept03Lusion: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const fluidRef = useRef<HTMLDivElement | null>(null)
+  const engineRef = useRef<GelatinousFluidEngine | null>(null)
   const [scrollY, setScrollY] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [scrollVelocity, setScrollVelocity] = useState(0)
@@ -21,6 +24,22 @@ export const Concept03Lusion: React.FC = () => {
 
   const audioCtxRef = useRef<AudioContext | null>(null)
   const fluidFilterRef = useRef<BiquadFilterNode | null>(null)
+
+  // Mount 60fps Three.js Gelatinous Fluid Surface Tension Engine
+  useEffect(() => {
+    if (!fluidRef.current) return
+    const engine = new GelatinousFluidEngine({
+      container: fluidRef.current,
+      stiffness: 0.14,
+      damping: 0.84,
+    })
+    engineRef.current = engine
+
+    return () => {
+      engine.dispose()
+      engineRef.current = null
+    }
+  }, [])
 
   // Track scroll position & velocity
   useEffect(() => {
@@ -137,156 +156,10 @@ export const Concept03Lusion: React.FC = () => {
     }
   }, [scrollVelocity, audioActive])
 
-  // 60FPS Lusion-Style Fluid Gel Metaball Simulation
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    let animationFrameId: number
-    let width = (canvas.width = window.innerWidth)
-    let height = (canvas.height = window.innerHeight)
-
-    const handleResize = () => {
-      width = canvas.width = window.innerWidth
-      height = canvas.height = window.innerHeight
-    }
-    window.addEventListener('resize', handleResize)
-
-    let mouseX = width * 0.5
-    let mouseY = height * 0.5
-    let targetMouseX = mouseX
-    let targetMouseY = mouseY
-
-    const handleMouseMove = (e: MouseEvent) => {
-      targetMouseX = e.clientX
-      targetMouseY = e.clientY
-    }
-    window.addEventListener('mousemove', handleMouseMove)
-
-    // Fluid droplet vertices (36 radial points for organic gel boundary)
-    const vertexCount = 48
-    const baseRadius = Math.min(width, height) * 0.26
-    const offsets: number[] = new Array(vertexCount).fill(0)
-    const velocities: number[] = new Array(vertexCount).fill(0)
-
-    let angle = 0
-
-    const render = () => {
-      angle += 0.015 + scrollVelocity * 0.001
-
-      // Smooth mouse follow with heavy fluid inertia
-      mouseX += (targetMouseX - mouseX) * 0.06
-      mouseY += (targetMouseY - mouseY) * 0.06
-
-      // Glossy dark slate clear with subtle refraction persistence
-      ctx.fillStyle = 'rgba(9, 10, 15, 0.32)'
-      ctx.fillRect(0, 0, width, height)
-
-      const centerX = width * 0.5 + (mouseX - width * 0.5) * 0.15
-      const centerY = height * 0.44 + (mouseY - height * 0.5) * 0.15 + (scrollProgress - 0.5) * 120
-
-      // Squash and stretch based on scroll velocity
-      const stretchY = 1.0 + Math.min(0.35, scrollVelocity * 0.018) + fluidImpulse * 0.2
-      const stretchX = 1.0 / Math.sqrt(stretchY)
-
-      // Update droplet spring physics
-      const tensionK = (surfaceTension / 100) * 0.08 + 0.02
-      const dampC = (100 - viscosity) / 100 * 0.08 + 0.88
-
-      for (let i = 0; i < vertexCount; i++) {
-        // Neighbor smoothing
-        const prev = offsets[(i - 1 + vertexCount) % vertexCount]
-        const next = offsets[(i + 1) % vertexCount]
-        const force = -tensionK * offsets[i] + tensionK * 0.45 * (prev + next - 2 * offsets[i])
-
-        velocities[i] = (velocities[i] + force) * dampC
-        offsets[i] += velocities[i]
-      }
-
-      // Render Multi-Layered Gel Membrane
-      ctx.save()
-      ctx.translate(centerX, centerY)
-      ctx.scale(stretchX, stretchY)
-
-      // Outer Refractive Caustic Glow
-      const glowGrad = ctx.createRadialGradient(0, 0, baseRadius * 0.4, 0, 0, baseRadius * 1.8)
-      glowGrad.addColorStop(0, 'rgba(0, 102, 255, 0.25)')
-      glowGrad.addColorStop(0.6, 'rgba(224, 231, 255, 0.08)')
-      glowGrad.addColorStop(1, 'rgba(9, 10, 15, 0)')
-
-      ctx.fillStyle = glowGrad
-      ctx.beginPath()
-      ctx.arc(0, 0, baseRadius * 1.8, 0, Math.PI * 2)
-      ctx.fill()
-
-      // Primary Fluid Droplet Curve (Catmull-Rom smooth spline)
-      ctx.beginPath()
-      for (let i = 0; i <= vertexCount; i++) {
-        const idx = i % vertexCount
-        const theta = (idx / vertexCount) * Math.PI * 2 + angle * 0.2
-        const harmonicWobble = Math.sin(theta * 3 + angle * 2) * 12 + Math.cos(theta * 5 - angle) * 8
-        const r = baseRadius + offsets[idx] + harmonicWobble
-
-        const vx = Math.cos(theta) * r
-        const vy = Math.sin(theta) * r
-
-        if (i === 0) {
-          ctx.moveTo(vx, vy)
-        } else {
-          ctx.lineTo(vx, vy)
-        }
-      }
-      ctx.closePath()
-
-      // Glossy Gel Fill
-      const gelGrad = ctx.createLinearGradient(-baseRadius, -baseRadius, baseRadius, baseRadius)
-      gelGrad.addColorStop(0, '#1e293b')
-      gelGrad.addColorStop(0.35, '#0f172a')
-      gelGrad.addColorStop(0.75, '#0284c7')
-      gelGrad.addColorStop(1, '#0066ff')
-
-      ctx.fillStyle = gelGrad
-      ctx.fill()
-
-      // Specular Highlight Arc
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
-      ctx.lineWidth = 2.5
-      ctx.shadowColor = '#ffffff'
-      ctx.shadowBlur = 14
-      ctx.stroke()
-      ctx.shadowBlur = 0
-
-      // Internal Caustic Bubble
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
-      ctx.beginPath()
-      ctx.ellipse(-baseRadius * 0.35, -baseRadius * 0.35, baseRadius * 0.28, baseRadius * 0.14, -0.6, 0, Math.PI * 2)
-      ctx.fill()
-
-      ctx.restore()
-
-      // Decay impulse
-      if (fluidImpulse > 0.01) {
-        setFluidImpulse((imp) => imp * 0.9)
-      }
-
-      animationFrameId = requestAnimationFrame(render)
-    }
-
-    render()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      window.removeEventListener('mousemove', handleMouseMove)
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [viscosity, surfaceTension, fluidImpulse, scrollProgress, scrollVelocity])
-
   return (
     <div className="lusion-root">
-      {/* 60FPS Fluid Gel Canvas */}
-      <canvas ref={canvasRef} className="lusion-canvas" aria-hidden="true" />
+      {/* 60FPS Three.js Gelatinous Fluid Surface Tension Canvas */}
+      <div ref={fluidRef} className="lusion-canvas" aria-hidden="true" />
 
       {/* Floating Fluid Telemetry Bar */}
       <div className="lusion-hud-fixed">
@@ -345,6 +218,41 @@ export const Concept03Lusion: React.FC = () => {
             witness organic surface deformation.
           </p>
 
+          <div
+            className="lusion-author-chip"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 14,
+              margin: '18px 0 24px 0',
+              background: 'rgba(255, 255, 255, 0.04)',
+              backdropFilter: 'blur(12px)',
+              padding: '6px 18px',
+              borderRadius: 999,
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+            }}
+          >
+            <img
+              src="/assets/images/sirosiu-portrait.webp"
+              alt="Ankush Malothia (Sirosiu)"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1.5px solid #38bdf8',
+              }}
+            />
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#f8fafc' }}>
+                Ankush Malothia (Sirosiu)
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#7dd3fc', fontFamily: 'monospace' }}>
+                Creative Engineering &bull; Shader Graphics &bull; Real-Time Systems
+              </div>
+            </div>
+          </div>
+
           <div className="lusion-scroll-indicator">
             <span className="lusion-scroll-line" />
             <span className="lusion-scroll-text">SCROLL TO DEFORM GEL MEMBRANE ↓</span>
@@ -384,6 +292,14 @@ export const Concept03Lusion: React.FC = () => {
 
                 <h3 className="lusion-project-title">{proj.title}</h3>
                 <p className="lusion-project-tagline">{proj.tagline}</p>
+
+                {/* Interactive Reactive Project Schematic */}
+                <ProjectSchematicVisualizer
+                  id={proj.id as any}
+                  accentColor="#38bdf8"
+                  secondaryColor="#818cf8"
+                  style={{ width: '100%', height: 160, borderRadius: 8, margin: '14px 0' }}
+                />
 
                 <div className="lusion-metric-row">
                   {proj.metrics.slice(0, 2).map((m, mIdx) => (
@@ -582,6 +498,14 @@ export const Concept03Lusion: React.FC = () => {
             </div>
 
             <div className="lusion-modal-body">
+              {/* High-Resolution Interactive Circuit / Physics Schematic */}
+              <ProjectSchematicVisualizer
+                id={activeProject.id as any}
+                accentColor="#38bdf8"
+                secondaryColor="#818cf8"
+                style={{ width: '100%', height: 220, borderRadius: 8, marginBottom: 20 }}
+              />
+
               <div className="lusion-modal-section">
                 <h4>PHYSICAL PROBLEM STATEMENT</h4>
                 <p>{activeProject.problemStatement || activeProject.summary}</p>

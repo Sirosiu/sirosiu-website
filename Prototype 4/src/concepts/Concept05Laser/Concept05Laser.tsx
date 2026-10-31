@@ -5,10 +5,13 @@ import {
   SITE_METADATA,
   ProjectItem,
 } from '../../data/portfolioData'
+import { ASMLLithographyEngine } from './LaserBlueprintEngine'
+import { ProjectSchematicVisualizer } from '../../components/ProjectSchematicVisualizer'
 import './LaserStyles.css'
 
 export const Concept05Laser: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const laserRef = useRef<HTMLDivElement | null>(null)
+  const engineRef = useRef<ASMLLithographyEngine | null>(null)
   const [scrollY, setScrollY] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [scrollVelocity, setScrollVelocity] = useState(0)
@@ -19,6 +22,18 @@ export const Concept05Laser: React.FC = () => {
   const [audioActive, setAudioActive] = useState(false)
 
   const audioCtxRef = useRef<AudioContext | null>(null)
+
+  // Mount 60fps ASML Lithography Silicon CAD Vector Laser Engine
+  useEffect(() => {
+    if (!laserRef.current) return
+    const engine = new ASMLLithographyEngine(laserRef.current)
+    engineRef.current = engine
+
+    return () => {
+      engine.dispose()
+      engineRef.current = null
+    }
+  }, [])
 
   // Track scroll position & velocity
   useEffect(() => {
@@ -105,114 +120,13 @@ export const Concept05Laser: React.FC = () => {
     }
   }, [audioActive])
 
-  // 60FPS Laser Circuit Vector Tracing Canvas
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    let animationFrameId: number
-    let width = (canvas.width = window.innerWidth)
-    let height = (canvas.height = window.innerHeight)
-
-    const handleResize = () => {
-      width = canvas.width = window.innerWidth
-      height = canvas.height = window.innerHeight
-    }
-    window.addEventListener('resize', handleResize)
-
-    let beamPos = 0
-
-    const render = () => {
-      beamPos = (scrollProgress * 2.5 + performance.now() * 0.0004) % 1.0
-
-      // Matte dark graphite clear with phosphor persistence
-      ctx.fillStyle = 'rgba(11, 13, 16, 0.28)'
-      ctx.fillRect(0, 0, width, height)
-
-      // 1. Draw Orthographic CAD Grid
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)'
-      ctx.lineWidth = 1
-      const gridSize = 40
-      ctx.beginPath()
-      for (let x = 0; x < width; x += gridSize) {
-        ctx.moveTo(x, 0)
-        ctx.lineTo(x, height)
-      }
-      for (let y = 0; y < height; y += gridSize) {
-        ctx.moveTo(0, y)
-        ctx.lineTo(width, y)
-      }
-      ctx.stroke()
-
-      // 2. Draw Integrated Circuit Silicon Die Boundary
-      const dieW = Math.min(width * 0.65, 680)
-      const dieH = Math.min(height * 0.55, 460)
-      const dieX = (width - dieW) * 0.5
-      const dieY = height * 0.45 - dieH * 0.5 + (scrollProgress - 0.5) * 80
-
-      ctx.strokeStyle = 'rgba(34, 197, 94, 0.25)'
-      ctx.lineWidth = 1.2
-      ctx.strokeRect(dieX, dieY, dieW, dieH)
-
-      // 3. Draw Laser Toolpath Traces (Vector Interconnects)
-      const pathSegments = 16
-      ctx.strokeStyle = '#22c55e'
-      ctx.lineWidth = 1.6
-      ctx.shadowColor = '#22c55e'
-      ctx.shadowBlur = 10
-
-      ctx.beginPath()
-      for (let i = 0; i < pathSegments; i++) {
-        const segX = dieX + (dieW / pathSegments) * i
-        const segY = dieY + (i % 2 === 0 ? 40 : dieH - 40)
-        if (i === 0) ctx.moveTo(segX, segY)
-        else ctx.lineTo(segX, segY)
-      }
-      ctx.stroke()
-
-      // 4. Draw Active Laser Beam Head
-      const activeIdx = Math.floor(beamPos * pathSegments)
-      const headX = dieX + (dieW / pathSegments) * activeIdx
-      const headY = dieY + (activeIdx % 2 === 0 ? 40 : dieH - 40)
-
-      ctx.fillStyle = '#ffffff'
-      ctx.shadowColor = '#38bdf8'
-      ctx.shadowBlur = 18
-      ctx.beginPath()
-      ctx.arc(headX, headY, 3.5, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.shadowBlur = 0
-
-      // Crosshair Reticle on Laser Head
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)'
-      ctx.lineWidth = 1
-      ctx.beginPath()
-      ctx.moveTo(headX - 16, headY)
-      ctx.lineTo(headX + 16, headY)
-      ctx.moveTo(headX, headY - 16)
-      ctx.lineTo(headX, headY + 16)
-      ctx.stroke()
-
-      animationFrameId = requestAnimationFrame(render)
-    }
-
-    render()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [scrollProgress, scrollVelocity])
-
   // Rayleigh Resolution Limit: CD = k1 * (lambda / NA), where k1 ~ 0.35
   const rayleighCdNm = (0.35 * (wavelengthNm / numericalAperture)).toFixed(2)
 
   return (
     <div className="laser-root">
       {/* 60FPS Laser CAD Background Canvas */}
-      <canvas ref={canvasRef} className="laser-canvas" aria-hidden="true" />
+      <div ref={laserRef} className="laser-canvas" aria-hidden="true" />
 
       {/* Fixed Silicon Telemetry HUD Header */}
       <div className="laser-hud-fixed">
@@ -275,6 +189,41 @@ export const Concept05Laser: React.FC = () => {
             hardware dies.
           </p>
 
+          <div
+            className="laser-author-chip"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 14,
+              margin: '18px 0 24px 0',
+              background: 'rgba(255, 255, 255, 0.04)',
+              backdropFilter: 'blur(12px)',
+              padding: '6px 18px',
+              borderRadius: 999,
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+            }}
+          >
+            <img
+              src="/assets/images/sirosiu-portrait.webp"
+              alt="Ankush Malothia (Sirosiu)"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1.5px solid #38bdf8',
+              }}
+            />
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#f8fafc' }}>
+                Ankush Malothia (Sirosiu)
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#38bdf8', fontFamily: 'monospace' }}>
+                ASIC & RISC-V RTL &bull; 28GHz mmWave &bull; Edge Micro-Architectures
+              </div>
+            </div>
+          </div>
+
           <div className="laser-scroll-indicator">
             <span className="laser-scroll-line" />
             <span className="laser-scroll-text">SCROLL TO ADVANCE LASER TOOLPATH ↓</span>
@@ -314,6 +263,14 @@ export const Concept05Laser: React.FC = () => {
 
                 <h3 className="laser-project-title">{proj.title}</h3>
                 <p className="laser-project-tagline">{proj.tagline}</p>
+
+                {/* Interactive Reactive Project Schematic */}
+                <ProjectSchematicVisualizer
+                  id={proj.id as any}
+                  accentColor="#38bdf8"
+                  secondaryColor="#f59e0b"
+                  style={{ width: '100%', height: 160, borderRadius: 8, margin: '14px 0' }}
+                />
 
                 <div className="laser-metric-row">
                   {proj.metrics.slice(0, 2).map((m, mIdx) => (
@@ -499,6 +456,14 @@ export const Concept05Laser: React.FC = () => {
             </div>
 
             <div className="laser-modal-body">
+              {/* High-Resolution Interactive Circuit / Physics Schematic */}
+              <ProjectSchematicVisualizer
+                id={activeProject.id as any}
+                accentColor="#38bdf8"
+                secondaryColor="#f59e0b"
+                style={{ width: '100%', height: 220, borderRadius: 8, marginBottom: 20 }}
+              />
+
               <div className="laser-modal-section">
                 <h4>PHYSICAL PROBLEM STATEMENT</h4>
                 <p>{activeProject.problemStatement || activeProject.summary}</p>

@@ -38,6 +38,12 @@
   z-index: 1;
 }
 
+.lusion-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
 /* Floating Fluid Telemetry Bar */
 .lusion-hud-fixed {
   position: fixed;
