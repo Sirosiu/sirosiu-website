@@ -4,11 +4,11 @@ import { WorldAudio } from './WorldAudio'
 import './Concept04WorldEntrance.css'
 
 const LOADING_MESSAGES: [number, string][] = [
-  [0, 'Scanning cosmic synaptic frequencies...'],
-  [22, 'Synthesizing axon highway & Nodes of Ranvier...'],
-  [48, 'Igniting cortical nebulae & neurotransmitter starfield...'],
-  [74, 'Calibrating action-potential conduction waves...'],
-  [100, 'Cosmic neural continuum ready. Enter the domain.'],
+  [0, 'Aligning deep space observatories & orbital telemetry...'],
+  [24, 'Igniting relativistic warp drive & Kerr accretion disc...'],
+  [48, 'Mapping gravitational lensing & stellar coordinate grid...'],
+  [72, 'Synchronizing Ankush Malothia’s core architecture systems...'],
+  [100, 'Cosmic portal locked. Step into Ankush’s universe.'],
 ]
 
 export const Concept04WorldEntrance: React.FC = () => {
@@ -18,7 +18,7 @@ export const Concept04WorldEntrance: React.FC = () => {
 
   // Loader state
   const [loadPercent, setLoadPercent] = useState<number>(0)
-  const [loadStatus, setLoadStatus] = useState<string>('Scanning cosmic synaptic frequencies...')
+  const [loadStatus, setLoadStatus] = useState<string>('Aligning deep space observatories & orbital telemetry...')
   const [isReady, setIsReady] = useState<boolean>(false)
   const [isDeparting, setIsDeparting] = useState<boolean>(false)
   const [isLoaderHidden, setIsLoaderHidden] = useState<boolean>(false)
@@ -44,7 +44,7 @@ export const Concept04WorldEntrance: React.FC = () => {
     }
   }, [])
 
-  // 2. Initialize 3D Engine & Realistic Preloader
+  // 2. Initialize 3D Engine & Paced Preloader
   useEffect(() => {
     if (!containerRef.current) return
 
@@ -56,7 +56,7 @@ export const Concept04WorldEntrance: React.FC = () => {
       onReady: () => {
         setIsReady(true)
         setLoadPercent(100)
-        setLoadStatus('Cosmic neural continuum ready. Enter the domain.')
+        setLoadStatus('Cosmic portal locked. Step into Ankush’s universe.')
       },
     })
     engineRef.current = engine
@@ -70,10 +70,10 @@ export const Concept04WorldEntrance: React.FC = () => {
         clearInterval(interval)
         setLoadPercent(100)
         setIsReady(true)
-        setLoadStatus('Cosmic neural continuum ready. Enter the domain.')
+        setLoadStatus('Cosmic portal locked. Step into Ankush’s universe.')
       } else {
         setLoadPercent(Math.floor(currentP))
-        let matchedMsg = 'Scanning cosmic synaptic frequencies...'
+        let matchedMsg = 'Aligning deep space observatories & orbital telemetry...'
         for (let i = LOADING_MESSAGES.length - 1; i >= 0; i--) {
           if (currentP >= LOADING_MESSAGES[i][0]) {
             matchedMsg = LOADING_MESSAGES[i][1]
@@ -111,8 +111,8 @@ export const Concept04WorldEntrance: React.FC = () => {
     // Run intro narrative timeline
     const startTime = performance.now()
     const beats: [number, number, string][] = [
-      [1.0, 4.2, 'Some thoughts transcend the boundaries of space.'],
-      [4.8, 8.0, 'Step into the neural cosmos. Let’s see where it leads.'],
+      [1.0, 4.2, 'In the silence of deep space, complex systems find perfect clarity.'],
+      [4.8, 8.0, 'I architect software that spans light-years. Welcome to my domain.'],
     ]
 
     let rafId = 0
@@ -213,7 +213,7 @@ export const Concept04WorldEntrance: React.FC = () => {
         </button>
 
         <a className="c04-top-btn" href="mailto:sirosiu@gmail.com">
-          Talk to Harshit ↗
+          Talk to Ankush ↗
         </a>
 
         {mode === 'intro' && (
@@ -228,16 +228,16 @@ export const Concept04WorldEntrance: React.FC = () => {
         <section
           id="loader"
           className={`c04-loader ${isDeparting ? 'departing' : ''}`}
-          aria-label="Preparing cosmic synaptic world"
+          aria-label="Preparing Ankush Malothia celestial cosmos"
         >
           <div className="c04-loader-art" aria-hidden="true" />
           <div className="c04-loader-haze" aria-hidden="true" />
 
-          <p className="c04-loader-name">SIROSIU // HARSHIT SINGH</p>
+          <p className="c04-loader-name">ANKUSH MALOTHIA // SIROSIU</p>
           <h2 className="c04-loader-title">
-            Every idea starts
+            We build at the edge
             <br />
-            with a single synapse.
+            of the known universe.
           </h2>
 
           <div className="c04-loader-bottom">
@@ -271,11 +271,11 @@ export const Concept04WorldEntrance: React.FC = () => {
               disabled={!isReady}
               onClick={handleStartIntro}
             >
-              Enter the world <span>↗</span>
+              Enter Ankush's Universe <span>↗</span>
             </button>
 
             <a className="c04-loader-contact" href="mailto:sirosiu@gmail.com">
-              Talk to Harshit ↗
+              Talk to Ankush ↗
             </a>
 
             <p className="c04-loader-small">
@@ -324,7 +324,7 @@ export const Concept04WorldEntrance: React.FC = () => {
         </div>
         <div className="c04-scroll-cue-label">
           Scroll down to move forward
-          <span>Traverse the synaptic cosmos</span>
+          <span>Traverse Ankush's celestial highway</span>
         </div>
       </button>
 
@@ -334,15 +334,14 @@ export const Concept04WorldEntrance: React.FC = () => {
           {/* Chapter 01 */}
           <article className="c04-chapter-card">
             <div className="c04-card-inner">
-              <span className="c04-card-folio">01 / CONSCIOUSNESS</span>
-              <h2 className="c04-card-title">Architecture begins where neurons fire and thoughts take form.</h2>
+              <span className="c04-card-folio">ORBITAL STATION 01 // HYPERION</span>
+              <h2 className="c04-card-title">Sub-millisecond latency across planetary clusters.</h2>
               <p className="c04-card-body">
-                The first thing someone asks for isn’t always what they need most.
-                We discover the core tension before building: how systems speak, how data moves,
-                and how humans interact under cognitive load.
+                Zero-copy RingBuffer streaming, lock-free concurrency, and deterministic throughput
+                engineered by Ankush Malothia to handle millions of real-time transactions with sub-millisecond p99.
               </p>
               <a href="mailto:sirosiu@gmail.com" className="c04-card-action">
-                Discuss an architecture ↗
+                Inspect Hyperion Engine ↗
               </a>
             </div>
           </article>
@@ -350,14 +349,14 @@ export const Concept04WorldEntrance: React.FC = () => {
           {/* Chapter 02 */}
           <article className="c04-chapter-card">
             <div className="c04-card-inner">
-              <span className="c04-card-folio">02 / NETWORK</span>
-              <h2 className="c04-card-title">High-dimensional distributed intelligence, synchronized across space.</h2>
+              <span className="c04-card-folio">ORBITAL STATION 02 // ARGON</span>
+              <h2 className="c04-card-title">Autonomous intelligence with deterministic precision.</h2>
               <p className="c04-card-body">
-                From high-throughput distributed microservices to real-time WebGL spatial shaders
-                and self-calibrating neural clusters. Complex systems engineered with effortless elegance.
+                Multi-agent orchestration engines designed by Ankush Malothia, self-calibrating across
+                high-dimensional tool pipelines and sandboxed execution runtimes.
               </p>
               <a href="https://github.com/sirosiu" target="_blank" rel="noreferrer" className="c04-card-action">
-                View GitHub Repositories ↗
+                Explore Argon Architecture ↗
               </a>
             </div>
           </article>
@@ -365,14 +364,14 @@ export const Concept04WorldEntrance: React.FC = () => {
           {/* Chapter 03 */}
           <article className="c04-chapter-card">
             <div className="c04-card-inner">
-              <span className="c04-card-folio">03 / SYNAPSE</span>
-              <h2 className="c04-card-title">Zero-latency transmission, Hodgkin-Huxley precision.</h2>
+              <span className="c04-card-folio">ORBITAL STATION 03 // AETHER</span>
+              <h2 className="c04-card-title">Raymarched spatial shaders & zero-latency WebGPU.</h2>
               <p className="c04-card-body">
-                Every millisecond matters. Raymarched cortical atmospheres, 60fps buttery physics,
-                and mathematically grounded architectures that scale smoothly across millions of users.
+                Volumetric relativistic simulations, real-time physics, and mathematically grounded graphics
+                that push browser hardware to its physical limits.
               </p>
               <a href="#explore" className="c04-card-action" onClick={(e) => { e.preventDefault(); handleCueClick(); }}>
-                Continue down the axon ↗
+                Continue down the ribbon ↗
               </a>
             </div>
           </article>
@@ -380,10 +379,10 @@ export const Concept04WorldEntrance: React.FC = () => {
           {/* Chapter 04 */}
           <article className="c04-chapter-card">
             <div className="c04-card-inner">
-              <span className="c04-card-folio">04 / SINGULARITY</span>
-              <h2 className="c04-card-title">Ready to bring your idea into living form?</h2>
+              <span className="c04-card-folio">ORBITAL STATION 04 // CHRONOS</span>
+              <h2 className="c04-card-title">Ready to build something extraordinary?</h2>
               <p className="c04-card-body">
-                You don’t need an exhaustive plan to begin. Tell me what you want to build or elevate,
+                You don’t need an exhaustive plan to begin. Tell Ankush Malothia what you want to build or elevate,
                 and we will carve the path together.
               </p>
               <a href="mailto:sirosiu@gmail.com" className="c04-card-action">

@@ -467,12 +467,12 @@ export const CONCEPT_META = {
     palette: ['#090a0f', '#12141e', '#0066ff', '#e0e7ff', '#ffffff'],
   },
   4: {
-    id: 'cosmic-synapse',
+    id: 'celestial-cosmos',
     number: '04',
-    name: 'Cosmic Synapse',
-    personality: 'Celestial neural cosmos, Hodgkin-Huxley axon conduction highway, Nodes of Ranvier portals, Soma star-nuclei',
-    aesthetic: 'Deep Space Obsidian (#020308) • Synaptic Cyan (#00f0ff) • Bio-Electric Violet (#8b5cf6) • Soma Gold (#ffdf7a)',
-    palette: ['#020308', '#090d24', '#00f0ff', '#8b5cf6', '#ffdf7a'],
+    name: "Ankush's Cosmos",
+    personality: 'Kerr Relativistic Black Hole, Crystalline Starlight Ribbon Highway, Orbital Stations, Ankush Malothia Systems',
+    aesthetic: 'Void Obsidian (#020308) • Accretion Amber (#ff9922) • Electric Cyan (#00f0ff) • Starlight Violet (#8b5cf6)',
+    palette: ['#020308', '#060919', '#00f0ff', '#8b5cf6', '#ff9922'],
   },
   5: {
     id: 'quantum-terminal',

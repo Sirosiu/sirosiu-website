@@ -7,13 +7,13 @@ export interface WorldEngineOptions {
   onReady?: () => void
 }
 
-export const COSMIC_SYNAPSE_PALETTE = {
-  obsidianVoid: new THREE.Color(0x020308),
-  abyssalIndigo: new THREE.Color(0x090d24),
-  synapticCyan: new THREE.Color(0x00f0ff),
-  bioViolet: new THREE.Color(0x8b5cf6),
+export const CELESTIAL_PALETTE = {
+  voidBlack: new THREE.Color(0x020308),
+  deepNebula: new THREE.Color(0x060919),
+  electricCyan: new THREE.Color(0x00f0ff),
+  starlightViolet: new THREE.Color(0x8b5cf6),
+  accretionAmber: new THREE.Color(0xff9922),
   somaGold: new THREE.Color(0xffdf7a),
-  membraneSlate: new THREE.Color(0x1e293b),
 } as const
 
 export class ThresholdWorldEngine {
@@ -25,7 +25,7 @@ export class ThresholdWorldEngine {
   private rafId = 0
   private isDisposed = false
 
-  // Curve and Kinematics
+  // Curve and Trajectory
   private curve!: THREE.CatmullRomCurve3
   private frenetFrames!: {
     tangents: THREE.Vector3[]
@@ -35,29 +35,41 @@ export class ThresholdWorldEngine {
   private totalSplineLength = 1200
   private splineSegments = 400
 
-  // 3D Meshes & Shader Materials
+  // 1. Kerr Relativistic Black Hole (Horizon Feature)
+  private kerrBlackHoleMesh!: THREE.Mesh
+  private kerrMaterial!: THREE.ShaderMaterial
+
+  // 2. Crystalline Starlight Ribbon Highway
+  private ribbonHighwayMesh!: THREE.Mesh
+  private ribbonMaterial!: THREE.ShaderMaterial
   private axonCoreMesh!: THREE.Mesh
   private axonMaterial!: THREE.ShaderMaterial
-  private myelinInstancedMesh!: THREE.InstancedMesh
+
+  // 3. Holographic Portal Rings & Dendrites
+  private portalInstancedMesh!: THREE.InstancedMesh
   private dendriteGroup!: THREE.Group
+
+  // 4. Starfield & Cosmic Warp Streaks
   private starfieldPoints!: THREE.Points
   private starfieldMaterial!: THREE.ShaderMaterial
+
+  // 5. Volumetric Nebulae
   private nebulaGroup: THREE.Group = new THREE.Group()
   private nebulaMaterial!: THREE.ShaderMaterial
   private nebulaMeshes: THREE.Mesh[] = []
 
-  // Landmark Soma Nuclei
-  private somaLandmarks: Array<{
+  // 6. Orbital Monolith Stations (Ankush's Projects)
+  private orbitalStations: Array<{
     group: THREE.Group
-    coreMesh: THREE.Mesh
-    wireMesh: THREE.Mesh
-    light: THREE.PointLight
-    vesicles: THREE.Points
+    monolithMesh: THREE.Mesh
+    ringMesh: THREE.Mesh
+    beaconLight: THREE.PointLight
     uPos: number
+    title: string
   }> = []
 
-  // Dynamic Camera Rig & Spike Light
-  private spikeLight!: THREE.PointLight
+  // Dynamic Camera Rig & Traveling Photon Light
+  private photonLight!: THREE.PointLight
   private hemiLight!: THREE.HemisphereLight
 
   // State Management
@@ -69,7 +81,7 @@ export class ThresholdWorldEngine {
   private scrollVelocity = 0
   private lastScrollProgress = 0
 
-  // Look target vectors
+  // Camera tracking vectors
   private currentLookTarget = new THREE.Vector3()
   private desiredLookTarget = new THREE.Vector3()
 
@@ -79,7 +91,7 @@ export class ThresholdWorldEngine {
   constructor(container: HTMLElement, options?: WorldEngineOptions) {
     this.container = container
 
-    // 1. Canvas & WebGL Renderer
+    // Canvas & WebGL Renderer
     this.canvas = document.createElement('canvas')
     this.canvas.className = 'threshold-world-canvas'
     this.canvas.style.position = 'absolute'
@@ -99,49 +111,49 @@ export class ThresholdWorldEngine {
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight)
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
-    this.renderer.toneMappingExposure = 1.2
-    this.renderer.setClearColor(COSMIC_SYNAPSE_PALETTE.obsidianVoid, 1.0)
+    this.renderer.toneMappingExposure = 1.25
+    this.renderer.setClearColor(CELESTIAL_PALETTE.voidBlack, 1.0)
 
-    // 2. Scene & Deep Space Cosmic Fog
+    // Scene & Deep Void Fog
     this.scene = new THREE.Scene()
-    this.scene.name = 'Cosmic-Synaptic Neural Highway'
-    this.scene.background = COSMIC_SYNAPSE_PALETTE.obsidianVoid
-    this.scene.fog = new THREE.FogExp2(0x020308, 0.009)
+    this.scene.name = 'Ankush Malothia — Celestial Space World'
+    this.scene.background = CELESTIAL_PALETTE.voidBlack
+    this.scene.fog = new THREE.FogExp2(0x020308, 0.0075)
 
-    // 3. Camera Setup
+    // Perspective Camera
     const aspect = this.container.clientWidth / Math.max(1, this.container.clientHeight)
-    this.camera = new THREE.PerspectiveCamera(52, aspect, 0.1, 3000)
+    this.camera = new THREE.PerspectiveCamera(52, aspect, 0.1, 3500)
     this.scene.add(this.camera)
 
-    // 4. Build Systems
+    // Setup all celestial features
     this.setupLighting()
     this.setupMasterSpline()
-    this.setupAxonCore()
-    this.setupMyelinNodes()
-    this.setupDendriteArbors()
+    this.setupKerrBlackHole()
+    this.setupCrystallineRibbonHighway()
+    this.setupPortalRings()
+    this.setupDendriteConstellations()
     this.setupCosmicStarfield()
-    this.setupCorticalNebulae()
-    this.setupSomaLandmarks()
+    this.setupStellarNebulae()
+    this.setupOrbitalStations()
 
-    // 5. Initial Pose
+    // Initial camera pose
     this.updateCameraPose(0, 'loading')
 
     window.addEventListener('resize', this.handleResize)
 
-    // Warmup shaders
+    // Shader Warmup & Loading simulation
     this.initializeAssets(options)
 
-    // Start render loop
+    // Start 60fps render loop
     this.animate(performance.now())
   }
 
   private setupLighting(): void {
-    this.hemiLight = new THREE.HemisphereLight(0x00f0ff, 0x090d24, 0.45)
+    this.hemiLight = new THREE.HemisphereLight(0x00f0ff, 0x060919, 0.4)
     this.scene.add(this.hemiLight)
 
-    // Traveling action potential spike light
-    this.spikeLight = new THREE.PointLight(0x00f0ff, 4.5, 75, 1.8)
-    this.scene.add(this.spikeLight)
+    this.photonLight = new THREE.PointLight(0x00f0ff, 5.0, 85, 1.8)
+    this.scene.add(this.photonLight)
   }
 
   private setupMasterSpline(): void {
@@ -160,125 +172,209 @@ export class ThresholdWorldEngine {
     this.frenetFrames = this.curve.computeFrenetFrames(this.splineSegments, false)
   }
 
-  private setupAxonCore(): void {
-    const tubeGeo = new THREE.TubeGeometry(this.curve, this.splineSegments, 1.8, 16, false)
+  /**
+   * 1. The Kerr Relativistic Black Hole: Looms majestically down the flight trajectory
+   */
+  private setupKerrBlackHole(): void {
+    const planeGeo = new THREE.PlaneGeometry(160, 160)
 
-    this.axonMaterial = new THREE.ShaderMaterial({
+    this.kerrMaterial = new THREE.ShaderMaterial({
       transparent: true,
-      depthWrite: true,
+      depthWrite: false,
       side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
       uniforms: {
         uTime: { value: 0 },
-        uScroll: { value: 0 },
-        uVelocity: { value: 0 },
-        uColorSlate: { value: COSMIC_SYNAPSE_PALETTE.membraneSlate },
-        uColorCyan: { value: COSMIC_SYNAPSE_PALETTE.synapticCyan },
-        uColorViolet: { value: COSMIC_SYNAPSE_PALETTE.bioViolet },
-        uColorGold: { value: COSMIC_SYNAPSE_PALETTE.somaGold },
-        uFogColor: { value: COSMIC_SYNAPSE_PALETTE.obsidianVoid },
-        uFogDensity: { value: 0.009 },
+        uSpin: { value: 0.94 },
       },
       vertexShader: /* glsl */ `
-        uniform float uTime;
-        uniform float uScroll;
-        uniform float uVelocity;
-
         varying vec2 vUv;
-        varying vec3 vViewPosition;
-        varying vec3 vNormalView;
-        varying float vSpikeAmplitude;
-
-        float computeActionPotential(float u, float time, float scroll, float vel) {
-          float phase = fract(u * 22.0 - time * (1.4 + abs(vel) * 2.2) - scroll * 15.0);
-          float depolarization = smoothstep(0.0, 0.06, phase) * exp(-phase * 7.5);
-          return depolarization;
-        }
-
         void main() {
           vUv = uv;
-
-          float primarySpike = computeActionPotential(uv.x, uTime, uScroll, uVelocity);
-          float harmonic = computeActionPotential(uv.x * 0.5 + 0.25, uTime * 0.7, uScroll, uVelocity);
-          vSpikeAmplitude = clamp(primarySpike + harmonic * 0.45, 0.0, 1.5);
-
-          float radialAngle = uv.y * 6.2831853;
-          float helixRipple = sin(uv.x * 160.0 + radialAngle * 3.0 - uTime * 6.0) * 0.06;
-          float swell = vSpikeAmplitude * (0.32 + min(abs(uVelocity), 2.5) * 0.16) + helixRipple;
-
-          vec3 displacedPos = position + normal * swell;
-
-          vec4 mvPosition = modelViewMatrix * vec4(displacedPos, 1.0);
-          vViewPosition = -mvPosition.xyz;
-          vNormalView = normalize(normalMatrix * normal);
-
-          gl_Position = projectionMatrix * mvPosition;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
       `,
       fragmentShader: /* glsl */ `
         precision highp float;
-
-        uniform float uTime;
-        uniform float uVelocity;
-        uniform vec3 uColorSlate;
-        uniform vec3 uColorCyan;
-        uniform vec3 uColorViolet;
-        uniform vec3 uColorGold;
-        uniform vec3 uFogColor;
-        uniform float uFogDensity;
-
         varying vec2 vUv;
-        varying vec3 vViewPosition;
-        varying vec3 vNormalView;
-        varying float vSpikeAmplitude;
+        uniform float uTime;
+        uniform float uSpin;
+
+        float hash(vec2 p) {
+          return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+        }
+
+        float noise(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          f = f * f * (3.0 - 2.0 * f);
+          return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+                     mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+        }
 
         void main() {
-          vec3 N = normalize(vNormalView);
-          vec3 V = normalize(vViewPosition);
+          vec2 uv = (vUv - 0.5) * 2.0;
 
-          float cosTheta = abs(dot(N, V));
-          float fresnel = pow(1.0 - cosTheta, 2.6);
-          float coreMask = pow(cosTheta, 1.5);
+          float frameDrag = uSpin * 0.18;
+          vec2 p = uv - vec2(frameDrag, 0.0);
+          float b = length(p);
 
-          float angle = vUv.y * 6.2831853;
-          float filaments = pow(0.5 + 0.5 * sin(angle * 8.0 + vUv.x * 120.0 - uTime * 4.0), 3.0);
-          float nodesOfRanvier = smoothstep(0.92, 1.0, sin(vUv.x * 320.0));
+          float rShadow = 1.32 - 0.14 * uSpin * (p.x / max(b, 0.001));
+          float deflection = (rShadow * rShadow) / max(b * b - rShadow * 0.5, 0.035);
+          vec2 lensedUv = vec2(p.x, p.y - sign(p.y) * deflection * 0.68);
+          float rLensed = length(lensedUv);
 
-          vec3 color = uColorSlate * (0.35 + 0.65 * filaments);
+          vec3 color = vec3(0.0);
 
-          float cyanDrive = (0.24 + vSpikeAmplitude * 1.85) * (coreMask + filaments * 0.5);
-          color += uColorCyan * cyanDrive;
+          // Accretion Disk with relativistic Doppler beaming
+          if (rLensed > 1.38 && rLensed < 5.2) {
+            float angle = atan(lensedUv.y, lensedUv.x) + uTime * 1.6;
+            float turbulence = noise(vec2(rLensed * 2.8, angle * 2.2));
+            float intensity = smoothstep(1.38, 1.75, rLensed) * exp(-(rLensed - 1.38) * 0.55) * (0.6 + 0.4 * turbulence);
 
-          float auraPulse = 0.65 + 0.35 * sin(vUv.x * 60.0 - uTime * 3.2);
-          color += uColorViolet * fresnel * (0.9 + vSpikeAmplitude * 1.5 + abs(uVelocity) * 0.4) * auraPulse;
+            float beta = 0.65;
+            float cosTheta = -p.x / max(b, 0.001);
+            float dopplerFactor = 1.0 / (sqrt(1.0 - beta * beta) * (1.0 - beta * cosTheta));
 
-          float crest = smoothstep(0.62, 1.15, vSpikeAmplitude);
-          color += uColorGold * (crest * 1.4 + nodesOfRanvier * vSpikeAmplitude * 0.85);
+            vec3 recedingCol = vec3(1.0, 0.42, 0.08); // Amber Redshift
+            vec3 approachingCol = vec3(0.0, 0.94, 1.0); // Electric Cyan Blueshift
+            vec3 diskCol = mix(recedingCol, approachingCol, smoothstep(0.4, 1.6, dopplerFactor));
 
-          float depth = length(vViewPosition);
-          float fogFactor = clamp(1.0 - exp(-uFogDensity * uFogDensity * depth * depth), 0.0, 1.0);
-          color = mix(color, uFogColor, fogFactor);
+            color += diskCol * intensity * pow(dopplerFactor, 3.0);
+          }
 
-          float alpha = clamp(0.6 + fresnel * 0.4 + vSpikeAmplitude * 0.4, 0.0, 1.0) * (1.0 - fogFactor * 0.85);
+          // Luminous Photon Ring
+          float photonRing = exp(-abs(b - rShadow) * 34.0) * 1.6;
+          color += vec3(0.85, 0.95, 1.0) * photonRing;
+
+          // Event Horizon Blackout Core
+          float horizonMask = smoothstep(rShadow * 0.96, rShadow * 1.02, b);
+          color *= horizonMask;
+
+          float alpha = clamp(length(color), 0.0, 1.0);
+          if (alpha < 0.02) discard;
+
           gl_FragColor = vec4(color, alpha);
         }
       `,
     })
 
-    this.axonCoreMesh = new THREE.Mesh(tubeGeo, this.axonMaterial)
+    this.kerrBlackHoleMesh = new THREE.Mesh(planeGeo, this.kerrMaterial)
+    // Position directly down the visual terminus of the spline
+    const terminusPoint = this.curve.getPointAt(0.35)
+    this.kerrBlackHoleMesh.position.set(terminusPoint.x + 35, terminusPoint.y + 20, -380)
+    this.scene.add(this.kerrBlackHoleMesh)
+  }
+
+  /**
+   * 2. Crystalline Starlight Ribbon Highway: coordinate grid ribbon replacing the plain tube
+   */
+  private setupCrystallineRibbonHighway(): void {
+    // Outer translucent coordinate ribbon
+    const ribbonGeo = new THREE.TubeGeometry(this.curve, this.splineSegments, 3.2, 8, false)
+    this.ribbonMaterial = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uVelocity: { value: 0 },
+      },
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        varying vec3 vViewPosition;
+        void main() {
+          vUv = uv;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          vViewPosition = -mvPosition.xyz;
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        precision highp float;
+        varying vec2 vUv;
+        varying vec3 vViewPosition;
+        uniform float uTime;
+        uniform float uVelocity;
+
+        void main() {
+          float gridU = abs(fract(vUv.x * 70.0 - uTime * 2.2) - 0.5) / max(fwidth(vUv.x * 70.0), 0.001);
+          float gridV = abs(fract(vUv.y * 10.0) - 0.5) / max(fwidth(vUv.y * 10.0), 0.001);
+          float grid = 1.0 - clamp(min(gridU, gridV), 0.0, 1.0);
+
+          float centerDist = abs(vUv.y - 0.5) * 2.0;
+          float core = pow(1.0 - centerDist, 3.0) * (1.1 + abs(uVelocity) * 1.4);
+          float caustics = sin(vUv.x * 140.0 + uTime * 4.0) * cos(vUv.y * 45.0 - uTime * 3.0);
+
+          vec3 cyan = vec3(0.0, 0.94, 1.0);
+          vec3 violet = vec3(0.55, 0.36, 0.96);
+
+          vec3 color = mix(violet, cyan, vUv.y) * (grid * 0.45 + caustics * 0.25);
+          color += cyan * core * 2.6;
+
+          float alpha = clamp((1.0 - centerDist) * 0.75 + grid * 0.5 + core, 0.0, 1.0);
+          float depth = length(vViewPosition);
+          alpha *= (1.0 - smoothstep(110.0, 380.0, depth));
+
+          gl_FragColor = vec4(color, alpha);
+        }
+      `,
+    })
+    this.ribbonHighwayMesh = new THREE.Mesh(ribbonGeo, this.ribbonMaterial)
+    this.scene.add(this.ribbonHighwayMesh)
+
+    // Inner energetic core
+    const coreGeo = new THREE.TubeGeometry(this.curve, this.splineSegments, 1.2, 12, false)
+    this.axonMaterial = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uVelocity: { value: 0 },
+      },
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        precision highp float;
+        varying vec2 vUv;
+        uniform float uTime;
+        uniform float uVelocity;
+
+        void main() {
+          float pulse = fract(vUv.x * 24.0 - uTime * 1.8);
+          float wave = smoothstep(0.0, 0.08, pulse) * exp(-pulse * 6.5);
+          vec3 color = mix(vec3(0.55, 0.36, 0.96), vec3(0.0, 0.94, 1.0), wave);
+          color += vec3(1.0, 0.88, 0.48) * smoothstep(0.7, 1.0, wave);
+          gl_FragColor = vec4(color * (0.35 + wave * 1.8), wave * 0.85);
+        }
+      `,
+    })
+    this.axonCoreMesh = new THREE.Mesh(coreGeo, this.axonMaterial)
     this.scene.add(this.axonCoreMesh)
   }
 
-  private setupMyelinNodes(): void {
+  /**
+   * 3. Holographic Portal Rings & Dendrite Constellations
+   */
+  private setupPortalRings(): void {
     const ringCount = 110
-    const ringGeo = new THREE.TorusGeometry(6.2, 0.16, 12, 48)
+    const ringGeo = new THREE.TorusGeometry(6.4, 0.16, 12, 48)
     const ringMat = new THREE.MeshBasicMaterial({
       color: 0x8b5cf6,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.75,
       blending: THREE.AdditiveBlending,
     })
 
-    this.myelinInstancedMesh = new THREE.InstancedMesh(ringGeo, ringMat, ringCount)
+    this.portalInstancedMesh = new THREE.InstancedMesh(ringGeo, ringMat, ringCount)
     const dummy = new THREE.Object3D()
     const rotMatrix = new THREE.Matrix4()
 
@@ -295,26 +391,26 @@ export class ThresholdWorldEngine {
       dummy.position.copy(pos)
       dummy.rotation.setFromRotationMatrix(rotMatrix)
 
-      // Every 5th ring is a wider, intense cyan Node of Ranvier gate
-      const isRanvierNode = i % 5 === 0
-      const scale = isRanvierNode ? 1.45 : 0.95
-      dummy.scale.set(scale, scale, isRanvierNode ? 2.0 : 3.8)
+      const isGate = i % 5 === 0
+      const scale = isGate ? 1.45 : 0.92
+      dummy.scale.set(scale, scale, isGate ? 2.0 : 3.6)
       dummy.updateMatrix()
-      this.myelinInstancedMesh.setMatrixAt(i, dummy.matrix)
-      this.myelinInstancedMesh.setColorAt(
+
+      this.portalInstancedMesh.setMatrixAt(i, dummy.matrix)
+      this.portalInstancedMesh.setColorAt(
         i,
-        new THREE.Color(isRanvierNode ? 0x00f0ff : 0x8b5cf6)
+        new THREE.Color(isGate ? 0x00f0ff : 0x8b5cf6)
       )
     }
 
-    this.myelinInstancedMesh.instanceMatrix.needsUpdate = true
-    if (this.myelinInstancedMesh.instanceColor) {
-      this.myelinInstancedMesh.instanceColor.needsUpdate = true
+    this.portalInstancedMesh.instanceMatrix.needsUpdate = true
+    if (this.portalInstancedMesh.instanceColor) {
+      this.portalInstancedMesh.instanceColor.needsUpdate = true
     }
-    this.scene.add(this.myelinInstancedMesh)
+    this.scene.add(this.portalInstancedMesh)
   }
 
-  private setupDendriteArbors(): void {
+  private setupDendriteConstellations(): void {
     this.dendriteGroup = new THREE.Group()
     const branchMat = new THREE.MeshBasicMaterial({
       color: 0x00f0ff,
@@ -334,20 +430,23 @@ export class ThresholdWorldEngine {
 
       const side = i % 2 === 0 ? 1 : -1
       const p1 = origin.clone().addScaledVector(B, side * 7.5)
-      const p2 = p1.clone().addScaledVector(B, side * 22).addScaledVector(N, 10).addScaledVector(T, -14)
-      const p3 = p2.clone().addScaledVector(B, side * 32).addScaledVector(N, i % 4 === 0 ? 16 : -12).addScaledVector(T, -26)
+      const p2 = p1.clone().addScaledVector(B, side * 24).addScaledVector(N, 12).addScaledVector(T, -16)
+      const p3 = p2.clone().addScaledVector(B, side * 36).addScaledVector(N, i % 4 === 0 ? 18 : -14).addScaledVector(T, -30)
 
       const branchCurve = new THREE.CatmullRomCurve3([origin, p1, p2, p3])
-      const branchGeo = new THREE.TubeGeometry(branchCurve, 24, 0.26, 6, false)
+      const branchGeo = new THREE.TubeGeometry(branchCurve, 24, 0.25, 6, false)
       this.dendriteGroup.add(new THREE.Mesh(branchGeo, branchMat))
     }
 
     this.scene.add(this.dendriteGroup)
   }
 
+  /**
+   * 4. Cosmic Starfield & Screen-Space Warp Streaks
+   */
   private setupCosmicStarfield(): void {
-    const count = 2200
-    const [bx, by, bz] = [280, 180, 500]
+    const count = 2500
+    const [bx, by, bz] = [320, 200, 520]
 
     const geometry = new THREE.BufferGeometry()
     const positions = new Float32Array(count * 3)
@@ -382,9 +481,6 @@ export class ThresholdWorldEngine {
         uVelocity: { value: 0 },
         uEntranceBoost: { value: 0 },
         uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 2) },
-        uColorCyan: { value: COSMIC_SYNAPSE_PALETTE.synapticCyan },
-        uColorViolet: { value: COSMIC_SYNAPSE_PALETTE.bioViolet },
-        uColorGold: { value: COSMIC_SYNAPSE_PALETTE.somaGold },
       },
       vertexShader: /* glsl */ `
         attribute float aScale;
@@ -398,7 +494,6 @@ export class ThresholdWorldEngine {
         uniform float uEntranceBoost;
         uniform float uPixelRatio;
 
-        varying float vPhase;
         varying float vColorSeed;
         varying float vTwinkle;
         varying float vDepthFade;
@@ -406,11 +501,9 @@ export class ThresholdWorldEngine {
         varying float vStreakRatio;
 
         void main() {
-          vPhase = aPhase;
           vColorSeed = aColorSeed;
 
           vec3 pos = position;
-
           float relZ = mod(pos.z - uCameraZ, uBoxZ) - uBoxZ;
           pos.z = uCameraZ + relZ;
 
@@ -432,10 +525,10 @@ export class ThresholdWorldEngine {
           vStreakDir = (deltaLen > 0.0001) ? (screenDelta / deltaLen) : vec2(0.0, 1.0);
           vStreakDir.y = -vStreakDir.y;
 
-          vStreakRatio = 1.0 + warpSpeed * 3.0;
+          vStreakRatio = 1.0 + warpSpeed * 3.2;
 
-          float basePointSize = (aScale * 190.0 / dist) * uPixelRatio;
-          gl_PointSize = clamp(basePointSize * vStreakRatio, 2.0, 130.0);
+          float basePointSize = (aScale * 195.0 / dist) * uPixelRatio;
+          gl_PointSize = clamp(basePointSize * vStreakRatio, 2.0, 135.0);
 
           vTwinkle = 0.6 + 0.4 * sin(uTime * (2.2 + aScale) + aPhase * 6.2831);
           float nearFade = smoothstep(2.0, 18.0, dist);
@@ -447,12 +540,6 @@ export class ThresholdWorldEngine {
       `,
       fragmentShader: /* glsl */ `
         precision highp float;
-
-        uniform vec3 uColorCyan;
-        uniform vec3 uColorViolet;
-        uniform vec3 uColorGold;
-
-        varying float vPhase;
         varying float vColorSeed;
         varying float vTwinkle;
         varying float vDepthFade;
@@ -463,7 +550,6 @@ export class ThresholdWorldEngine {
           if (vDepthFade <= 0.001) discard;
 
           vec2 uv = (gl_PointCoord - 0.5) * 2.0;
-
           vec2 perpDir = vec2(-vStreakDir.y, vStreakDir.x);
           float along = dot(uv, vStreakDir);
           float across = dot(uv, perpDir);
@@ -478,11 +564,11 @@ export class ThresholdWorldEngine {
 
           if (alpha <= 0.005) discard;
 
-          vec3 color = uColorCyan;
-          if (vColorSeed > 0.65) color = uColorViolet;
-          else if (vColorSeed > 0.45) color = uColorGold;
+          vec3 color = vec3(0.0, 0.94, 1.0); // Cyan
+          if (vColorSeed > 0.65) color = vec3(0.55, 0.36, 0.96); // Violet
+          else if (vColorSeed > 0.45) color = vec3(1.0, 0.88, 0.48); // Starlight Gold
 
-          color = mix(color, vec3(1.0), core * 0.6);
+          color = mix(color, vec3(1.0), core * 0.65);
           gl_FragColor = vec4(color, alpha);
         }
       `,
@@ -492,8 +578,11 @@ export class ThresholdWorldEngine {
     this.scene.add(this.starfieldPoints)
   }
 
-  private setupCorticalNebulae(): void {
-    const planeGeo = new THREE.PlaneGeometry(220, 220, 1, 1)
+  /**
+   * 5. Multi-Layered Volumetric Stellar Nebulae
+   */
+  private setupStellarNebulae(): void {
+    const planeGeo = new THREE.PlaneGeometry(240, 240, 1, 1)
 
     this.nebulaMaterial = new THREE.ShaderMaterial({
       transparent: true,
@@ -502,8 +591,6 @@ export class ThresholdWorldEngine {
       side: THREE.DoubleSide,
       uniforms: {
         uTime: { value: 0 },
-        uColorTeal: { value: COSMIC_SYNAPSE_PALETTE.synapticCyan },
-        uColorViolet: { value: COSMIC_SYNAPSE_PALETTE.bioViolet },
       },
       vertexShader: /* glsl */ `
         uniform float uTime;
@@ -518,17 +605,14 @@ export class ThresholdWorldEngine {
           vUv = uv;
           vec3 pos = position;
           float n = noise(pos.xy * 0.02);
-          pos.z += n * 18.0;
+          pos.z += n * 20.0;
           vNoiseMod = n;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
         }
       `,
       fragmentShader: /* glsl */ `
         precision highp float;
-        uniform vec3 uColorTeal;
-        uniform vec3 uColorViolet;
         uniform float uTime;
-
         varying vec2 vUv;
         varying float vNoiseMod;
 
@@ -541,21 +625,23 @@ export class ThresholdWorldEngine {
           float pattern = sin(vUv.x * 12.0 + uTime * 0.4) * cos(vUv.y * 12.0 - uTime * 0.3);
           float intensity = smoothstep(0.1, 0.9, radial * (0.6 + 0.4 * pattern + vNoiseMod * 0.3));
 
-          vec3 color = mix(uColorViolet, uColorTeal, vUv.x + vNoiseMod * 0.2);
-          gl_FragColor = vec4(color, intensity * 0.22);
+          vec3 teal = vec3(0.0, 0.94, 1.0);
+          vec3 violet = vec3(0.55, 0.36, 0.96);
+          vec3 color = mix(violet, teal, vUv.x + vNoiseMod * 0.25);
+          gl_FragColor = vec4(color, intensity * 0.24);
         }
       `,
     })
 
-    const count = 14
+    const count = 16
     for (let i = 0; i < count; i++) {
       const mesh = new THREE.Mesh(planeGeo, this.nebulaMaterial)
-      const z = -60 - (i / count) * 1100
-      const x = (Math.random() - 0.5) * 380
-      const y = (Math.random() - 0.5) * 190 + 20
+      const z = -60 - (i / count) * 1150
+      const x = (Math.random() - 0.5) * 400
+      const y = (Math.random() - 0.5) * 200 + 25
       mesh.position.set(x, y, z)
       mesh.rotation.z = Math.random() * Math.PI
-      const scale = 1.6 + Math.random() * 2.2
+      const scale = 1.6 + Math.random() * 2.4
       mesh.scale.set(scale, scale, scale)
       this.nebulaGroup.add(mesh)
       this.nebulaMeshes.push(mesh)
@@ -564,71 +650,61 @@ export class ThresholdWorldEngine {
     this.scene.add(this.nebulaGroup)
   }
 
-  private setupSomaLandmarks(): void {
-    const milestones = [0.15, 0.38, 0.65, 0.88]
-    const coreGeo = new THREE.IcosahedronGeometry(3.6, 1)
-    const coreMat = new THREE.MeshStandardMaterial({
+  /**
+   * 6. Floating Orbital Monolith Stations (Marking Ankush's Real Architectural Systems)
+   */
+  private setupOrbitalStations(): void {
+    const stationSpecs = [
+      { u: 0.16, title: 'STATION 01 // HYPERION STREAM' },
+      { u: 0.40, title: 'STATION 02 // ARGON RUNTIME' },
+      { u: 0.65, title: 'STATION 03 // AETHER SPATIAL ENGINE' },
+      { u: 0.88, title: 'STATION 04 // CHRONOS NEURAL MATRIX' },
+    ]
+
+    const monolithGeo = new THREE.BoxGeometry(2.4, 7.8, 2.4)
+    const monolithMat = new THREE.MeshStandardMaterial({
+      color: 0x070c14,
+      metalness: 0.95,
+      roughness: 0.15,
+      emissive: 0x00f0ff,
+      emissiveIntensity: 0.25,
+    })
+
+    const ringGeo = new THREE.TorusGeometry(5.2, 0.12, 12, 48)
+    const ringMat = new THREE.MeshBasicMaterial({
       color: 0xffdf7a,
-      emissive: 0xffdf7a,
-      emissiveIntensity: 0.9,
-      roughness: 0.2,
-      metalness: 0.8,
-    })
-
-    const wireGeo = new THREE.IcosahedronGeometry(4.8, 2)
-    const wireMat = new THREE.MeshBasicMaterial({
-      color: 0x00f0ff,
-      wireframe: true,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
     })
 
-    milestones.forEach((u) => {
-      const pos = this.curve.getPointAt(u)
+    stationSpecs.forEach((spec) => {
+      const pos = this.curve.getPointAt(spec.u)
       const group = new THREE.Group()
       group.position.copy(pos)
 
-      const coreMesh = new THREE.Mesh(coreGeo, coreMat)
-      group.add(coreMesh)
+      // Sleek Monolith Core
+      const monolithMesh = new THREE.Mesh(monolithGeo, monolithMat)
+      group.add(monolithMesh)
 
-      const wireMesh = new THREE.Mesh(wireGeo, wireMat)
-      group.add(wireMesh)
+      // Orbiting Golden Ring
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat)
+      ringMesh.rotation.x = Math.PI / 4
+      group.add(ringMesh)
 
-      const pointLight = new THREE.PointLight(0xffdf7a, 3.0, 55, 2.0)
-      group.add(pointLight)
-
-      const vesicleCount = 45
-      const vGeo = new THREE.BufferGeometry()
-      const vPos = new Float32Array(vesicleCount * 3)
-
-      for (let i = 0; i < vesicleCount; i++) {
-        const angle = (i / vesicleCount) * Math.PI * 2
-        const r = 7.5 + Math.random() * 3.0
-        vPos[i * 3] = Math.cos(angle) * r
-        vPos[i * 3 + 1] = (Math.random() - 0.5) * 3.5
-        vPos[i * 3 + 2] = Math.sin(angle) * r
-      }
-
-      vGeo.setAttribute('position', new THREE.BufferAttribute(vPos, 3))
-      const vMat = new THREE.PointsMaterial({
-        color: 0x00f0ff,
-        size: 0.5,
-        transparent: true,
-        opacity: 0.85,
-        blending: THREE.AdditiveBlending,
-      })
-      const vesicles = new THREE.Points(vGeo, vMat)
-      group.add(vesicles)
+      // Beacon Point Light
+      const beaconLight = new THREE.PointLight(0x00f0ff, 3.5, 60, 2.0)
+      group.add(beaconLight)
 
       this.scene.add(group)
 
-      this.somaLandmarks.push({
+      this.orbitalStations.push({
         group,
-        coreMesh,
-        wireMesh,
-        light: pointLight,
-        vesicles,
-        uPos: u,
+        monolithMesh,
+        ringMesh,
+        beaconLight,
+        uPos: spec.u,
+        title: spec.title,
       })
     })
   }
@@ -639,23 +715,23 @@ export class ThresholdWorldEngine {
     }
 
     try {
-      report(8, 'Detecting cosmic synaptic signals')
+      report(8, 'Aligning deep space observatories & orbital telemetry...')
       await new Promise((r) => setTimeout(r, 160))
 
-      report(30, 'Sculpting axon highway & Nodes of Ranvier')
+      report(28, 'Igniting relativistic warp drive & Kerr accretion disc...')
       await new Promise((r) => setTimeout(r, 200))
 
-      report(60, 'Igniting cortical nebulae & neurotransmitter starfield')
+      report(55, 'Mapping gravitational lensing & stellar coordinate grid...')
       await new Promise((r) => setTimeout(r, 220))
 
-      report(85, 'Charging Hodgkin-Huxley action potentials')
+      report(82, 'Synchronizing Ankush Malothia’s core architecture systems...')
       await this.renderer.compileAsync(this.scene, this.camera)
 
-      report(100, 'Cosmic neural continuum ready. Enter the domain.')
+      report(100, 'Cosmic portal locked. Step into Ankush’s universe.')
       options?.onReady?.()
     } catch (e) {
       console.error('Initialization error:', e)
-      report(100, 'Cosmic neural continuum ready.')
+      report(100, 'Cosmic portal locked.')
       options?.onReady?.()
     }
   }
@@ -673,42 +749,40 @@ export class ThresholdWorldEngine {
 
   public updateCameraPose(tIntro: number, mode: WorldMode): void {
     if (mode === 'loading') {
-      const t = (performance.now() - this.startTime) * 0.0007
+      const t = (performance.now() - this.startTime) * 0.0006
       const u = 0.001
       const spinePoint = this.curve.getPointAt(u)
       const tangent = this.curve.getTangentAt(u)
 
       const cameraX = spinePoint.x + Math.sin(t * 0.8) * 2.5
-      const cameraY = spinePoint.y + 4.8 + Math.cos(t * 0.6) * 1.2
+      const cameraY = spinePoint.y + 5.2 + Math.cos(t * 0.6) * 1.2
       const cameraZ = spinePoint.z + 18.0
 
       this.camera.position.set(cameraX, cameraY, cameraZ)
-      this.desiredLookTarget.copy(spinePoint).addScaledVector(tangent, 35)
+      this.desiredLookTarget.copy(spinePoint).addScaledVector(tangent, 38)
       this.camera.fov = 46.0
     } else if (mode === 'intro') {
-      // Forward Fly-Through along the curved neural axon
-      // Accelerates smoothly from u = 0.001 to u = 0.05
+      // Forward Warp Fly-Through into Ankush's space domain
       const uFlight = tIntro * tIntro * (3 - 2 * tIntro)
-      const uSpline = THREE.MathUtils.lerp(0.001, 0.052, uFlight)
+      const uSpline = THREE.MathUtils.lerp(0.001, 0.056, uFlight)
 
       const spinePoint = this.curve.getPointAt(uSpline)
       const tangent = this.curve.getTangentAt(uSpline)
       const normal = this.frenetFrames.normals[Math.min(Math.floor(uSpline * this.splineSegments), this.splineSegments)]
 
-      const cameraPos = spinePoint.clone().addScaledVector(normal, THREE.MathUtils.lerp(4.8, 2.8, uFlight))
-      this.camera.position.copy(cameraPos)
-      this.desiredLookTarget.copy(spinePoint).addScaledVector(tangent, 40)
-      this.camera.fov = THREE.MathUtils.lerp(46.0, 58.0, uFlight)
-    } else if (mode === 'transition' || mode === 'journey') {
-      // Journey Mode driven by scroll: u from 0.05 to 0.96
-      const uSpline = THREE.MathUtils.lerp(0.052, 0.96, this.smoothScrollProgress)
-      const spinePoint = this.curve.getPointAt(uSpline)
-      const tangent = this.curve.getTangentAt(uSpline)
-      const normal = this.frenetFrames.normals[Math.min(Math.floor(uSpline * this.splineSegments), this.splineSegments)]
-
-      const cameraPos = spinePoint.clone().addScaledVector(normal, 2.8)
+      const cameraPos = spinePoint.clone().addScaledVector(normal, THREE.MathUtils.lerp(5.2, 2.6, uFlight))
       this.camera.position.copy(cameraPos)
       this.desiredLookTarget.copy(spinePoint).addScaledVector(tangent, 45)
+      this.camera.fov = THREE.MathUtils.lerp(46.0, 60.0, uFlight)
+    } else if (mode === 'transition' || mode === 'journey') {
+      const uSpline = THREE.MathUtils.lerp(0.056, 0.96, this.smoothScrollProgress)
+      const spinePoint = this.curve.getPointAt(uSpline)
+      const tangent = this.curve.getTangentAt(uSpline)
+      const normal = this.frenetFrames.normals[Math.min(Math.floor(uSpline * this.splineSegments), this.splineSegments)]
+
+      const cameraPos = spinePoint.clone().addScaledVector(normal, 2.6)
+      this.camera.position.copy(cameraPos)
+      this.desiredLookTarget.copy(spinePoint).addScaledVector(tangent, 50)
       this.camera.fov = 55.0
     }
 
@@ -738,20 +812,30 @@ export class ThresholdWorldEngine {
     if (this.mode === 'intro') {
       this.introTime += dt
       introT = THREE.MathUtils.clamp(this.introTime / this.introDuration, 0, 1)
-      entranceBoost = Math.sin(introT * Math.PI) * 1.5
+      entranceBoost = Math.sin(introT * Math.PI) * 1.6
     }
 
     // Camera Kinematics
     this.updateCameraPose(introT, this.mode)
 
-    // Update Axon Shaders
-    if (this.axonMaterial) {
-      this.axonMaterial.uniforms.uTime.value = timeSec
-      this.axonMaterial.uniforms.uScroll.value = this.smoothScrollProgress
-      this.axonMaterial.uniforms.uVelocity.value = this.scrollVelocity + (this.mode === 'intro' ? 1.8 : 0)
+    // Update Kerr Black Hole
+    if (this.kerrMaterial) {
+      this.kerrMaterial.uniforms.uTime.value = timeSec
+      // Face towards camera
+      this.kerrBlackHoleMesh.lookAt(this.camera.position)
     }
 
-    // Update Cosmic Starfield Shaders & Warp Streaks
+    // Update Crystalline Ribbon Highway
+    if (this.ribbonMaterial) {
+      this.ribbonMaterial.uniforms.uTime.value = timeSec
+      this.ribbonMaterial.uniforms.uVelocity.value = this.scrollVelocity + (this.mode === 'intro' ? 2.0 : 0)
+    }
+    if (this.axonMaterial) {
+      this.axonMaterial.uniforms.uTime.value = timeSec
+      this.axonMaterial.uniforms.uVelocity.value = this.scrollVelocity
+    }
+
+    // Update Starfield & Warp Streaks
     if (this.starfieldMaterial) {
       this.starfieldMaterial.uniforms.uTime.value = timeSec
       this.starfieldMaterial.uniforms.uCameraZ.value = this.camera.position.z
@@ -759,7 +843,7 @@ export class ThresholdWorldEngine {
       this.starfieldMaterial.uniforms.uEntranceBoost.value = entranceBoost
     }
 
-    // Update Cortical Nebulae
+    // Update Nebulae
     if (this.nebulaMaterial) {
       this.nebulaMaterial.uniforms.uTime.value = timeSec
       this.nebulaMeshes.forEach((m, idx) => {
@@ -767,30 +851,28 @@ export class ThresholdWorldEngine {
       })
     }
 
-    // Update Spike Light (travels ahead of camera along the curve)
+    // Update Photon Light
     const currentUSpline = this.mode === 'loading'
       ? 0.015
       : this.mode === 'intro'
       ? THREE.MathUtils.lerp(0.01, 0.065, introT)
       : THREE.MathUtils.lerp(0.065, 0.98, this.smoothScrollProgress)
 
-    const spikePoint = this.curve.getPointAt(Math.min(1.0, currentUSpline + 0.02))
-    this.spikeLight.position.copy(spikePoint).add(new THREE.Vector3(0, 2.5, 0))
+    const photonPoint = this.curve.getPointAt(Math.min(1.0, currentUSpline + 0.025))
+    this.photonLight.position.copy(photonPoint).add(new THREE.Vector3(0, 3.0, 0))
 
-    // Update Landmark Soma Nuclei
-    this.somaLandmarks.forEach((landmark) => {
-      landmark.coreMesh.rotation.x = timeSec * 0.4
-      landmark.coreMesh.rotation.y = timeSec * 0.5
-      landmark.wireMesh.rotation.y = -timeSec * 0.35
-      landmark.vesicles.rotation.y = timeSec * 0.6
+    // Update Orbital Monolith Stations
+    this.orbitalStations.forEach((station) => {
+      station.monolithMesh.rotation.y = timeSec * 0.45
+      station.ringMesh.rotation.z = timeSec * 0.65
 
-      const landmarkZ = landmark.group.position.z
-      const dist = Math.abs(this.camera.position.z - landmarkZ)
-      const arrivalFlare = Math.max(0.0, 1.0 - dist / 55.0)
+      const stationZ = station.group.position.z
+      const dist = Math.abs(this.camera.position.z - stationZ)
+      const proximity = Math.max(0.0, 1.0 - dist / 60.0)
 
-      landmark.light.intensity = 2.5 + arrivalFlare * 9.5
-      const scale = 1.0 + Math.sin(timeSec * 3.0) * 0.08 + arrivalFlare * 0.4
-      landmark.coreMesh.scale.set(scale, scale, scale)
+      station.beaconLight.intensity = 3.0 + proximity * 10.0
+      const scale = 1.0 + proximity * 0.25
+      station.group.scale.set(scale, scale, scale)
     })
 
     this.renderer.render(this.scene, this.camera)
