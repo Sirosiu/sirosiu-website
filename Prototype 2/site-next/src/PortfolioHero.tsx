@@ -329,7 +329,7 @@ export default function PortfolioHero({
             <p className="systems-stack-sub">
               Select an architectural layer to inspect verified hardware specifications, runtime benchmarks, and domain tooling.
             </p>
-            <UnifiedTactilePipelineStack isLight={isLight} />
+            <UnifiedTactilePipelineStack isLight={isLight} onNavigate={onNavigate} />
           </div>
         </section>
 

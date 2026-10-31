@@ -40,10 +40,10 @@ export default function AboutSection() {
               </div>
             </div>
             <p className="edu-field">Electronics &amp; Communication Engineering (ECE)</p>
-            <p className="edu-institution" style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', marginTop: '4px', fontWeight: 500 }}>
+            <p className="edu-institution">
               Dr. B. R. Ambedkar National Institute of Technology, Jalandhar (NIT Jalandhar)
             </p>
-            <p style={{ fontSize: '12px', color: '#f59e0b', marginTop: '2px', fontFamily: 'var(--font-mono, monospace)' }}>
+            <p className="edu-grad-year">
               Expected Graduation: 2028
             </p>
             <div className="edu-divider" />

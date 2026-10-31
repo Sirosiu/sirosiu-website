@@ -12,6 +12,8 @@ export type ProjectDomain =
   | 'Machine Learning & Full-Stack'
   | 'Creative Engineering'
 
+export type ProjectRepoStatus = 'public' | 'private' | 'in-progress' | 'lab-archive'
+
 export interface ProjectItem {
   id: string
   index: string
@@ -20,6 +22,7 @@ export interface ProjectItem {
   domain: ProjectDomain
   domainCode: string
   status: ProjectLifecycleStatus
+  repoStatus: ProjectRepoStatus
   builtScope: string
   plannedScope: string
   summary: string
@@ -39,10 +42,11 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     id: 'ave-agent',
     index: '01',
     title: 'Ave: Personal AI Agent & Wearable OS',
-    tagline: 'Privacy-first personal autonomous agent for natural-language interaction, tool execution, and episodic memory.',
+    tagline: 'Privacy-first personal autonomous agent prototype for natural-language interaction, tool execution, and episodic memory.',
     domain: 'Applied AI & Agents',
     domainCode: 'AI-SYS-01',
     status: 'In progress',
+    repoStatus: 'in-progress',
     builtScope: 'Agent architecture, local LLM experimentation, tool use, memory graph, and voice/text interaction.',
     plannedScope: 'Wearable hardware integration, quantized local inference, and controlled device actions.',
     summary:
@@ -78,6 +82,7 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     domain: 'Machine Learning & Full-Stack',
     domainCode: 'ML-SYS-02',
     status: 'Built',
+    repoStatus: 'public',
     builtScope: 'Trained XGBoost transaction classifier on Kaggle Credit Card dataset with severe imbalance compensation.',
     plannedScope: 'Online streaming inference with Apache Kafka and automated feedback loop for false positive reduction.',
     summary:
@@ -91,7 +96,7 @@ export const DEMO_PROJECTS: ProjectItem[] = [
       { label: 'DATASET', value: 'Kaggle Credit' },
     ],
     tags: ['Python', 'XGBoost', 'scikit-learn', 'FastAPI', 'WebSockets', 'SQLite', 'Next.js', 'TypeScript'],
-    repoUrl: 'https://github.com/Sirosiu/fraudlens',
+    repoUrl: 'https://github.com/Sirosiu/Fraudlens',
     demoUrl: '#demo-fraudlens',
     contributions: [
       'Trained an XGBoost transaction classifier on Kaggle’s Credit Card Fraud Detection dataset using class weighting for severe class imbalance.',
@@ -100,7 +105,7 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     ],
     outcomes: [
       'High precision-recall tradeoff ensuring minimal false alarms while catching anomalous spikes.',
-      'Sub-15ms end-to-end evaluation latency from transaction receipt to dashboard alert.',
+      'Sub-15ms end-to-end evaluation latency (<12ms model inference) from transaction receipt to dashboard alert.',
     ],
     coverGradient: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.15))',
     icon: '🛡️',
@@ -113,6 +118,7 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     domain: 'RF Engineering',
     domainCode: 'EM-RF-03',
     status: 'Built',
+    repoStatus: 'lab-archive',
     builtScope: 'Simulated 2.4 GHz half-wave dipole in CST (VSWR 1.01), inset-fed patch, and 2.6 GHz broadside array.',
     plannedScope: 'PCB microstrip fabrication and anechoic chamber radiation pattern measurement.',
     summary:
@@ -120,7 +126,7 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     architectureHighlight:
       'FDTD full-wave simulation, NF2FF transformation, impedance matching optimization, and ParaView 3D field visualization pipeline.',
     metrics: [
-      { label: 'MIN VSWR', value: '1.01' },
+      { label: 'SIM VSWR', value: '1.01' },
       { label: 'RESONANCE', value: '2.34 GHz' },
       { label: 'HELICAL BANDS', value: '1 & 2.4 GHz' },
       { label: '3D EXPORT', value: 'ParaView' },
@@ -129,13 +135,13 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     repoUrl: 'https://github.com/Sirosiu/antenna-modeling',
     demoUrl: '#demo-antenna',
     contributions: [
-      'Simulated a 2.4 GHz half-wave dipole in CST, observing resonance near 2.34 GHz and minimum VSWR of 1.01.',
+      'Simulated a 2.4 GHz half-wave dipole in CST, observing resonance near 2.34 GHz and minimum simulated VSWR of 1.01.',
       'Modeled an inset-fed patch and a broadside array near 2.6 GHz with optimized impedance matching.',
       'Used openEMS and MATLAB to model a 5.8 GHz patch and helical antennas at 1 and 2.4 GHz, exporting 3D results to ParaView.',
     ],
     outcomes: [
-      'Validated sub-1.05 VSWR across primary resonance bands.',
-      'Extracted accurate near-field-to-far-field radiation patterns and current distributions in 3D.',
+      'Validated sub-1.05 simulated VSWR across primary resonance bands in CST Studio Suite.',
+      'Extracted near-field-to-far-field radiation patterns and surface current distributions in 3D.',
     ],
     coverGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.15))',
     icon: '📡',
@@ -148,6 +154,7 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     domain: 'Computer Architecture',
     domainCode: 'ARCH-RTL-04',
     status: 'Built',
+    repoStatus: 'private',
     builtScope: '5-stage in-order CPU RTL in SystemVerilog, hazard unit with forwarding, 4x4 systolic matrix co-processor.',
     plannedScope: 'FPGA hardware board bring-up on Xilinx Artix-7 and open-source ASIC tape-out flow.',
     summary:
@@ -166,10 +173,10 @@ export const DEMO_PROJECTS: ProjectItem[] = [
     contributions: [
       'Authored modular RTL in SystemVerilog for Fetch, Decode, Execute, Memory, and Writeback stages.',
       'Designed custom hazard unit resolving RAW dependencies via forwarding paths without pipeline bubbles.',
-      'Passed 100% of official RISC-V architectural compliance test suite.',
+      'Verified cycle-accurate execution in Verilator testbench automation.',
     ],
     outcomes: [
-      'Passed 100% of official RISC-V architectural compliance tests (riscv-tests suite).',
+      'Passed 100% of official RISC-V architectural compliance tests (riscv-tests suite in simulation).',
       'Demonstrated 4.2x cycle reduction on 16x16 matrix convolution compared to baseline software emulation.',
     ],
     coverGradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.15))',
@@ -177,22 +184,23 @@ export const DEMO_PROJECTS: ProjectItem[] = [
   },
   {
     id: 'rf-patch-array',
-    index: '03',
+    index: '05',
     title: 'Dual-Band Microstrip Patch Antenna Array',
     tagline: 'High-frequency electromagnetic simulation, S-parameter optimization & far-field visualizer.',
     domain: 'RF Engineering',
-    domainCode: 'EM-RF-03',
+    domainCode: 'EM-RF-05',
     status: 'Built',
+    repoStatus: 'lab-archive',
     builtScope: 'Analytical transmission line modeling, 3D FDTD full-wave CST/OpenEMS simulation, S11 optimization (< -22dB), WebGL 3D radiation visualizer.',
     plannedScope: 'Physical PCB milling fabrication and vector network analyzer (VNA) anechoic chamber measurements.',
     summary:
-      'Dual-band 2.45 GHz & 5.8 GHz microstrip patch antenna array designed on FR4 and Rogers RO4350B substrates. Employs inset-fed impedance matching and an optimized corporate feeding network to minimize reflection losses and maximize directional gain.',
+      'Dual-band 2.45 GHz & 5.8 GHz microstrip patch antenna array modeled on FR4 and Rogers RO4350B substrates. Employs inset-fed impedance matching and an optimized corporate feeding network to minimize reflection losses and maximize directional gain.',
     architectureHighlight:
       'Full-wave 3D electromagnetic FDTD simulation, corporate power divider with quarter-wave transformers, and custom WebGL radiation pattern visualizer.',
     metrics: [
-      { label: 'RETURN LOSS (S11)', value: '-22.4 dB' },
-      { label: 'PEAK GAIN', value: '+7.8 dBi' },
-      { label: 'VSWR', value: '1.16 : 1' },
+      { label: 'SIM S11 LOSS', value: '-22.4 dB' },
+      { label: 'SIM GAIN', value: '+7.8 dBi' },
+      { label: 'SIM VSWR', value: '1.16 : 1' },
       { label: 'BANDS', value: '2.45 & 5.8 GHz' },
     ],
     tags: ['MATLAB', 'CST Studio', 'OpenEMS', 'FDTD Method', 'Antenna Design', 'S-Parameters', 'WebGL'],
@@ -204,7 +212,7 @@ export const DEMO_PROJECTS: ProjectItem[] = [
       'Developed MATLAB automated scripts for continuous parameter sweeping and impedance matching.',
     ],
     outcomes: [
-      'Achieved S11 return loss of -22.4 dB at 2.45 GHz resonance with bandwidth covering full ISM band.',
+      'Achieved simulated S11 return loss of -22.4 dB at 2.45 GHz resonance with bandwidth covering full ISM band.',
       'Synthesized radiation visualizer rendering elevation and azimuth plane cuts directly in the browser.',
     ],
     coverGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.15))',

@@ -273,9 +273,9 @@ export default function ContactSection({ isLight = false }: ContactSectionProps 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="silicon-action-btn"
-                  data-eda-tag="[VERIFY DIE PAYLOAD ↗]"
+                  data-eda-tag="[VIEW RÉSUMÉ ↗]"
                 >
-                  VERIFY DIE ↗
+                  VIEW RÉSUMÉ ↗
                 </a>
               </div>
             </div>

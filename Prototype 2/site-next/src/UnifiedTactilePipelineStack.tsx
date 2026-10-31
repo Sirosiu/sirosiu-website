@@ -46,7 +46,7 @@ const STACK_STAGES: StackStage[] = [
     domain: 'Autonomous Intelligence Systems',
     coreLanguages: 'Autonomous Agents · NPU Acceleration · PyTorch',
     tools: ['Autonomous Agent Runtimes', 'Local LLMs', 'PyTorch', 'ONNX Runtime', 'C++', 'Python', 'Quantization (GGUF)'],
-    verifiedSpec: 'Sub-40ms on-device agent routing loop, 128-dim vector embeddings, and tool orchestration',
+    verifiedSpec: 'Sub-48ms on-device agent routing loop, 128-dim vector embeddings, and tool orchestration',
     busLabel: 'LAYER 03 · ON-DEVICE AGENT & NPU ORCHESTRATION',
     zOffsetPx: 72,
   },
@@ -58,7 +58,7 @@ const STACK_STAGES: StackStage[] = [
     domain: 'Electromagnetics & Hardware',
     coreLanguages: 'Antenna Arrays · CST Studio · HFSS · PCB',
     tools: ['Antenna Arrays', 'CST Studio', 'Smith Charts', 'VNA S-Parameters', 'HFSS', 'KiCad PCB'],
-    verifiedSpec: '5.8 GHz ISM patch array with S11 return loss < -24 dB and 6.2 dBi measured gain',
+    verifiedSpec: '5.8 GHz ISM patch array with simulated S11 return loss < -22.4 dB and 7.8 dBi simulated gain (CST / OpenEMS FDTD)',
     busLabel: 'LAYER 04 · HIGH-FREQUENCY EM & PHYSICAL INTERFACE',
     zOffsetPx: 108,
   },
@@ -66,9 +66,10 @@ const STACK_STAGES: StackStage[] = [
 
 interface UnifiedTactilePipelineStackProps {
   isLight?: boolean
+  onNavigate?: (path: string) => void
 }
 
-export default function UnifiedTactilePipelineStack({}: UnifiedTactilePipelineStackProps = {}) {
+export default function UnifiedTactilePipelineStack({ onNavigate }: UnifiedTactilePipelineStackProps = {}) {
   const [activeStage, setActiveStage] = useState(0)
   const [isExploded, setIsExploded] = useState(false)
   const current = STACK_STAGES[activeStage]
@@ -97,9 +98,10 @@ export default function UnifiedTactilePipelineStack({}: UnifiedTactilePipelineSt
 
   const handleScrollToWork = (e: React.MouseEvent) => {
     e.preventDefault()
-    const target = document.getElementById('work')
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' })
+    if (onNavigate) {
+      onNavigate('/projects')
+    } else {
+      window.location.href = '/projects'
     }
   }
 
@@ -235,10 +237,10 @@ export default function UnifiedTactilePipelineStack({}: UnifiedTactilePipelineSt
             type="button"
             onClick={handleScrollToWork}
             className="bus-explore-action"
-            title="Explore matching engineering projects"
-            data-eda-tag="[EXPLORE WORK ↓]"
+            title="Explore matching engineering architectures and projects"
+            data-eda-tag="[EXPLORE ARCHITECTURES →]"
           >
-            VIEW PROJECTS ↓
+            VIEW ARCHITECTURES →
           </button>
         </div>
       </div>

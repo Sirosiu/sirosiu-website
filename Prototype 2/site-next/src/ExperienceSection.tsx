@@ -2,7 +2,7 @@ export default function ExperienceSection() {
   const experiences = [
     {
       period: '2024 – PRESENT',
-      role: 'Lead Systems & AI Architect',
+      role: 'Independent System Architect & Core Maintainer',
       organization: 'Ave Core Maintainer · Independent System',
       badge: 'ACTIVE ARCHITECTURE',
       badgeType: 'active',
@@ -32,7 +32,7 @@ export default function ExperienceSection() {
     },
     {
       period: '2023 – 2024',
-      role: 'High-Frequency RF & Antenna Design Engineer',
+      role: 'RF & Electromagnetics Student Researcher',
       organization: 'ECE Communications Laboratory',
       badge: 'LAB RESEARCH',
       badgeType: 'lab',
@@ -40,8 +40,8 @@ export default function ExperienceSection() {
         'Conducted electromagnetic field modeling, microstrip patch antenna array geometry optimization, and impedance matching for dual-band wireless links.',
       deliverables: [
         'Designed 2.4/5.8GHz dual-band patch antenna array with optimized corporate microstrip feeding network.',
-        'Validated S-parameters in CST Studio Suite and OpenEMS FDTD, achieving return loss S11 < -22 dB and VSWR < 1.15.',
-        'Generated far-field 3D radiation gain patterns (7.8 dBi) and surface current density maps using custom MATLAB scripts.',
+        'Validated S-parameters in CST Studio Suite and OpenEMS FDTD simulations, achieving simulated return loss S11 < -22.4 dB and VSWR < 1.16.',
+        'Generated far-field 3D radiation gain patterns (7.8 dBi simulated gain) and surface current density maps using custom MATLAB scripts.',
       ],
       skills: ['CST Studio Suite', 'OpenEMS (FDTD)', 'MATLAB', 'S-Parameters', 'VSWR', 'Radiation Patterns', 'DSP'],
     },
@@ -100,7 +100,7 @@ export default function ExperienceSection() {
                 <p className="exp-summary">{exp.summary}</p>
 
                 <div className="exp-deliverables-block">
-                  <h4 className="exp-deliverables-title">VERIFIED DELIVERABLES & OUTCOMES:</h4>
+                  <h4 className="exp-deliverables-title">KEY DELIVERABLES & EVALUATIONS:</h4>
                   <ul className="exp-deliverables-list">
                     {exp.deliverables.map((item, dIdx) => (
                       <li key={dIdx}>{item}</li>
