@@ -15,6 +15,7 @@ export const Concept04WorldEntrance: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const engineRef = useRef<ThresholdWorldEngine | null>(null)
   const audioRef = useRef<WorldAudio | null>(null)
+  const bottomPanelRef = useRef<HTMLDivElement>(null)
 
   // Loader state
   const [loadPercent, setLoadPercent] = useState<number>(0)
@@ -42,6 +43,25 @@ export const Concept04WorldEntrance: React.FC = () => {
       audioRef.current?.dispose()
       audioRef.current = null
     }
+  }, [])
+
+  // 1b. Interactive Pointer Parallax Tilt
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      const xNorm = (e.clientX / window.innerWidth - 0.5) * 2.0
+      const yNorm = (e.clientY / window.innerHeight - 0.5) * 2.0
+      engineRef.current?.setPointer(xNorm, yNorm)
+
+      if (bottomPanelRef.current) {
+        const tiltX = (xNorm * 9).toFixed(2)
+        const tiltY = (-yNorm * 9).toFixed(2)
+        bottomPanelRef.current.style.setProperty('--tilt-x', `${tiltX}deg`)
+        bottomPanelRef.current.style.setProperty('--tilt-y', `${tiltY}deg`)
+      }
+    }
+
+    window.addEventListener('pointermove', handlePointerMove)
+    return () => window.removeEventListener('pointermove', handlePointerMove)
   }, [])
 
   // 2. Initialize 3D Engine & Paced Preloader
@@ -230,6 +250,11 @@ export const Concept04WorldEntrance: React.FC = () => {
           className={`c04-loader ${isDeparting ? 'departing' : ''}`}
           aria-label="Preparing Ankush Malothia celestial cosmos"
         >
+          <div className="c04-loader-badge" aria-hidden="true">
+            <span className="c04-badge-dot" />
+            <span>SECTOR 04 // CARINA NEBULAR COMPLEX · RA 10h 45m 03s · DEC -59° 52′ 04″</span>
+          </div>
+
           <div className="c04-loader-art" aria-hidden="true" />
           <div className="c04-loader-haze" aria-hidden="true" />
 
@@ -240,7 +265,7 @@ export const Concept04WorldEntrance: React.FC = () => {
             of the known universe.
           </h2>
 
-          <div className="c04-loader-bottom">
+          <div ref={bottomPanelRef} className="c04-loader-bottom">
             <div className="c04-loader-number">
               <span id="percent">{loadPercent}</span>
               <small>%</small>
