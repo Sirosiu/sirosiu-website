@@ -1,8 +1,12 @@
-// Concept03Experimental.tsx
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './ExperimentalStyles.css';
 
-export type FieldMode = 'CURL_FLUID' | 'CLIFFORD_ATTRACTOR' | 'POYNTING_RF' | 'QUANTUM_WAVE';
+export type SimulationEngine =
+  | '3D_VOLUMETRIC_RAYMARCH'
+  | 'CLIFFORD_PARTICLE_VORTEX'
+  | 'PHOSPHOR_CRT_OSCILLOSCOPE'
+  | 'MATRIX_ASCII_GLYPH_STREAM';
+
 export type PaletteId = 'CYBER_ACID' | 'SOLAR_PLASMA' | 'NEON_EMERALD' | 'QUANTUM_SILVER';
 
 interface PaletteSpec {
@@ -16,6 +20,7 @@ interface PaletteSpec {
   secondaryRgb: string;
   tertiary: string;
   tertiaryRgb: string;
+  amber: string;
 }
 
 const PALETTES: Record<PaletteId, PaletteSpec> = {
@@ -30,18 +35,20 @@ const PALETTES: Record<PaletteId, PaletteSpec> = {
     secondaryRgb: '59, 130, 246',
     tertiary: '#f43f5e',
     tertiaryRgb: '244, 63, 94',
+    amber: '#fbbf24',
   },
   SOLAR_PLASMA: {
     id: 'SOLAR_PLASMA',
     label: 'SOLAR_PLASMA',
-    abyss: '#09080c',
-    abyssRgb: '9, 8, 12',
+    abyss: '#09070c',
+    abyssRgb: '9, 7, 12',
     primary: '#fbbf24',
     primaryRgb: '251, 191, 36',
     secondary: '#f97316',
     secondaryRgb: '249, 115, 22',
     tertiary: '#f43f5e',
     tertiaryRgb: '244, 63, 94',
+    amber: '#a3e635',
   },
   NEON_EMERALD: {
     id: 'NEON_EMERALD',
@@ -54,6 +61,7 @@ const PALETTES: Record<PaletteId, PaletteSpec> = {
     secondaryRgb: '6, 182, 212',
     tertiary: '#a855f7',
     tertiaryRgb: '168, 85, 247',
+    amber: '#fbbf24',
   },
   QUANTUM_SILVER: {
     id: 'QUANTUM_SILVER',
@@ -64,8 +72,9 @@ const PALETTES: Record<PaletteId, PaletteSpec> = {
     primaryRgb: '226, 232, 240',
     secondary: '#93c5fd',
     secondaryRgb: '147, 197, 253',
-    tertiary: '#64748b',
-    tertiaryRgb: '100, 116, 139',
+    tertiary: '#f43f5e',
+    tertiaryRgb: '244, 63, 94',
+    amber: '#fbbf24',
   },
 };
 
@@ -75,7 +84,7 @@ interface ExperimentalProject {
   title: string;
   subtitle: string;
   energySignature: string;
-  recommendedMode: FieldMode;
+  recommendedEngine: SimulationEngine;
   harmonicFreq: number;
   vorticityGain: number;
   chromaticSplit: number;
@@ -95,9 +104,9 @@ const EXPERIMENTAL_PROJECTS: ExperimentalProject[] = [
     title: 'A.V.E. // Autonomous Cognitive Runtime',
     subtitle: 'Sovereign Voice, Episodic Vector Memory & Local Transformer Kernel',
     energySignature: '4.20 GB VRAM // 184ms WAKE-TO-TOKEN',
-    recommendedMode: 'CURL_FLUID',
-    harmonicFreq: 0.0036,
-    vorticityGain: 1.5,
+    recommendedEngine: '3D_VOLUMETRIC_RAYMARCH',
+    harmonicFreq: 0.0038,
+    vorticityGain: 1.55,
     chromaticSplit: 2.2,
     summary:
       'Low-latency local cognitive runtime coupling real-time acoustic wake detection, HNSW episodic memory graphs, and quantized GGUF inference with deterministic OS syscall execution.',
@@ -105,7 +114,7 @@ const EXPERIMENTAL_PROJECTS: ExperimentalProject[] = [
       'Cloud LLM APIs enforce high network tail-latency, zero persistent episodic state across reboots, and total loss of hardware/OS execution sovereignty.',
     architecture: [
       '[ALSA / PIPEWIRE RING] → Lock-free SPSC PCM audio stream into C++ Whisper VAD',
-      '[HNSW + SQLITE WAL] → Hybrid vector-episodic recall in less than 12ms without external DB daemons',
+      '[HNSW + SQLITE WAL] → Hybrid vector-episodic recall in under 12ms without external DB daemons',
       '[LLAMA.CPP INT4_K_M] → Speculative token decoding & sandboxed Rust/Python syscall bridge',
     ],
     telemetry: [
@@ -140,9 +149,9 @@ impl<const N: usize> LockFreePcmRing<N> {
     title: 'FraudLens // Temporal Graph Anomaly Vortex',
     subtitle: 'High-Frequency Financial Stream Scoring & Inline SHAP Attribution',
     energySignature: '14,800 TPS // 6.4ms P99 TAIL',
-    recommendedMode: 'CLIFFORD_ATTRACTOR',
+    recommendedEngine: 'CLIFFORD_PARTICLE_VORTEX',
     harmonicFreq: 0.0054,
-    vorticityGain: 1.85,
+    vorticityGain: 1.9,
     chromaticSplit: 2.9,
     summary:
       'Real-time transaction graph anomaly detector fusing sliding-window velocity tensors, calibrated XGBoost + TabNet ensembles, and inline SHAP compliance telemetry.',
@@ -176,9 +185,9 @@ impl<const N: usize> LockFreePcmRing<N> {
     title: 'Maxwell // 3D Electromagnetic Field Solver',
     subtitle: 'Full-Wave Radiation Synthesis & Automated Smith Impedance Matching',
     energySignature: '2.4GHz–28GHz // S11 -28.4 dB',
-    recommendedMode: 'POYNTING_RF',
-    harmonicFreq: 0.0066,
-    vorticityGain: 1.35,
+    recommendedEngine: 'PHOSPHOR_CRT_OSCILLOSCOPE',
+    harmonicFreq: 0.0064,
+    vorticityGain: 1.4,
     chromaticSplit: 2.0,
     summary:
       'Computational electromagnetics engine resolving 3D far-field directivity tensors, surface current densities, and quarter-wave stub matching networks.',
@@ -210,8 +219,8 @@ impl<const N: usize> LockFreePcmRing<N> {
     title: 'RV32I // 5-Stage Pipelined RISC-V Core',
     subtitle: 'Synthesizable Verilog Processor with Hazard Forwarding & Branch Logic',
     energySignature: '185 MHz SYNTH // 1.18 CPI',
-    recommendedMode: 'QUANTUM_WAVE',
-    harmonicFreq: 0.0028,
+    recommendedEngine: 'MATRIX_ASCII_GLYPH_STREAM',
+    harmonicFreq: 0.0031,
     vorticityGain: 1.65,
     chromaticSplit: 2.4,
     summary:
@@ -247,7 +256,7 @@ end`,
     title: 'Helios // 28GHz Phased Microstrip Array',
     subtitle: '4x4 Corporate Wilkinson Feed & Defected Ground Beamforming',
     energySignature: '16.4 dBi GAIN // ±42° STEERING',
-    recommendedMode: 'POYNTING_RF',
+    recommendedEngine: 'PHOSPHOR_CRT_OSCILLOSCOPE',
     harmonicFreq: 0.0072,
     vorticityGain: 1.95,
     chromaticSplit: 3.1,
@@ -279,34 +288,37 @@ AF = sum(exp(1j * (0:3)' * (k * d * sin(Theta) .* cos(Phi) + beta_x)));`,
     id: 'portfolio-sys',
     code: 'SYS-WEB-06',
     title: 'SIROSIU // Multi-Paradigm Generative Kernel',
-    subtitle: '4-Mode Physics Engine, WebAudio Synth & Zero-Overflow Architecture',
+    subtitle: '4-Engine Simulation Core, WebAudio Synth & Zero-Overflow Architecture',
     energySignature: '60 FPS LOCK // SUB-6ms FRAME',
-    recommendedMode: 'QUANTUM_WAVE',
-    harmonicFreq: 0.0042,
-    vorticityGain: 1.55,
+    recommendedEngine: '3D_VOLUMETRIC_RAYMARCH',
+    harmonicFreq: 0.0044,
+    vorticityGain: 1.6,
     chromaticSplit: 2.5,
     summary:
-      'Flagship creative engineering platform uniting 4 procedural vector field solvers, reactive Web Audio synthesis, and executable hardware/ML sandboxes.',
+      'Flagship creative engineering platform uniting 3D volumetric raymarching, Clifford particle attractors, CRT phosphor oscilloscopes, and reactive ASCII matrix streams.',
     problem:
       'Standard engineering portfolios rely on static templates rather than demonstrating live mathematical, acoustic, and systems execution in the browser.',
     architecture: [
-      '[4-MODE SOLVER] → Real-time Curl Fluid, Clifford Attractor, Poynting RF & Quantum Wave fields',
-      '[WEBAUDIO DRONE] → Biquad-filtered harmonic oscillators modulated by particle vorticity',
+      '[4-ENGINE CORE] → Real-time 3D Volumetric Raymarch, Clifford Vortex, CRT Scope & ASCII Matrix',
+      '[WEBAUDIO DRONE] → Biquad-filtered harmonic oscillators + tactile UI micro-tonal clicks',
       '[EXECUTABLE LABS] → Interactive Smith Chart, RV32I Clock Stepper, VAD & Fraud Radar',
     ],
     telemetry: [
-      { k: 'FRAME BUDGET', v: '< 6.0 ms', tier: 'primary' },
-      { k: 'PHYSICS MODES', v: '04 Engines', tier: 'secondary' },
+      { k: 'FRAME BUDGET', v: 'Under 6.0 ms', tier: 'primary' },
+      { k: 'RENDER ENGINES', v: '04 Real-Time', tier: 'secondary' },
       { k: 'MIN VIEWPORT', v: '320px Locked', tier: 'tertiary' },
-      { k: 'SIGNATURE MARK', v: 'SHINO v3.5', tier: 'primary' },
+      { k: 'SIGNATURE MARK', v: 'SHINO v4.0', tier: 'primary' },
     ],
-    codeTitle: 'curl_advection_kernel.ts',
-    codeSnippet: `function stepCurlParticle(x: number, y: number, t: number, eps = 1.5) {
-  const dPsiDy = (potential(x, y + eps, t) - potential(x, y - eps, t)) / (2 * eps);
-  const dPsiDx = (potential(x + eps, y, t) - potential(x - eps, y, t)) / (2 * eps);
-  return { vx: dPsiDy * GAIN, vy: -dPsiDx * GAIN }; // Divergence ∇·v === 0
+    codeTitle: 'volumetric_raymarch_kernel.ts',
+    codeSnippet: `function sampleVolumetricGyroid(x: number, y: number, z: number, t: number): number {
+  const s = 1.65;
+  const gx = Math.sin(x * s + t) * Math.cos(y * s) +
+             Math.sin(y * s + t) * Math.cos(z * s) +
+             Math.sin(z * s) * Math.cos(x * s - t);
+  const envelope = Math.exp(-0.42 * (x * x + y * y + z * z));
+  return Math.max(0, (1.15 - Math.abs(gx)) * envelope);
 }`,
-    stack: ['TypeScript', 'React', 'Canvas 2D', 'Web Audio API', 'CSS Grid Math'],
+    stack: ['TypeScript', 'React', 'Canvas 2D / 3D Projection', 'Web Audio API', 'CSS Grid Math'],
   },
 ];
 
@@ -368,20 +380,50 @@ const PIPELINE_CYCLES = [
   },
 ];
 
+const ENGINE_METADATA: Record<
+  SimulationEngine,
+  { badge: string; title: string; math: string; desc: string }
+> = {
+  '3D_VOLUMETRIC_RAYMARCH': {
+    badge: 'ENGINE 01 // VOLUMETRIC RAYMARCH',
+    title: '3D Raymarched Gyroid Density & Iso-Slicing',
+    math: 'ρ(x,y,z) = exp(-αr²) · [sin(x)cos(y) + sin(y)cos(z) + sin(z)cos(x)]',
+    desc: 'Interactive 3D orbital ray-sliced density lattice with specular Phong illumination and depth-sorted volumetric emission.',
+  },
+  'CLIFFORD_PARTICLE_VORTEX': {
+    badge: 'ENGINE 02 // CLIFFORD ATTRACTOR',
+    title: '2,250-Particle Chaotic Attractor & Chromatic Split',
+    math: 'x_{n+1} = sin(a·y_n) + c·cos(a·x_n),  y_{n+1} = sin(b·x_n) + d·cos(b·y_n)',
+    desc: 'High-density strange attractor filaments fused with divergence-free curl vorticity and velocity-mapped RGB dispersion.',
+  },
+  'PHOSPHOR_CRT_OSCILLOSCOPE': {
+    badge: 'ENGINE 03 // CRT OSCILLOSCOPE',
+    title: 'Dual-Trace Phosphor Vector Scope & Smith Harmonics',
+    math: 'Γ(ω) = (Z_L(ω) - Z_0) / (Z_L(ω) + Z_0) // Lissajous X-Y Phase',
+    desc: 'Simulated analog electron beam with phosphor persistence, 28GHz carrier modulation, FFT harmonic spikes, and impedance locus.',
+  },
+  'MATRIX_ASCII_GLYPH_STREAM': {
+    badge: 'ENGINE 04 // ASCII GLYPH STREAM',
+    title: 'Procedural Tensor Glyph Rasterizer & Vector Matrix',
+    math: 'G(i,j,t) = LUT[ ⌊ ||∇ × Ψ(i,j,t)||₂ · N_glyphs ⌋ ]',
+    desc: 'Real-time mathematical fluid advection quantized into glowing ANSI/Unicode engineering glyphs and directional phase arrows.',
+  },
+};
+
 export const Concept03Experimental: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Core Visual & Physics State
-  const [fieldMode, setFieldMode] = useState<FieldMode>('CURL_FLUID');
+  // Core Visual & Simulation Engine State
+  const [engine, setEngine] = useState<SimulationEngine>('3D_VOLUMETRIC_RAYMARCH');
   const [paletteId, setPaletteId] = useState<PaletteId>('CYBER_ACID');
   const [activeProject, setActiveProject] = useState<ExperimentalProject>(EXPERIMENTAL_PROJECTS[0]);
   const [dossierOpen, setDossierOpen] = useState<boolean>(false);
 
   // Synthesizer & Simulation Parameters
-  const [curlScale, setCurlScale] = useState<number>(0.0036);
-  const [turbulenceGain, setTurbulenceGain] = useState<number>(1.5);
+  const [curlScale, setCurlScale] = useState<number>(0.0038);
+  const [turbulenceGain, setTurbulenceGain] = useState<number>(1.55);
   const [dispersionOffset, setDispersionOffset] = useState<number>(2.2);
-  const [trailPersistence, setTrailPersistence] = useState<number>(0.91);
+  const [trailPersistence, setTrailPersistence] = useState<number>(0.9);
   const [gravityWellActive, setGravityWellActive] = useState<boolean>(false);
 
   // Web Audio API State
@@ -394,37 +436,64 @@ export const Concept03Experimental: React.FC = () => {
 
   // HUD Live Readouts
   const [hudMetrics, setHudMetrics] = useState({
-    meanSpeed: '2.84',
-    peakVorticity: '1.92',
-    reynolds: '4,280',
+    meanSpeed: '3.12',
+    peakVorticity: '2.08',
+    reynolds: '4,620',
     cursorVec: '(0.0, 0.0)',
   });
 
   // --- INTERACTIVE LAB SANDBOX STATES ---
-  // Sandbox 1: Smith Chart Tuner
+  // Sandbox 1: 50Ω Smith Chart Tuner
   const [smithR, setSmithR] = useState<number>(52);
-  const [smithX, setSmithX] = useState<number>(14);
+  const [smithX, setSmithX] = useState<number>(18);
 
   // Sandbox 2: RV32I Pipeline Clock Stepper
   const [clockStep, setClockStep] = useState<number>(1);
 
   // Sandbox 3: VAD Acoustic Streamer
   const [vadThreshold, setVadThreshold] = useState<number>(42);
-  const [vadSignalLevel, setVadSignalLevel] = useState<number>(68);
+  const [vadSignalLevel, setVadSignalLevel] = useState<number>(72);
 
   // Sandbox 4: FraudLens Anomaly Radar
   const [txVelocity, setTxVelocity] = useState<number>(38);
   const [anomalyBurst, setAnomalyBurst] = useState<boolean>(false);
 
   // Terminal Uplink State
-  const [uplinkCommand, setUplinkCommand] = useState<string>('ping sirosiu.com --ack');
+  const [uplinkCommand, setUplinkCommand] = useState<string>('sirosiu --probe all --verify');
   const [uplinkResponse, setUplinkResponse] = useState<string>(
-    '64 bytes from sirosiu.com (SHINO_KERNEL_v3.5): icmp_seq=1 ttl=64 time=0.42 ms [STATUS: READY]'
+    '[SHINO_KERNEL_v4.0]: 04 Simulation Engines Online | 06 Silicon/ML Attractors Verified | 60.0 FPS Locked'
+  );
+
+  // Tactile UI Micro-Tonal Click Synthesizer
+  const triggerTactileClick = useCallback(
+    (freq = 740) => {
+      if (!audioEnabled || !audioCtxRef.current) return;
+      try {
+        const ctx = audioCtxRef.current;
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const clickGain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + 0.028);
+
+        clickGain.gain.setValueAtTime(0.04, now);
+        clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+
+        osc.connect(clickGain);
+        clickGain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.032);
+      } catch {
+        // Ignore audio context state errors if suspended
+      }
+    },
+    [audioEnabled]
   );
 
   // Keep simulation refs synced for 60fps loop
   const simRef = useRef({
-    fieldMode,
+    engine,
     palette: PALETTES[paletteId],
     curlScale,
     turbulenceGain,
@@ -432,11 +501,13 @@ export const Concept03Experimental: React.FC = () => {
     trailPersistence,
     gravityWellActive,
     audioEnabled,
+    smithR,
+    smithX,
   });
 
   useEffect(() => {
     simRef.current = {
-      fieldMode,
+      engine,
       palette: PALETTES[paletteId],
       curlScale,
       turbulenceGain,
@@ -444,9 +515,11 @@ export const Concept03Experimental: React.FC = () => {
       trailPersistence,
       gravityWellActive,
       audioEnabled,
+      smithR,
+      smithX,
     };
   }, [
-    fieldMode,
+    engine,
     paletteId,
     curlScale,
     turbulenceGain,
@@ -454,6 +527,8 @@ export const Concept03Experimental: React.FC = () => {
     trailPersistence,
     gravityWellActive,
     audioEnabled,
+    smithR,
+    smithX,
   ]);
 
   // Close modal on Escape
@@ -465,10 +540,12 @@ export const Concept03Experimental: React.FC = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  // Toggle Web Audio Synthesizer cleanly with linear ramps
+  // Toggle Web Audio Synthesizer cleanly with linear gain ramps
   const toggleWebAudio = useCallback(() => {
     if (!audioEnabled) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!audioCtxRef.current) {
         const ctx = new AudioCtx();
         const osc1 = ctx.createOscillator();
@@ -478,15 +555,15 @@ export const Concept03Experimental: React.FC = () => {
 
         osc1.type = 'sawtooth';
         osc2.type = 'triangle';
-        osc1.frequency.setValueAtTime(55, ctx.currentTime); // A1 fundamental
+        osc1.frequency.setValueAtTime(55, ctx.currentTime); // A1 deep drone
         osc2.frequency.setValueAtTime(82.41, ctx.currentTime); // E2 fifth harmonic
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(240, ctx.currentTime);
-        filter.Q.setValueAtTime(4.5, ctx.currentTime);
+        filter.frequency.setValueAtTime(220, ctx.currentTime);
+        filter.Q.setValueAtTime(4.8, ctx.currentTime);
 
         gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 0.4);
+        gain.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 0.35);
 
         osc1.connect(filter);
         osc2.connect(filter);
@@ -506,7 +583,7 @@ export const Concept03Experimental: React.FC = () => {
         const now = audioCtxRef.current.currentTime;
         masterGainRef.current.gain.cancelScheduledValues(now);
         masterGainRef.current.gain.setValueAtTime(0.001, now);
-        masterGainRef.current.gain.linearRampToValueAtTime(0.055, now + 0.35);
+        masterGainRef.current.gain.linearRampToValueAtTime(0.055, now + 0.3);
       }
       setAudioEnabled(true);
     } else {
@@ -530,26 +607,36 @@ export const Concept03Experimental: React.FC = () => {
 
   // High-Resolution Canvas PNG Frame Snapshot Export
   const handleExportSnapshot = () => {
+    triggerTactileClick(1120);
     const canvas = canvasRef.current;
     if (!canvas) return;
     const dataUrl = canvas.toDataURL('image/png');
     const link = document.createElement('a');
-    link.download = `SIROSIU_${fieldMode}_${paletteId}_${Date.now()}.png`;
+    link.download = `SIROSIU_${engine}_${paletteId}_${Date.now()}.png`;
     link.href = dataUrl;
     link.click();
   };
 
+  // Switch Engine Handler
+  const handleSelectEngine = (nextEngine: SimulationEngine) => {
+    triggerTactileClick(880);
+    setEngine(nextEngine);
+  };
+
   // Select Project Attractor & Synchronize Field Physics
   const handleSelectProject = (proj: ExperimentalProject, openModal = false) => {
+    triggerTactileClick(660);
     setActiveProject(proj);
-    setFieldMode(proj.recommendedMode);
+    setEngine(proj.recommendedEngine);
     setCurlScale(proj.harmonicFreq);
     setTurbulenceGain(proj.vorticityGain);
     setDispersionOffset(proj.chromaticSplit);
     if (openModal) setDossierOpen(true);
   };
 
-  // Multi-Field Procedural Physics Engine Loop
+  // ============================================================================
+  // MASTER 4-ENGINE REAL-TIME CANVAS SIMULATION LOOP (60FPS LOCKED)
+  // ============================================================================
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -557,9 +644,10 @@ export const Concept03Experimental: React.FC = () => {
     if (!ctx) return;
 
     let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth);
-    let height = (canvas.height = canvas.parentElement?.clientHeight || 680);
+    let height = (canvas.height = canvas.parentElement?.clientHeight || 720);
 
-    const PARTICLE_COUNT = 1750;
+    // 2,250 Particles for Engine 02 (Clifford Vortex)
+    const PARTICLE_COUNT = 2250;
     const particles: {
       x: number;
       y: number;
@@ -568,22 +656,27 @@ export const Concept03Experimental: React.FC = () => {
       vx: number;
       vy: number;
       speed: number;
-      phase: number;
     }[] = [];
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const x = Math.random() * width;
       const y = Math.random() * height;
-      particles.push({
-        x,
-        y,
-        px: x,
-        py: y,
-        vx: 0,
-        vy: 0,
-        speed: 0,
-        phase: Math.random() * Math.PI * 2,
-      });
+      particles.push({ x, y, px: x, py: y, vx: 0, vy: 0, speed: 0 });
+    }
+
+    // 3D Volumetric Raymarch Voxel Lattice Samples for Engine 01
+    const VOL_RES = 15; // 15x15x15 = 3,375 volumetric density ray-samples
+    const volSamples: { x: number; y: number; z: number }[] = [];
+    for (let ix = 0; ix < VOL_RES; ix++) {
+      for (let iy = 0; iy < VOL_RES; iy++) {
+        for (let iz = 0; iz < VOL_RES; iz++) {
+          volSamples.push({
+            x: (ix / (VOL_RES - 1)) * 2 - 1,
+            y: (iy / (VOL_RES - 1)) * 2 - 1,
+            z: (iz / (VOL_RES - 1)) * 2 - 1,
+          });
+        }
+      }
     }
 
     const pointer = {
@@ -591,87 +684,13 @@ export const Concept03Experimental: React.FC = () => {
       y: height * 0.5,
       vx: 0,
       vy: 0,
+      yaw: 0.55,
+      pitch: 0.38,
       active: false,
       down: false,
     };
 
-    // 1. CURL_FLUID Scalar Potential
-    const scalarPotential = (x: number, y: number, t: number, scale: number) => {
-      const s1 = scale;
-      const s2 = scale * 2.15;
-      const s3 = scale * 4.2;
-      return (
-        Math.sin(x * s1 + t * 0.65) * Math.cos(y * s1 - t * 0.48) +
-        0.55 * Math.sin(x * s2 - y * s2 + t * 1.15) +
-        0.25 * Math.cos(x * s3 + y * s2 - t * 1.65)
-      );
-    };
-
-    const computeFieldVelocity = (
-      x: number,
-      y: number,
-      t: number,
-      mode: FieldMode,
-      scale: number,
-      gain: number
-    ) => {
-      if (mode === 'CURL_FLUID') {
-        const eps = 1.6;
-        const dPsiDy =
-          (scalarPotential(x, y + eps, t, scale) - scalarPotential(x, y - eps, t, scale)) /
-          (2 * eps);
-        const dPsiDx =
-          (scalarPotential(x + eps, y, t, scale) - scalarPotential(x - eps, y, t, scale)) /
-          (2 * eps);
-        const amp = 340 * gain;
-        return { vx: dPsiDy * amp, vy: -dPsiDx * amp };
-      }
-
-      if (mode === 'CLIFFORD_ATTRACTOR') {
-        // Normalized strange attractor coordinates [-2, 2]
-        const nx = ((x - width * 0.5) / (width * 0.35)) * 2.0;
-        const ny = ((y - height * 0.5) / (height * 0.35)) * 2.0;
-        const a = -1.4 + Math.sin(t * 0.25) * 0.25;
-        const b = 1.6 + Math.cos(t * 0.2) * 0.2;
-        const c = 1.0 + scale * 80;
-        const d = 0.7;
-        const tx = Math.sin(a * ny) + c * Math.cos(a * nx);
-        const ty = Math.sin(b * nx) + d * Math.cos(b * ny);
-        return {
-          vx: (tx - nx) * 2.4 * gain,
-          vy: (ty - ny) * 2.4 * gain,
-        };
-      }
-
-      if (mode === 'POYNTING_RF') {
-        // 28GHz Phased Dipole Radiation & Poynting Flux S = E x H
-        const cx = width * 0.5;
-        const cy = height * 0.5;
-        const dx = x - cx;
-        const dy = y - cy;
-        const r = Math.hypot(dx, dy) + 1;
-        const theta = Math.atan2(dy, dx);
-        const k = scale * 18;
-        const wave = Math.cos(k * r - t * 4.2);
-        const arrayLobe = Math.cos(4 * theta + Math.sin(t * 0.8));
-        const radialVel = (1.6 + wave * 1.35 * Math.abs(arrayLobe)) * gain;
-        const tangVel = Math.sin(k * r - t * 4.2) * arrayLobe * 1.4 * gain;
-        return {
-          vx: (dx / r) * radialVel - (dy / r) * tangVel,
-          vy: (dy / r) * radialVel + (dx / r) * tangVel,
-        };
-      }
-
-      // QUANTUM_WAVE: 2D standing wave packet nodal interference
-      const k = scale * 14;
-      const wx = Math.sin(x * k + t * 1.4) * Math.cos(y * k - t * 1.1);
-      const wy = Math.cos(x * k - t * 1.1) * Math.sin(y * k + t * 1.4);
-      const harmonic = Math.sin((x * x + y * y) * 0.000015 - t * 2.0);
-      return {
-        vx: (wx + harmonic * 0.6) * 2.6 * gain,
-        vy: (wy - harmonic * 0.6) * 2.6 * gain,
-      };
-    };
+    const GLYPH_LUT = ['·', '∶', '+', '×', 'Δ', 'λ', 'Ψ', '∇', 'Γ', 'Ω', '▒', '▓', '█'];
 
     const onPointerMove = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -682,13 +701,16 @@ export const Concept03Experimental: React.FC = () => {
       pointer.x = nx;
       pointer.y = ny;
       pointer.active = true;
+
+      // Orbital camera update for 3D Volumetric Raymarch
+      pointer.yaw += pointer.vx * 0.0055;
+      pointer.pitch = Math.max(-1.2, Math.min(1.2, pointer.pitch + pointer.vy * 0.0055));
     };
 
     const onPointerLeave = () => {
       pointer.active = false;
       pointer.down = false;
     };
-
     const onPointerDown = () => {
       pointer.down = true;
     };
@@ -699,7 +721,7 @@ export const Concept03Experimental: React.FC = () => {
     const onResize = () => {
       if (!canvas.parentElement) return;
       width = canvas.width = canvas.parentElement.clientWidth || 320;
-      height = canvas.height = canvas.parentElement.clientHeight || 580;
+      height = canvas.height = canvas.parentElement.clientHeight || 640;
       ctx.fillStyle = simRef.current.palette.abyss;
       ctx.fillRect(0, 0, width, height);
     };
@@ -719,11 +741,11 @@ export const Concept03Experimental: React.FC = () => {
 
     const renderLoop = () => {
       rafId = requestAnimationFrame(renderLoop);
-      time += 0.012;
+      time += 0.014;
       frameCount++;
 
       const {
-        fieldMode: mode,
+        engine: currentEngine,
         palette: pal,
         curlScale: cScale,
         turbulenceGain: tGain,
@@ -733,113 +755,336 @@ export const Concept03Experimental: React.FC = () => {
         audioEnabled: soundOn,
       } = simRef.current;
 
-      // Persistence decay in abyss color
-      ctx.globalCompositeOperation = 'source-over';
-      const alphaDecay = Math.max(0.03, Math.min(0.24, 1 - persist));
-      ctx.fillStyle = `rgba(${pal.abyssRgb}, ${alphaDecay.toFixed(3)})`;
-      ctx.fillRect(0, 0, width, height);
+      let telemetryVelocity = 2.8;
+      let telemetryPeak = 1.95;
 
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.lineWidth = 1.2;
+      // ======================================================================
+      // ENGINE 01: 3D_VOLUMETRIC_RAYMARCH
+      // ======================================================================
+      if (currentEngine === '3D_VOLUMETRIC_RAYMARCH') {
+        ctx.globalCompositeOperation = 'source-over';
+        const alphaDecay = Math.max(0.12, 1 - persist * 0.85);
+        ctx.fillStyle = `rgba(${pal.abyssRgb}, ${alphaDecay.toFixed(2)})`;
+        ctx.fillRect(0, 0, width, height);
 
-      let speedSum = 0;
-      let maxSpeed = 0;
+        ctx.globalCompositeOperation = 'lighter';
 
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
-        const p = particles[i];
-        p.px = p.x;
-        p.py = p.y;
+        const yaw = pointer.yaw + time * 0.22;
+        const pitch = pointer.pitch + Math.sin(time * 0.35) * 0.15;
+        const cosY = Math.cos(yaw);
+        const sinY = Math.sin(yaw);
+        const cosP = Math.cos(pitch);
+        const sinP = Math.sin(pitch);
 
-        const fieldVel = computeFieldVelocity(p.x, p.y, time, mode, cScale, tGain);
-        let vx = fieldVel.vx;
-        let vy = fieldVel.vy;
+        const fov = Math.min(width, height) * 0.68;
+        const cx = width * 0.56;
+        const cy = height * 0.5;
+        const freq = 2.6 + cScale * 260;
+        const sliceZ = Math.sin(time * 0.9) * 0.45;
 
-        // Cursor Vortex & Singularity Interaction
-        if (pointer.active) {
-          const dx = p.x - pointer.x;
-          const dy = p.y - pointer.y;
-          const distSq = dx * dx + dy * dy + 120;
-          const radiusSq = 56000;
+        let activeVoxels = 0;
 
-          if (distSq < radiusSq) {
-            const falloff = 1 - distSq / radiusSq;
-            if (pointer.down || wellMode) {
-              vx += (-dx * 0.036 - dy * 0.048) * falloff * 3.3;
-              vy += (-dy * 0.036 + dx * 0.048) * falloff * 3.3;
-            } else {
-              vx += (-dy * 0.032 + pointer.vx * 0.34) * falloff * 2.6;
-              vy += (dx * 0.032 + pointer.vy * 0.34) * falloff * 2.6;
-            }
+        for (let i = 0; i < volSamples.length; i++) {
+          const v = volSamples[i];
+          // Evaluate 3D Gyroid + Quantum Torus Volumetric Density ρ(x,y,z,t)
+          const rSq = v.x * v.x + v.y * v.y + v.z * v.z;
+          if (rSq > 1.35) continue;
+
+          const gyroid =
+            Math.sin(v.x * freq + time * 1.3) * Math.cos(v.y * freq - time * 0.8) +
+            Math.sin(v.y * freq + time * 1.1) * Math.cos(v.z * freq) +
+            Math.sin(v.z * freq - time * 1.2) * Math.cos(v.x * freq);
+
+          const density = (1.35 - Math.abs(gyroid)) * Math.exp(-rSq * 1.15) * tGain;
+          if (density < 0.38) continue;
+
+          activeVoxels++;
+
+          // 3D Orbital Camera Transformation
+          const x1 = v.x * cosY - v.z * sinY;
+          const z1 = v.z * cosY + v.x * sinY;
+          const y2 = v.y * cosP - z1 * sinP;
+          const z2 = z1 * cosP + v.y * sinP + 2.85;
+
+          const invZ = fov / Math.max(0.4, z2);
+          const sx = cx + x1 * invZ;
+          const sy = cy + y2 * invZ;
+
+          // Interactive Depth Slicing Plane Highlight
+          const isSliced = Math.abs(v.z - sliceZ) < 0.11;
+          const radius = Math.max(1.2, (density * 2.9 * fov) / (z2 * 190));
+
+          if (isSliced || (wellMode && rSq < 0.35)) {
+            ctx.fillStyle = `rgba(${pal.primaryRgb}, 0.88)`;
+            ctx.beginPath();
+            ctx.arc(sx, sy, radius * 1.45, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (density > 0.95) {
+            ctx.fillStyle = `rgba(${pal.tertiaryRgb}, 0.48)`;
+            ctx.beginPath();
+            ctx.arc(sx - disp * 0.6, sy, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = `rgba(${pal.secondaryRgb}, 0.52)`;
+            ctx.beginPath();
+            ctx.arc(sx + disp * 0.6, sy, radius, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.fillStyle = `rgba(${pal.secondaryRgb}, 0.26)`;
+            ctx.beginPath();
+            ctx.arc(sx, sy, radius * 0.9, 0, Math.PI * 2);
+            ctx.fill();
           }
         }
 
-        p.vx = p.vx * 0.45 + vx * 0.55;
-        p.vy = p.vy * 0.45 + vy * 0.55;
-        p.x += p.vx;
-        p.y += p.vy;
+        telemetryVelocity = (activeVoxels / 320) * tGain;
+        telemetryPeak = telemetryVelocity * 0.78;
+      }
 
-        const spd = Math.hypot(p.vx, p.vy);
-        p.speed = spd;
-        speedSum += spd;
-        if (spd > maxSpeed) maxSpeed = spd;
+      // ======================================================================
+      // ENGINE 02: CLIFFORD_PARTICLE_VORTEX
+      // ======================================================================
+      else if (currentEngine === 'CLIFFORD_PARTICLE_VORTEX') {
+        ctx.globalCompositeOperation = 'source-over';
+        const alphaDecay = Math.max(0.03, Math.min(0.24, 1 - persist));
+        ctx.fillStyle = `rgba(${pal.abyssRgb}, ${alphaDecay.toFixed(3)})`;
+        ctx.fillRect(0, 0, width, height);
 
-        // Boundary Wrap
-        if (p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
-          if (mode === 'POYNTING_RF') {
-            p.x = width * 0.5 + (Math.random() - 0.5) * 40;
-            p.y = height * 0.5 + (Math.random() - 0.5) * 40;
-          } else {
-            p.x = Math.random() * width;
-            p.y = Math.random() * height;
-          }
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.lineWidth = 1.15;
+
+        const a = -1.45 + Math.sin(time * 0.28) * 0.25;
+        const b = 1.68 + Math.cos(time * 0.22) * 0.22;
+        const c = 1.05 + cScale * 75;
+        const d = 0.78;
+
+        let speedSum = 0;
+        let maxSpd = 0;
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const p = particles[i];
           p.px = p.x;
           p.py = p.y;
+
+          const nx = ((p.x - width * 0.54) / (width * 0.34)) * 2.0;
+          const ny = ((p.y - height * 0.5) / (height * 0.34)) * 2.0;
+
+          // Clifford Strange Attractor + Harmonic Curl Derivative
+          const tx = Math.sin(a * ny) + c * Math.cos(a * nx);
+          const ty = Math.sin(b * nx) + d * Math.cos(b * ny);
+
+          let vx = (tx - nx) * 2.35 * tGain;
+          let vy = (ty - ny) * 2.35 * tGain;
+
+          if (pointer.active) {
+            const dx = p.x - pointer.x;
+            const dy = p.y - pointer.y;
+            const distSq = dx * dx + dy * dy + 100;
+            if (distSq < 56000) {
+              const f = 1 - distSq / 56000;
+              if (pointer.down || wellMode) {
+                vx += (-dx * 0.038 - dy * 0.048) * f * 3.2;
+                vy += (-dy * 0.038 + dx * 0.048) * f * 3.2;
+              } else {
+                vx += (-dy * 0.032 + pointer.vx * 0.34) * f * 2.5;
+                vy += (dx * 0.032 + pointer.vy * 0.34) * f * 2.5;
+              }
+            }
+          }
+
+          p.vx = p.vx * 0.45 + vx * 0.55;
+          p.vy = p.vy * 0.45 + vy * 0.55;
+          p.x += p.vx;
+          p.y += p.vy;
+
+          const spd = Math.hypot(p.vx, p.vy);
+          p.speed = spd;
+          speedSum += spd;
+          if (spd > maxSpd) maxSpd = spd;
+
+          if (p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
+            p.x = Math.random() * width;
+            p.y = Math.random() * height;
+            p.px = p.x;
+            p.py = p.y;
+          }
+
+          if (spd > 3.4) {
+            ctx.strokeStyle = `rgba(${pal.tertiaryRgb}, 0.58)`;
+            ctx.beginPath();
+            ctx.moveTo(p.px - disp, p.py - disp * 0.5);
+            ctx.lineTo(p.x - disp, p.y - disp * 0.5);
+            ctx.stroke();
+
+            ctx.strokeStyle = `rgba(${pal.secondaryRgb}, 0.54)`;
+            ctx.beginPath();
+            ctx.moveTo(p.px + disp, p.py + disp * 0.5);
+            ctx.lineTo(p.x + disp, p.y + disp * 0.5);
+            ctx.stroke();
+
+            ctx.strokeStyle = `rgba(${pal.primaryRgb}, 0.92)`;
+            ctx.beginPath();
+            ctx.moveTo(p.px, p.py);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+          } else if (spd > 1.9) {
+            ctx.strokeStyle = `rgba(${pal.tertiaryRgb}, 0.48)`;
+            ctx.beginPath();
+            ctx.moveTo(p.px - disp * 0.4, p.py);
+            ctx.lineTo(p.x - disp * 0.4, p.y);
+            ctx.stroke();
+
+            ctx.strokeStyle = `rgba(${pal.secondaryRgb}, 0.65)`;
+            ctx.beginPath();
+            ctx.moveTo(p.px, p.py);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+          } else {
+            ctx.strokeStyle = `rgba(${pal.secondaryRgb}, 0.36)`;
+            ctx.beginPath();
+            ctx.moveTo(p.px, p.py);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+          }
         }
 
-        // Dynamic Chromatic Dispersion mapped to active Palette
-        if (spd > 3.5) {
-          ctx.strokeStyle = `rgba(${pal.tertiaryRgb}, 0.58)`;
-          ctx.beginPath();
-          ctx.moveTo(p.px - disp, p.py - disp * 0.5);
-          ctx.lineTo(p.x - disp, p.y - disp * 0.5);
-          ctx.stroke();
+        telemetryVelocity = speedSum / PARTICLE_COUNT;
+        telemetryPeak = maxSpd * 0.44;
+      }
 
-          ctx.strokeStyle = `rgba(${pal.secondaryRgb}, 0.54)`;
-          ctx.beginPath();
-          ctx.moveTo(p.px + disp, p.py + disp * 0.5);
-          ctx.lineTo(p.x + disp, p.y + disp * 0.5);
-          ctx.stroke();
+      // ======================================================================
+      // ENGINE 03: PHOSPHOR_CRT_OSCILLOSCOPE
+      // ======================================================================
+      else if (currentEngine === 'PHOSPHOR_CRT_OSCILLOSCOPE') {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = `rgba(${pal.abyssRgb}, 0.18)`;
+        ctx.fillRect(0, 0, width, height);
 
-          ctx.strokeStyle = `rgba(${pal.primaryRgb}, 0.92)`;
-          ctx.beginPath();
-          ctx.moveTo(p.px, p.py);
-          ctx.lineTo(p.x, p.y);
-          ctx.stroke();
-        } else if (spd > 2.0) {
+        // Draw Subtle CRT Graticule Grid & Smith Reference Circles
+        const scopeCx = width * 0.55;
+        const scopeCy = height * 0.5;
+        const scopeRadius = Math.min(width, height) * 0.34;
+
+        ctx.strokeStyle = `rgba(${pal.secondaryRgb}, 0.14)`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(scopeCx, scopeCy, scopeRadius, 0, Math.PI * 2);
+        ctx.arc(scopeCx + scopeRadius * 0.25, scopeCy, scopeRadius * 0.75, 0, Math.PI * 2);
+        ctx.arc(scopeCx + scopeRadius * 0.5, scopeCy, scopeRadius * 0.5, 0, Math.PI * 2);
+        ctx.moveTo(scopeCx - scopeRadius * 1.25, scopeCy);
+        ctx.lineTo(scopeCx + scopeRadius * 1.25, scopeCy);
+        ctx.moveTo(scopeCx, scopeCy - scopeRadius * 1.15);
+        ctx.lineTo(scopeCx, scopeCy + scopeRadius * 1.15);
+        ctx.stroke();
+
+        ctx.globalCompositeOperation = 'lighter';
+
+        // Trace A: High-Frequency Lissajous Phase Harmonic Curve
+        const ratioX = 3 + Math.round(cScale * 600);
+        const ratioY = 4;
+        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = `rgba(${pal.primaryRgb}, 0.88)`;
+        ctx.beginPath();
+        const steps = 420;
+        for (let i = 0; i <= steps; i++) {
+          const u = (i / steps) * Math.PI * 2;
+          const mod = 1 + 0.18 * Math.sin(u * 6 - time * 3) * (tGain - 0.5);
+          const lx = scopeCx + Math.sin(ratioX * u + time * 1.6) * scopeRadius * 0.78 * mod;
+          const ly = scopeCy + Math.sin(ratioY * u) * scopeRadius * 0.78 * mod;
+          if (i === 0) ctx.moveTo(lx, ly);
+          else ctx.lineTo(lx, ly);
+        }
+        ctx.stroke();
+
+        // Chromatic Ghost Beam on Lissajous
+        if (disp > 0.5) {
+          ctx.lineWidth = 1.2;
           ctx.strokeStyle = `rgba(${pal.tertiaryRgb}, 0.52)`;
-          ctx.beginPath();
-          ctx.moveTo(p.px - disp * 0.5, p.py);
-          ctx.lineTo(p.x - disp * 0.5, p.y);
-          ctx.stroke();
-
-          ctx.strokeStyle = `rgba(${pal.secondaryRgb}, 0.68)`;
-          ctx.beginPath();
-          ctx.moveTo(p.px, p.py);
-          ctx.lineTo(p.x, p.y);
-          ctx.stroke();
-        } else {
-          ctx.strokeStyle = `rgba(${pal.secondaryRgb}, 0.38)`;
-          ctx.beginPath();
-          ctx.moveTo(p.px, p.py);
-          ctx.lineTo(p.x, p.y);
           ctx.stroke();
         }
+
+        // Trace B: Time-Domain 28GHz RF Carrier Envelope Across Viewport
+        ctx.lineWidth = 1.6;
+        ctx.strokeStyle = `rgba(${pal.secondaryRgb}, 0.78)`;
+        ctx.beginPath();
+        for (let x = 0; x < width; x += 4) {
+          const normX = x / width;
+          const envelope = Math.sin(normX * Math.PI * 4 - time * 2.2) * Math.cos(normX * 12 + time);
+          const carrier = Math.sin(x * cScale * 18 - time * 9);
+          const y = scopeCy + envelope * carrier * 68 * tGain;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        telemetryVelocity = 3.4 * tGain;
+        telemetryPeak = 2.65 * tGain;
+      }
+
+      // ======================================================================
+      // ENGINE 04: MATRIX_ASCII_GLYPH_STREAM
+      // ======================================================================
+      else if (currentEngine === 'MATRIX_ASCII_GLYPH_STREAM') {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = `rgba(${pal.abyssRgb}, 0.28)`;
+        ctx.fillRect(0, 0, width, height);
+
+        const cellSize = 24;
+        const cols = Math.ceil(width / cellSize);
+        const rows = Math.ceil(height / cellSize);
+
+        ctx.font = '600 12px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        let activeCells = 0;
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const gx = c * cellSize + cellSize * 0.5;
+            const gy = r * cellSize + cellSize * 0.5;
+
+            const wave =
+              Math.sin(gx * cScale * 2.2 + time * 1.5) *
+                Math.cos(gy * cScale * 2.2 - time * 1.1) +
+              0.5 * Math.sin((gx + gy) * cScale * 3.5 - time * 2.1);
+
+            let energy = Math.abs(wave) * tGain;
+
+            if (pointer.active) {
+              const dist = Math.hypot(gx - pointer.x, gy - pointer.y);
+              if (dist < 220) {
+                energy += (1 - dist / 220) * (wellMode ? 2.4 : 1.45);
+              }
+            }
+
+            if (energy < 0.28) continue;
+            activeCells++;
+
+            const glyphIdx = Math.min(
+              GLYPH_LUT.length - 1,
+              Math.floor((energy / 2.6) * GLYPH_LUT.length)
+            );
+            const char = GLYPH_LUT[glyphIdx];
+
+            if (energy > 1.65) {
+              ctx.fillStyle = `rgba(${pal.primaryRgb}, 0.95)`;
+            } else if (energy > 1.05) {
+              ctx.fillStyle = `rgba(${pal.tertiaryRgb}, 0.78)`;
+            } else {
+              ctx.fillStyle = `rgba(${pal.secondaryRgb}, 0.45)`;
+            }
+
+            ctx.fillText(char, gx, gy);
+          }
+        }
+
+        telemetryVelocity = (activeCells / Math.max(1, cols * rows)) * 4.2;
+        telemetryPeak = telemetryVelocity * 0.85;
       }
 
       pointer.vx *= 0.88;
       pointer.vy *= 0.88;
-
-      const mean = speedSum / PARTICLE_COUNT;
 
       // Modulate Web Audio Synthesizer if enabled
       if (
@@ -850,17 +1095,20 @@ export const Concept03Experimental: React.FC = () => {
         droneOsc2Ref.current
       ) {
         const now = audioCtxRef.current.currentTime;
-        const targetCutoff = Math.min(1400, 140 + mean * 95 + Math.hypot(pointer.vx, pointer.vy) * 8);
+        const targetCutoff = Math.min(
+          1500,
+          150 + telemetryVelocity * 95 + Math.hypot(pointer.vx, pointer.vy) * 8
+        );
         filterNodeRef.current.frequency.setTargetAtTime(targetCutoff, now, 0.08);
         droneOsc1Ref.current.frequency.setTargetAtTime(55 + cScale * 2200, now, 0.12);
-        droneOsc2Ref.current.frequency.setTargetAtTime(82.41 + mean * 3.2, now, 0.12);
+        droneOsc2Ref.current.frequency.setTargetAtTime(82.41 + telemetryVelocity * 3.5, now, 0.12);
       }
 
       if (frameCount % 14 === 0) {
         setHudMetrics({
-          meanSpeed: mean.toFixed(2),
-          peakVorticity: (maxSpeed * 0.42).toFixed(2),
-          reynolds: Math.round(mean * 1480 * tGain).toLocaleString(),
+          meanSpeed: telemetryVelocity.toFixed(2),
+          peakVorticity: telemetryPeak.toFixed(2),
+          reynolds: Math.round(telemetryVelocity * 1480 * tGain).toLocaleString(),
           cursorVec: `(${pointer.vx.toFixed(1)}, ${pointer.vy.toFixed(1)})`,
         });
       }
@@ -878,7 +1126,7 @@ export const Concept03Experimental: React.FC = () => {
     };
   }, []);
 
-  // --- SANDBOX 1 COMPUTATIONS (SMITH CHART) ---
+  // --- SANDBOX 1 COMPUTATIONS (50Ω SMITH CHART TUNER) ---
   const z0 = 50;
   const denom = (smithR + z0) ** 2 + smithX ** 2;
   const gammaReal = (smithR ** 2 + smithX ** 2 - z0 ** 2) / denom;
@@ -896,13 +1144,20 @@ export const Concept03Experimental: React.FC = () => {
 
   const handleUplinkSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    triggerTactileClick(960);
     const cmd = uplinkCommand.trim().toLowerCase();
     if (cmd.includes('ave')) {
-      setUplinkResponse('[AVE_DAEMON]: Wake-to-Token 184ms | HNSW Episodic Memory Online | 4.2GB VRAM');
+      setUplinkResponse(
+        '[AVE_DAEMON]: Wake-to-Token 184ms | HNSW Episodic Memory Online | 4.2GB VRAM'
+      );
     } else if (cmd.includes('riscv') || cmd.includes('rv32i')) {
-      setUplinkResponse('[RV32I_CORE]: 5-Stage Pipeline | 185MHz Artix-7 | CPI 1.18 | Forwarding Active');
+      setUplinkResponse(
+        '[RV32I_CORE]: 5-Stage Pipeline | 185MHz Artix-7 | CPI 1.18 | Forwarding Active'
+      );
     } else if (cmd.includes('rf') || cmd.includes('patch')) {
-      setUplinkResponse('[HELIOS_28GHZ]: 4x4 Rogers RO4003C Array | Gain 16.4 dBi | S11 -28.4 dB');
+      setUplinkResponse(
+        '[HELIOS_28GHZ]: 4x4 Rogers RO4003C Array | Gain 16.4 dBi | S11 -28.4 dB'
+      );
     } else {
       setUplinkResponse(
         `[SHINO_KERNEL_ACK]: Executed "${uplinkCommand}" → Direct channel open at ankush@sirosiu.com`
@@ -911,6 +1166,7 @@ export const Concept03Experimental: React.FC = () => {
   };
 
   const activePalette = PALETTES[paletteId];
+  const activeEngineMeta = ENGINE_METADATA[engine];
 
   return (
     <div
@@ -921,6 +1177,7 @@ export const Concept03Experimental: React.FC = () => {
           '--c3-primary': activePalette.primary,
           '--c3-secondary': activePalette.secondary,
           '--c3-tertiary': activePalette.tertiary,
+          '--c3-amber': activePalette.amber,
         } as React.CSSProperties
       }
     >
@@ -929,17 +1186,36 @@ export const Concept03Experimental: React.FC = () => {
         <div className="c3-hud-brand">
           <span className="c3-pulse-beacon" />
           <span className="c3-mono-primary">SIROSIU // SHINO</span>
-          <span className="c3-mono-secondary">EXPERIMENTAL STUDIO v3.5</span>
+          <span className="c3-mono-secondary">EXPERIMENTAL FLAGSHIP v4.0</span>
         </div>
 
-        <nav className="c3-hud-nav" aria-label="Experimental Studio Navigation">
-          <a href="#c3-field">00.FIELD</a>
-          <a href="#c3-attractors">01.ATTRACTORS</a>
-          <a href="#c3-spectra">02.SPECTRA</a>
-          <a href="#c3-sandboxes">03.LAB_SANDBOXES</a>
-          <a href="#c3-manifesto">04.MANIFESTO</a>
-          <a href="#c3-logs">05.LOGS</a>
-          <a href="#c3-uplink">06.UPLINK</a>
+        {/* Top HUD Instant 4-Engine Selector */}
+        <div className="c3-hud-engine-switcher" role="group" aria-label="Simulation Engine Selector">
+          {(
+            [
+              { id: '3D_VOLUMETRIC_RAYMARCH', short: '01.RAYMARCH_3D' },
+              { id: 'CLIFFORD_PARTICLE_VORTEX', short: '02.CLIFFORD_VORTEX' },
+              { id: 'PHOSPHOR_CRT_OSCILLOSCOPE', short: '03.CRT_SCOPE' },
+              { id: 'MATRIX_ASCII_GLYPH_STREAM', short: '04.ASCII_MATRIX' },
+            ] as { id: SimulationEngine; short: string }[]
+          ).map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleSelectEngine(item.id)}
+              className={`c3-hud-engine-btn ${engine === item.id ? 'is-active' : ''}`}
+            >
+              {item.short}
+            </button>
+          ))}
+        </div>
+
+        <nav className="c3-hud-nav" aria-label="Section Navigation">
+          <a href="#c3-attractors">WORK</a>
+          <a href="#c3-spectra">SPECTRA</a>
+          <a href="#c3-sandboxes">SANDBOXES</a>
+          <a href="#c3-logs">LOGS</a>
+          <a href="#c3-uplink">UPLINK</a>
         </nav>
 
         <div className="c3-hud-toolbar">
@@ -956,54 +1232,61 @@ export const Concept03Experimental: React.FC = () => {
         </div>
       </header>
 
-      {/* SECTION 00: HERO & MULTI-FIELD PROCEDURAL CANVAS */}
+      {/* SECTION 00: HERO & 4-ENGINE REAL-TIME SIMULATION CENTERPIECE */}
       <section id="c3-field" className="c3-hero-stage">
         <canvas
           ref={canvasRef}
           className="c3-curl-canvas"
-          aria-label="Interactive multi-mode procedural physics field"
+          aria-label="Interactive 4-engine real-time computational physics canvas"
         />
 
         <div className="c3-hero-overlay-grid">
-          {/* Left Hero Identity & Mode Switcher */}
+          {/* Left Hero Identity & Engine Matrix */}
           <div className="c3-glass-card c3-hero-card">
             <div className="c3-kicker-row">
-              <span className="c3-badge-primary">MODE // {fieldMode}</span>
+              <span className="c3-badge-primary">{activeEngineMeta.badge}</span>
               <span className="c3-mono-muted">ANKUSH MALOTHIA (SIROSIU)</span>
             </div>
 
             <h1 className="c3-hero-display">
-              LIVING
+              SOVEREIGN
               <br />
-              <span className="c3-gradient-text">COMPUTATIONAL</span>
+              <span className="c3-gradient-text">SILICON, RF</span>
               <br />
-              PHYSICS.
+              &amp; INTELLIGENCE.
             </h1>
 
             <p className="c3-hero-lead">
-              Creative engineering laboratory and sovereign systems practice operating across{' '}
-              <strong>5-stage RISC-V silicon</strong>, <strong>28GHz phased antenna arrays</strong>,{' '}
+              High-density creative engineering studio and systems architecture practice spanning{' '}
+              <strong>5-stage RISC-V processors</strong>, <strong>28GHz phased antenna arrays</strong>,{' '}
               <strong>brain-computer interfaces</strong>, and{' '}
               <strong>autonomous local AI runtimes</strong>.
             </p>
 
-            {/* 4-Mode Equation Switcher */}
+            {/* Active Engine Mathematical Telemetry Banner */}
+            <div className="c3-engine-spec-banner">
+              <div className="c3-engine-spec-title">{activeEngineMeta.title}</div>
+              <code className="c3-engine-spec-math">{activeEngineMeta.math}</code>
+              <p className="c3-engine-spec-desc">{activeEngineMeta.desc}</p>
+            </div>
+
+            {/* 4-Engine Interactive Selector Cards */}
             <div className="c3-mode-picker-block">
-              <span className="c3-picker-label">SELECT PROCEDURAL VECTOR FIELD EQUATION:</span>
+              <span className="c3-picker-label">SWITCH REAL-TIME SIMULATION ENGINE (01—04):</span>
               <div className="c3-mode-pills">
                 {(
                   [
-                    { id: 'CURL_FLUID', label: '01 // CURL_FLUID (∇·v=0)' },
-                    { id: 'CLIFFORD_ATTRACTOR', label: '02 // CLIFFORD_CHAOS' },
-                    { id: 'POYNTING_RF', label: '03 // POYNTING_28GHZ' },
-                    { id: 'QUANTUM_WAVE', label: '04 // QUANTUM_NODAL' },
-                  ] as { id: FieldMode; label: string }[]
+                    { id: '3D_VOLUMETRIC_RAYMARCH', label: '01 // 3D_VOLUMETRIC_RAYMARCH' },
+                    { id: 'CLIFFORD_PARTICLE_VORTEX', label: '02 // CLIFFORD_PARTICLE_VORTEX' },
+                    { id: 'PHOSPHOR_CRT_OSCILLOSCOPE', label: '03 // PHOSPHOR_CRT_OSCILLOSCOPE' },
+                    { id: 'MATRIX_ASCII_GLYPH_STREAM', label: '04 // MATRIX_ASCII_GLYPH_STREAM' },
+                  ] as { id: SimulationEngine; label: string }[]
                 ).map((m) => (
                   <button
                     key={m.id}
                     type="button"
-                    onClick={() => setFieldMode(m.id)}
-                    className={`c3-mode-pill ${fieldMode === m.id ? 'is-selected' : ''}`}
+                    onClick={() => handleSelectEngine(m.id)}
+                    className={`c3-mode-pill ${engine === m.id ? 'is-selected' : ''}`}
                   >
                     {m.label}
                   </button>
@@ -1013,19 +1296,19 @@ export const Concept03Experimental: React.FC = () => {
 
             {/* 4 Living Color Spectra Palettes */}
             <div className="c3-mode-picker-block">
-              <span className="c3-picker-label">CHROMATIC SPECTRUM PALETTE:</span>
+              <span className="c3-picker-label">LIVING PHOSPHOR COLOR SPECTRUM:</span>
               <div className="c3-palette-pills">
                 {Object.values(PALETTES).map((pal) => (
                   <button
                     key={pal.id}
                     type="button"
-                    onClick={() => setPaletteId(pal.id)}
+                    onClick={() => {
+                      triggerTactileClick(790);
+                      setPaletteId(pal.id);
+                    }}
                     className={`c3-palette-btn ${paletteId === pal.id ? 'is-selected' : ''}`}
                   >
-                    <span
-                      className="c3-swatch-dot"
-                      style={{ backgroundColor: pal.primary }}
-                    />
+                    <span className="c3-swatch-dot" style={{ backgroundColor: pal.primary }} />
                     <span>{pal.label}</span>
                   </button>
                 ))}
@@ -1034,12 +1317,15 @@ export const Concept03Experimental: React.FC = () => {
 
             <div className="c3-hero-actions">
               <a href="#c3-attractors" className="c3-btn-primary">
-                EXPLORE 06 ATTRACTORS ↓
+                INSPECT 06 ATTRACTORS ↓
               </a>
               <button
                 type="button"
                 className={`c3-btn-singularity ${gravityWellActive ? 'is-active' : ''}`}
-                onClick={() => setGravityWellActive((v) => !v)}
+                onClick={() => {
+                  triggerTactileClick(520);
+                  setGravityWellActive((v) => !v);
+                }}
               >
                 {gravityWellActive ? 'SINGULARITY WELL: LOCKED' : 'INJECT GRAVITY SINGULARITY'}
               </button>
@@ -1049,8 +1335,8 @@ export const Concept03Experimental: React.FC = () => {
           {/* Right Live Physics Synthesizer Console */}
           <aside className="c3-glass-card c3-synth-console">
             <div className="c3-console-header">
-              <span className="c3-mono-primary">FIELD MODULATOR // SHINO DSP</span>
-              <span className="c3-mono-secondary">1,750 NODES @ 60FPS</span>
+              <span className="c3-mono-primary">TELEMETRY SYNTHESIZER // SHINO v4.0</span>
+              <span className="c3-mono-secondary">60 FPS LOCKED</span>
             </div>
 
             <div className="c3-control-stack">
@@ -1065,13 +1351,16 @@ export const Concept03Experimental: React.FC = () => {
                   max="0.0085"
                   step="0.0002"
                   value={curlScale}
-                  onChange={(e) => setCurlScale(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(620);
+                    setCurlScale(parseFloat(e.target.value));
+                  }}
                 />
               </div>
 
               <div className="c3-control-row">
                 <div className="c3-control-label">
-                  <span>VORTICITY / FLUX GAIN (ω)</span>
+                  <span>VORTICITY / DENSITY GAIN (ω)</span>
                   <strong className="c3-mono-secondary">{turbulenceGain.toFixed(2)}x</strong>
                 </div>
                 <input
@@ -1080,13 +1369,16 @@ export const Concept03Experimental: React.FC = () => {
                   max="2.6"
                   step="0.05"
                   value={turbulenceGain}
-                  onChange={(e) => setTurbulenceGain(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(680);
+                    setTurbulenceGain(parseFloat(e.target.value));
+                  }}
                 />
               </div>
 
               <div className="c3-control-row">
                 <div className="c3-control-label">
-                  <span>CHROMATIC ABERRATION (ΔRGB)</span>
+                  <span>CHROMATIC DISPERSION (ΔRGB)</span>
                   <strong className="c3-mono-tertiary">{dispersionOffset.toFixed(1)} px</strong>
                 </div>
                 <input
@@ -1095,41 +1387,47 @@ export const Concept03Experimental: React.FC = () => {
                   max="4.5"
                   step="0.1"
                   value={dispersionOffset}
-                  onChange={(e) => setDispersionOffset(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(740);
+                    setDispersionOffset(parseFloat(e.target.value));
+                  }}
                 />
               </div>
 
               <div className="c3-control-row">
                 <div className="c3-control-label">
-                  <span>FRAME ACCUMULATION (τ)</span>
+                  <span>PHOSPHOR PERSISTENCE (τ)</span>
                   <strong className="c3-mono-primary">{(trailPersistence * 100).toFixed(0)}%</strong>
                 </div>
                 <input
                   type="range"
-                  min="0.78"
+                  min="0.76"
                   max="0.97"
                   step="0.01"
                   value={trailPersistence}
-                  onChange={(e) => setTrailPersistence(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(800);
+                    setTrailPersistence(parseFloat(e.target.value));
+                  }}
                 />
               </div>
             </div>
 
             <div className="c3-live-readout-grid">
               <div className="c3-readout-cell">
-                <span>MEAN VELOCITY</span>
-                <strong>{hudMetrics.meanSpeed} px/f</strong>
+                <span>MEAN FLUX</span>
+                <strong>{hudMetrics.meanSpeed} u/f</strong>
               </div>
               <div className="c3-readout-cell">
                 <span>PEAK VORTICITY</span>
                 <strong className="c3-mono-tertiary">{hudMetrics.peakVorticity} rad/s</strong>
               </div>
               <div className="c3-readout-cell">
-                <span>REYNOLDS NUM</span>
+                <span>REYNOLDS EST</span>
                 <strong className="c3-mono-primary">{hudMetrics.reynolds}</strong>
               </div>
               <div className="c3-readout-cell">
-                <span>CURSOR WAKE</span>
+                <span>ORBIT / WAKE</span>
                 <strong className="c3-mono-secondary">{hudMetrics.cursorVec}</strong>
               </div>
             </div>
@@ -1145,8 +1443,9 @@ export const Concept03Experimental: React.FC = () => {
             <h2 className="c3-section-title">SIX PRODUCTION ATTRACTOR SYSTEMS</h2>
           </div>
           <p className="c3-section-desc">
-            Click any project node to synchronize the procedural physics engine with its harmonic
-            signature, or open the full architectural dossier modal for RTL/Rust code inspection.
+            Select any project node to synchronize the real-time simulation engine with its native
+            physics mode, or click <strong>INSPECT FULL DOSSIER [+]</strong> for synthesizable
+            Verilog/Rust code.
           </p>
         </div>
 
@@ -1163,7 +1462,7 @@ export const Concept03Experimental: React.FC = () => {
                 >
                   <div className="c3-node-top">
                     <span className="c3-mono-primary">{proj.code}</span>
-                    <span className="c3-mono-tertiary">{proj.recommendedMode}</span>
+                    <span className="c3-mono-tertiary">{proj.recommendedEngine}</span>
                   </div>
                   <h3 className="c3-node-title">{proj.title}</h3>
                   <div className="c3-node-energy">{proj.energySignature}</div>
@@ -1180,7 +1479,10 @@ export const Concept03Experimental: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={() => setDossierOpen(true)}
+                onClick={() => {
+                  triggerTactileClick(980);
+                  setDossierOpen(true);
+                }}
                 className="c3-btn-dossier"
               >
                 INSPECT FULL DOSSIER [+]
@@ -1282,21 +1584,21 @@ export const Concept03Experimental: React.FC = () => {
         </div>
       </section>
 
-      {/* SECTION 03: INTERACTIVE EXECUTABLE LAB SANDBOXES */}
+      {/* SECTION 03: INTERACTIVE EXECUTABLE ECE / SILICON SANDBOXES */}
       <section id="c3-sandboxes" className="c3-section">
         <div className="c3-section-head">
           <div>
-            <span className="c3-eyebrow-primary">03 // EXECUTABLE INSTRUMENTATION</span>
-            <h2 className="c3-section-title">FOUR INTERACTIVE ENGINEERING SANDBOXES</h2>
+            <span className="c3-eyebrow-primary">03 // EXECUTABLE ECE &amp; SILICON LABS</span>
+            <h2 className="c3-section-title">FOUR INTERACTIVE HARDWARE &amp; ML SANDBOXES</h2>
           </div>
           <p className="c3-section-desc">
-            Live client-side micro-instruments executing real impedance math, RISC-V pipeline
-            forwarding, acoustic wake thresholding, and graph velocity scoring.
+            Live client-side micro-instruments computing real complex reflection coefficients,
+            RISC-V pipeline hazard forwarding, acoustic wake gating, and SHAP anomaly logits.
           </p>
         </div>
 
         <div className="c3-sandbox-grid">
-          {/* SANDBOX 01: SMITH CHART IMPEDANCE TUNER */}
+          {/* SANDBOX 01: 50Ω SMITH CHART TUNER */}
           <div className="c3-glass-card c3-sandbox-card">
             <div className="c3-sandbox-head">
               <span className="c3-mono-primary">SANDBOX 01 // EM-RF-03</span>
@@ -1306,9 +1608,30 @@ export const Concept03Experimental: React.FC = () => {
 
             <div className="c3-smith-visual-row">
               <svg viewBox="0 0 180 180" className="c3-smith-svg" aria-label="Live Smith Chart">
-                <circle cx="90" cy="90" r="76" fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="1.2" />
-                <circle cx="115" cy="90" r="51" fill="none" stroke="rgba(255,255,255,0.12)" strokeDasharray="3 3" />
-                <circle cx="140" cy="90" r="26" fill="none" stroke="rgba(255,255,255,0.12)" />
+                <circle
+                  cx="90"
+                  cy="90"
+                  r="76"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.22)"
+                  strokeWidth="1.2"
+                />
+                <circle
+                  cx="115"
+                  cy="90"
+                  r="51"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.14)"
+                  strokeDasharray="3 3"
+                />
+                <circle cx="140" cy="90" r="26" fill="none" stroke="rgba(255,255,255,0.14)" />
+                <path
+                  d="M 90 14 A 76 76 0 0 1 166 90"
+                  fill="none"
+                  stroke="var(--c3-secondary)"
+                  strokeWidth="1"
+                  strokeDasharray="2 2"
+                />
                 <line x1="14" y1="90" x2="166" y2="90" stroke="rgba(255,255,255,0.2)" />
                 <circle
                   cx={90 + gammaReal * 76}
@@ -1322,7 +1645,7 @@ export const Concept03Experimental: React.FC = () => {
                   x2={90 + gammaReal * 76}
                   y2={90 - gammaImag * 76}
                   stroke="var(--c3-tertiary)"
-                  strokeWidth="1.5"
+                  strokeWidth="1.6"
                 />
               </svg>
 
@@ -1350,7 +1673,10 @@ export const Concept03Experimental: React.FC = () => {
                   min="10"
                   max="150"
                   value={smithR}
-                  onChange={(e) => setSmithR(Number(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(580);
+                    setSmithR(Number(e.target.value));
+                  }}
                 />
               </label>
               <label>
@@ -1360,19 +1686,22 @@ export const Concept03Experimental: React.FC = () => {
                   min="-100"
                   max="100"
                   value={smithX}
-                  onChange={(e) => setSmithX(Number(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(610);
+                    setSmithX(Number(e.target.value));
+                  }}
                 />
               </label>
             </div>
           </div>
 
-          {/* SANDBOX 02: RV32I 5-STAGE PIPELINE CLOCK STEPPER */}
+          {/* SANDBOX 02: RV32I 5-STAGE PIPELINE STEPPER */}
           <div className="c3-glass-card c3-sandbox-card">
             <div className="c3-sandbox-head">
               <span className="c3-mono-primary">SANDBOX 02 // ARCH-RTL-04</span>
               <span className="c3-badge-secondary">{currentCycleSpec.cycle}</span>
             </div>
-            <h3>RV32I 5-Stage Pipeline Hazard Stepper</h3>
+            <h3>RV32I 5-Stage Pipeline Clock Stepper</h3>
 
             <div className="c3-pipeline-stages">
               <div className="c3-stage-pill">
@@ -1407,26 +1736,29 @@ export const Concept03Experimental: React.FC = () => {
                 <strong className="c3-mono-primary">{currentCycleSpec.forwardPath}</strong>
               </div>
               <div>
-                <span>REG x1 VALUE:</span>
+                <span>REG x1 STATE:</span>
                 <strong>{currentCycleSpec.regX1}</strong>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => setClockStep((s) => s + 1)}
+              onClick={() => {
+                triggerTactileClick(920);
+                setClockStep((s) => s + 1);
+              }}
               className="c3-sandbox-btn"
             >
               ADVANCE RISING CLOCK EDGE (CLK ↑)
             </button>
           </div>
 
-          {/* SANDBOX 03: A.V.E. VAD ACOUSTIC STREAMER */}
+          {/* SANDBOX 03: VAD ACOUSTIC STREAMER */}
           <div className="c3-glass-card c3-sandbox-card">
             <div className="c3-sandbox-head">
               <span className="c3-mono-primary">SANDBOX 03 // AI-SYS-01</span>
               <span className="c3-badge-secondary">
-                {vadSignalLevel > vadThreshold ? 'WAKE TRIGGERED (184ms)' : 'SILENCE GATED'}
+                {vadSignalLevel > vadThreshold ? 'WAKE ARMED (184ms)' : 'SILENCE GATED'}
               </span>
             </div>
             <h3>A.V.E. Acoustic VAD &amp; Ring Buffer</h3>
@@ -1448,23 +1780,29 @@ export const Concept03Experimental: React.FC = () => {
 
             <div className="c3-sandbox-controls">
               <label>
-                <span>INPUT ACOUSTIC ENERGY: {vadSignalLevel} dB</span>
+                <span>PCM INPUT ACOUSTIC GAIN: {vadSignalLevel} dB</span>
                 <input
                   type="range"
                   min="10"
                   max="100"
                   value={vadSignalLevel}
-                  onChange={(e) => setVadSignalLevel(Number(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(640);
+                    setVadSignalLevel(Number(e.target.value));
+                  }}
                 />
               </label>
               <label>
-                <span>VAD WAKE THRESHOLD: {vadThreshold} dB</span>
+                <span>SILENCE GATE THRESHOLD: {vadThreshold} dB</span>
                 <input
                   type="range"
                   min="20"
                   max="90"
                   value={vadThreshold}
-                  onChange={(e) => setVadThreshold(Number(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(700);
+                    setVadThreshold(Number(e.target.value));
+                  }}
                 />
               </label>
             </div>
@@ -1475,14 +1813,14 @@ export const Concept03Experimental: React.FC = () => {
             <div className="c3-sandbox-head">
               <span className="c3-mono-primary">SANDBOX 04 // ML-SYS-02</span>
               <span className="c3-badge-secondary">
-                SCORE: {(fraudProbability * 100).toFixed(1)}%
+                RISK: {(fraudProbability * 100).toFixed(1)}%
               </span>
             </div>
             <h3>FraudLens Graph Velocity &amp; SHAP</h3>
 
             <div className="c3-shap-bars">
               <div className="c3-shap-row">
-                <span>2-HOP VELOCITY</span>
+                <span>2-HOP VELOCITY TENSOR</span>
                 <div className="c3-shap-track">
                   <div
                     className="c3-shap-fill"
@@ -1500,7 +1838,7 @@ export const Concept03Experimental: React.FC = () => {
                 </div>
               </div>
               <div className="c3-shap-row">
-                <span>ENSEMBLE RISK LOGIT</span>
+                <span>SHAP ENSEMBLE LOGIT</span>
                 <div className="c3-shap-track">
                   <div
                     className="c3-shap-fill is-tertiary"
@@ -1512,21 +1850,27 @@ export const Concept03Experimental: React.FC = () => {
 
             <div className="c3-sandbox-controls">
               <label>
-                <span>BASE STREAM VELOCITY: {txVelocity}00 TPS</span>
+                <span>STREAM VELOCITY: {txVelocity}00 TPS</span>
                 <input
                   type="range"
                   min="10"
                   max="85"
                   value={txVelocity}
-                  onChange={(e) => setTxVelocity(Number(e.target.value))}
+                  onChange={(e) => {
+                    triggerTactileClick(760);
+                    setTxVelocity(Number(e.target.value));
+                  }}
                 />
               </label>
               <button
                 type="button"
-                onClick={() => setAnomalyBurst((b) => !b)}
+                onClick={() => {
+                  triggerTactileClick(540);
+                  setAnomalyBurst((b) => !b);
+                }}
                 className="c3-sandbox-btn"
               >
-                {anomalyBurst ? 'CLEAR COLLUSION BURST' : 'SIMULATE COLLUSION RING BURST'}
+                {anomalyBurst ? 'CLEAR COLLUSION BURST' : 'TRIGGER COLLUSION RING BURST'}
               </button>
             </div>
           </div>
@@ -1539,7 +1883,7 @@ export const Concept03Experimental: React.FC = () => {
           <div className="c3-manifesto-left">
             <span className="c3-eyebrow-primary">04 // ARCHITECTURAL MANIFESTO</span>
             <h2>
-              FROM <span>MAXWELL’S EQUATIONS</span> TO <span>AUTONOMOUS AGENTS</span>.
+              FROM <span>MAXWELL’S EQUATIONS</span> TO <span>SOVEREIGN SILICON</span>.
             </h2>
             <div className="c3-identity-stamp">
               <span>ANKUSH MALOTHIA // HANDLE: SIROSIU</span>
@@ -1727,7 +2071,7 @@ export const Concept03Experimental: React.FC = () => {
         <div className="c3-footer-wrap">
           <span>© 2026 SIROSIU // ANKUSH MALOTHIA — EXPERIMENTAL GENERATIVE SYSTEMS</span>
           <span className="c3-mono-primary">
-            SIGNATURE MARK: SHINO // MODE: {fieldMode} // PALETTE: {paletteId}
+            SIGNATURE MARK: SHINO // ENGINE: {engine} // PALETTE: {paletteId}
           </span>
         </div>
       </footer>
