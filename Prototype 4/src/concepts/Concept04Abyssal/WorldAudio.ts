@@ -1,193 +1,115 @@
 /**
- * WorldAudio - Ambient reverie sound engine for the Continuous World Entrance.
- * Plays high-fidelity reverie soundtrack with seamless looping,
- * accompanied by an emergency Web Audio synthesized harmonic drone fallback.
+ * WorldAudio - Procedural Web Audio synthesizer for Ankush Malothia // Sirosiu.
+ * Generates an ethereal tri-harmonic ambient celestial drone modulated by an LFO,
+ * and surges with a bandpass-filtered noise generator during warp acceleration.
  */
 
 export class WorldAudio {
-  private audioCtx: AudioContext | null = null
-  private audioElement: HTMLAudioElement | null = null
-  private mediaSource: MediaElementAudioSourceNode | null = null
+  private ctx: AudioContext | null = null
   private masterGain: GainNode | null = null
-
-  // Fallback Synthesizer Nodes
-  private synthGain: GainNode | null = null
-  private synthOscillators: OscillatorNode[] = []
-
+  private warpGain: GainNode | null = null
   private isEnabled = false
-  private isSynthesizing = false
 
-  constructor() {
+  public init(): void {
+    if (this.ctx) return
     try {
-      this.audioElement = new Audio('/audio/reverie-journey.mp3')
-      this.audioElement.loop = true
-      this.audioElement.preload = 'auto'
-      this.audioElement.volume = 0.75
+      const AudioCtxClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      if (!AudioCtxClass) return
+
+      this.ctx = new AudioCtxClass()
+      this.masterGain = this.ctx.createGain()
+      this.masterGain.gain.setValueAtTime(0, this.ctx.currentTime)
+      this.masterGain.connect(this.ctx.destination)
+
+      const lp = this.ctx.createBiquadFilter()
+      lp.type = 'lowpass'
+      lp.frequency.setValueAtTime(420, this.ctx.currentTime)
+      lp.connect(this.masterGain)
+
+      // Tri-harmonic warm celestial drone (55Hz, 82.5Hz, 110.4Hz)
+      const freqs = [55, 82.5, 110.4]
+      freqs.forEach((f, i) => {
+        if (!this.ctx) return
+        const o = this.ctx.createOscillator()
+        o.type = i === 0 ? 'triangle' : 'sine'
+        o.frequency.setValueAtTime(f, this.ctx.currentTime)
+        const g = this.ctx.createGain()
+        g.gain.setValueAtTime(0.22 / (i + 1), this.ctx.currentTime)
+        o.connect(g)
+        g.connect(lp)
+        o.start()
+      })
+
+      // Slow LFO for frequency breathing (0.07Hz)
+      const lfo = this.ctx.createOscillator()
+      const lfoGain = this.ctx.createGain()
+      lfo.frequency.setValueAtTime(0.07, this.ctx.currentTime)
+      lfoGain.gain.setValueAtTime(160, this.ctx.currentTime)
+      lfo.connect(lfoGain)
+      lfoGain.connect(lp.frequency)
+      lfo.start()
+
+      // Filtered noise generator for warp acceleration thrust
+      const bufferSize = this.ctx.sampleRate * 2
+      const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate)
+      const data = noiseBuffer.getChannelData(0)
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1
+      }
+      const noiseSource = this.ctx.createBufferSource()
+      noiseSource.buffer = noiseBuffer
+      noiseSource.loop = true
+
+      const bp = this.ctx.createBiquadFilter()
+      bp.type = 'bandpass'
+      bp.frequency.setValueAtTime(900, this.ctx.currentTime)
+      this.warpGain = this.ctx.createGain()
+      this.warpGain.gain.setValueAtTime(0, this.ctx.currentTime)
+
+      noiseSource.connect(bp)
+      bp.connect(this.warpGain)
+      this.warpGain.connect(this.masterGain)
+      noiseSource.start()
     } catch (e) {
-      console.warn('Audio element initialization skipped:', e)
+      console.warn('Web Audio initialization skipped:', e)
     }
   }
 
-  private initContext(): AudioContext | null {
-    if (this.audioCtx) {
-      if (this.audioCtx.state === 'suspended') {
-        this.audioCtx.resume()
+  public setSound(enabled: boolean): void {
+    this.isEnabled = enabled
+    if (enabled) {
+      this.init()
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume()
       }
-      return this.audioCtx
-    }
-
-    try {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-      if (!AudioCtxClass) return null
-      this.audioCtx = new AudioCtxClass()
-
-      this.masterGain = this.audioCtx.createGain()
-      this.masterGain.gain.setValueAtTime(0.01, this.audioCtx.currentTime)
-      this.masterGain.connect(this.audioCtx.destination)
-
-      if (this.audioElement && !this.mediaSource) {
-        try {
-          this.mediaSource = this.audioCtx.createMediaElementSource(this.audioElement)
-          this.mediaSource.connect(this.masterGain)
-        } catch (err) {
-          console.warn('Media element source attach warning:', err)
-        }
+      if (this.ctx && this.masterGain) {
+        this.masterGain.gain.setTargetAtTime(0.5, this.ctx.currentTime, 1.2)
       }
-
-      return this.audioCtx
-    } catch (e) {
-      console.warn('Web Audio Context initialization warning:', e)
-      return null
+    } else if (this.ctx && this.masterGain) {
+      this.masterGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.4)
     }
   }
 
-  public async play(): Promise<boolean> {
-    this.isEnabled = true
-    const ctx = this.initContext()
-
-    if (this.audioElement) {
-      try {
-        this.audioElement.muted = false
-        await this.audioElement.play()
-
-        if (this.masterGain && ctx) {
-          this.masterGain.gain.cancelScheduledValues(ctx.currentTime)
-          this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, ctx.currentTime)
-          this.masterGain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 1.8)
-        }
-        return true
-      } catch (err) {
-        console.warn('HTMLAudio play blocked, falling back to WebAudio Synth Drone:', err)
-        this.startSynthDrone()
-        return true
-      }
-    } else {
-      this.startSynthDrone()
-      return true
-    }
-  }
-
-  public pause(): void {
-    this.isEnabled = false
-    if (this.audioElement) {
-      try {
-        this.audioElement.pause()
-      } catch (e) {
-        // ignore
-      }
-    }
-    if (this.masterGain && this.audioCtx) {
-      try {
-        this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, this.audioCtx.currentTime)
-        this.masterGain.gain.linearRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.4)
-      } catch (e) {
-        // ignore
-      }
-    }
-    this.stopSynthDrone()
-  }
-
-  public toggle(): boolean {
-    if (this.isEnabled) {
-      this.pause()
-      return false
-    } else {
-      this.play()
-      return true
-    }
-  }
-
-  public get playing(): boolean {
+  public toggleSound(): boolean {
+    this.setSound(!this.isEnabled)
     return this.isEnabled
   }
 
-  /**
-   * Warm harmonic ambient drone fallback (F# minor / C# / G# reverie)
-   */
-  private startSynthDrone(): void {
-    if (this.isSynthesizing || !this.audioCtx) return
-    this.isSynthesizing = true
-
-    const ctx = this.audioCtx
-    this.synthGain = ctx.createGain()
-    this.synthGain.gain.setValueAtTime(0.001, ctx.currentTime)
-    this.synthGain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 2.5)
-
-    const filter = ctx.createBiquadFilter()
-    filter.type = 'lowpass'
-    filter.frequency.setValueAtTime(320, ctx.currentTime)
-    filter.frequency.exponentialRampToValueAtTime(850, ctx.currentTime + 6.0)
-    filter.Q.value = 2.0
-
-    this.synthGain.connect(filter)
-    filter.connect(ctx.destination)
-
-    // F#2 (92.5Hz), C#3 (138.6Hz), G#3 (207.65Hz), C#4 (277.2Hz)
-    const freqs = [92.5, 92.8, 138.6, 139.1, 207.65, 277.2]
-    this.synthOscillators = freqs.map((f, i) => {
-      const osc = ctx.createOscillator()
-      osc.type = i % 2 === 0 ? 'sawtooth' : 'sine'
-      osc.frequency.setValueAtTime(f, ctx.currentTime)
-      const oscGain = ctx.createGain()
-      oscGain.gain.value = 0.15 / freqs.length
-      osc.connect(oscGain)
-      oscGain.connect(this.synthGain!)
-      osc.start()
-      return osc
-    })
+  public setWarp(intensity: number): void {
+    if (!this.ctx || !this.warpGain) return
+    this.warpGain.gain.setTargetAtTime(Math.min(0.6, intensity * 0.35), this.ctx.currentTime, 0.1)
   }
 
-  private stopSynthDrone(): void {
-    if (!this.isSynthesizing) return
-    this.isSynthesizing = false
-    if (this.synthGain && this.audioCtx) {
-      this.synthGain.gain.linearRampToValueAtTime(0.0001, this.audioCtx.currentTime + 0.5)
-    }
-    setTimeout(() => {
-      this.synthOscillators.forEach((osc) => {
-        try {
-          osc.stop()
-          osc.disconnect()
-        } catch (e) {
-          // ignore
-        }
-      })
-      this.synthOscillators = []
-    }, 600)
+  public getSound(): boolean {
+    return this.isEnabled
   }
 
   public dispose(): void {
-    this.pause()
-    if (this.audioElement) {
-      this.audioElement.src = ''
-      this.audioElement = null
-    }
-    if (this.audioCtx && this.audioCtx.state !== 'closed') {
-      try {
-        this.audioCtx.close()
-      } catch (e) {
-        // ignore
-      }
+    if (this.ctx) {
+      this.ctx.close().catch(() => {})
+      this.ctx = null
     }
   }
 }

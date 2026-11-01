@@ -1,40 +1,35 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { ThresholdWorldEngine, WorldMode } from './ThresholdWorldEngine'
+import {
+  ThresholdWorldEngine,
+  WorldMode,
+  STATIONS,
+  WorldTelemetry,
+} from './ThresholdWorldEngine'
 import { WorldAudio } from './WorldAudio'
 import './Concept04WorldEntrance.css'
-
-const LOADING_MESSAGES: [number, string][] = [
-  [0, 'Aligning deep space observatories & orbital telemetry...'],
-  [24, 'Igniting relativistic warp drive & Kerr accretion disc...'],
-  [48, 'Mapping gravitational lensing & stellar coordinate grid...'],
-  [72, 'Synchronizing Ankush Malothia’s core architecture systems...'],
-  [100, 'Cosmic portal locked. Step into Ankush’s universe.'],
-]
 
 export const Concept04WorldEntrance: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const engineRef = useRef<ThresholdWorldEngine | null>(null)
   const audioRef = useRef<WorldAudio | null>(null)
-  const bottomPanelRef = useRef<HTMLDivElement>(null)
+  const introPanelRef = useRef<HTMLDivElement>(null)
 
-  // Loader state
-  const [loadPercent, setLoadPercent] = useState<number>(0)
-  const [loadStatus, setLoadStatus] = useState<string>('Aligning deep space observatories & orbital telemetry...')
-  const [isReady, setIsReady] = useState<boolean>(false)
-  const [isDeparting, setIsDeparting] = useState<boolean>(false)
-  const [isLoaderHidden, setIsLoaderHidden] = useState<boolean>(false)
+  // Experience & Telemetry State
+  const [telemetry, setTelemetry] = useState<WorldTelemetry>({
+    mode: 'idle',
+    progress: 0,
+    u: 0.012,
+    distance: 0,
+    velocity: 0,
+    activeStationIndex: -1,
+    activeBeat: '',
+    isAtEnd: false,
+  })
 
-  // Experience Mode
-  const [mode, setMode] = useState<WorldMode>('loading')
-  const [soundOn, setSoundOn] = useState<boolean>(false)
-  const [introLine, setIntroLine] = useState<string>('')
-  const [introLineOpacity, setIntroLineOpacity] = useState<number>(0)
-
-  // Veil Transition State
-  const [veilClass, setVeilClass] = useState<string>('')
-
-  // Scroll cue state
-  const [showScrollCue, setShowScrollCue] = useState<boolean>(false)
+  // Preloader boot state
+  const [bootProgress, setBootProgress] = useState(0)
+  const [soundOn, setSoundOn] = useState(false)
+  const [hasEntered, setHasEntered] = useState(false)
 
   // 1. Initialize Audio Engine
   useEffect(() => {
@@ -45,378 +40,273 @@ export const Concept04WorldEntrance: React.FC = () => {
     }
   }, [])
 
-  // 1b. Interactive Pointer Parallax Tilt
-  useEffect(() => {
-    const handlePointerMove = (e: PointerEvent) => {
-      const xNorm = (e.clientX / window.innerWidth - 0.5) * 2.0
-      const yNorm = (e.clientY / window.innerHeight - 0.5) * 2.0
-      engineRef.current?.setPointer(xNorm, yNorm)
-
-      if (bottomPanelRef.current) {
-        const tiltX = (xNorm * 9).toFixed(2)
-        const tiltY = (-yNorm * 9).toFixed(2)
-        bottomPanelRef.current.style.setProperty('--tilt-x', `${tiltX}deg`)
-        bottomPanelRef.current.style.setProperty('--tilt-y', `${tiltY}deg`)
-      }
-    }
-
-    window.addEventListener('pointermove', handlePointerMove)
-    return () => window.removeEventListener('pointermove', handlePointerMove)
-  }, [])
-
-  // 2. Initialize 3D Engine & Paced Preloader
+  // 2. Initialize 3D Engine
   useEffect(() => {
     if (!containerRef.current) return
 
-    const engine = new ThresholdWorldEngine(containerRef.current, {
-      onLoadProgress: (p, msg) => {
-        setLoadPercent((prev) => Math.max(prev, p))
-        setLoadStatus(msg)
+    const engine = new ThresholdWorldEngine(
+      containerRef.current,
+      {
+        onTelemetry: (next) => {
+          setTelemetry((prev) => {
+            if (
+              prev.mode === next.mode &&
+              prev.activeStationIndex === next.activeStationIndex &&
+              prev.activeBeat === next.activeBeat &&
+              prev.isAtEnd === next.isAtEnd &&
+              Math.abs(prev.u - next.u) < 0.003
+            ) {
+              return prev
+            }
+            return next
+          })
+        },
       },
-      onReady: () => {
-        setIsReady(true)
-        setLoadPercent(100)
-        setLoadStatus('Cosmic portal locked. Step into Ankush’s universe.')
-      },
-    })
+      (warp) => {
+        audioRef.current?.setWarp(warp)
+      }
+    )
     engineRef.current = engine
 
-    // Paced progress simulation ensuring smooth visual progression
-    let currentP = 0
-    const interval = setInterval(() => {
-      currentP += Math.random() * 8 + 3
-      if (currentP >= 100) {
-        currentP = 100
-        clearInterval(interval)
-        setLoadPercent(100)
-        setIsReady(true)
-        setLoadStatus('Cosmic portal locked. Step into Ankush’s universe.')
-      } else {
-        setLoadPercent(Math.floor(currentP))
-        let matchedMsg = 'Aligning deep space observatories & orbital telemetry...'
-        for (let i = LOADING_MESSAGES.length - 1; i >= 0; i--) {
-          if (currentP >= LOADING_MESSAGES[i][0]) {
-            matchedMsg = LOADING_MESSAGES[i][1]
-            break
-          }
-        }
-        setLoadStatus(matchedMsg)
-      }
-    }, 110)
-
     return () => {
-      clearInterval(interval)
       engine.dispose()
       engineRef.current = null
     }
   }, [])
 
-  // 3. Start Intro Fly-Through
-  const handleStartIntro = useCallback(() => {
-    if (!isReady || mode !== 'loading') return
-
-    audioRef.current?.play().then((playing) => {
-      if (playing) setSoundOn(true)
-    })
-
-    setIsDeparting(true)
-    setMode('intro')
-    engineRef.current?.setMode('intro')
-
-    // Fade out preloader over 900ms
-    setTimeout(() => {
-      setIsLoaderHidden(true)
-    }, 900)
-
-    // Run intro narrative timeline
-    const startTime = performance.now()
-    const beats: [number, number, string][] = [
-      [1.0, 4.2, 'In the silence of deep space, complex systems find perfect clarity.'],
-      [4.8, 8.0, 'I architect software that spans light-years. Welcome to my domain.'],
-    ]
-
-    let rafId = 0
-    const tickIntro = (now: number) => {
-      const elapsed = (now - startTime) / 1000
-
-      const currentBeat = beats.find(([start, end]) => elapsed >= start && elapsed < end)
-      if (currentBeat) {
-        setIntroLine(currentBeat[2])
-        const fadeIn = Math.min(1, (elapsed - currentBeat[0]) / 0.65)
-        const fadeOut = Math.min(1, (currentBeat[1] - elapsed) / 0.65)
-        setIntroLineOpacity(Math.max(0, Math.min(fadeIn, fadeOut)))
-      } else {
-        setIntroLineOpacity(0)
-      }
-
-      if (elapsed >= 8.3) {
-        endIntro()
-      } else {
-        rafId = requestAnimationFrame(tickIntro)
-      }
-    }
-
-    rafId = requestAnimationFrame(tickIntro)
-  }, [isReady, mode])
-
-  // 4. End Intro & Veil Crossfade
-  const endIntro = useCallback(() => {
-    if (mode === 'journey') return
-
-    setIntroLineOpacity(0)
-    setVeilClass('cover')
-
-    setTimeout(() => {
-      setMode('journey')
-      engineRef.current?.setMode('journey')
-      window.scrollTo(0, 0)
-      setShowScrollCue(true)
-
-      setVeilClass('cover reveal')
-
-      setTimeout(() => {
-        setVeilClass('')
-      }, 1400)
-    }, 850)
-  }, [mode])
-
-  // 5. Sound Toggle
-  const toggleSound = () => {
-    if (!audioRef.current) return
-    const isPlaying = audioRef.current.toggle()
-    setSoundOn(isPlaying)
-  }
-
-  // 6. Scroll listener for Journey Mode
+  // 3. Smooth Preloader Boot Progress
   useEffect(() => {
-    if (mode !== 'journey') return
+    let frame = 0
+    const started = performance.now()
+    const duration = 2200
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - started) / duration)
+      const eased = t * t * (3 - 2 * t)
+      setBootProgress(Math.round(eased * 100))
+      if (t < 1) frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
-      const progress = Math.min(1, Math.max(0, scrollY / maxScroll))
+  // 4. Mouse Parallax Tilt on Preloader Panel
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      const xNorm = (e.clientX / window.innerWidth - 0.5) * 2
+      const yNorm = (e.clientY / window.innerHeight - 0.5) * 2
 
-      engineRef.current?.setScrollProgress(progress)
-
-      if (scrollY > 50) {
-        setShowScrollCue(false)
-      } else {
-        setShowScrollCue(true)
+      if (introPanelRef.current) {
+        introPanelRef.current.style.setProperty('--tilt-x', `${-yNorm * 3}deg`)
+        introPanelRef.current.style.setProperty('--tilt-y', `${xNorm * 4}deg`)
       }
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [mode])
+    window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    return () => window.removeEventListener('pointermove', handlePointerMove)
+  }, [])
 
-  const handleCueClick = () => {
-    window.scrollBy({
-      top: Math.max(220, window.innerHeight * 0.42),
-      behavior: 'smooth',
-    })
-  }
+  // Actions
+  const handleEnter = useCallback(() => {
+    if (hasEntered || bootProgress < 100) return
+    setHasEntered(true)
+    audioRef.current?.setSound(true)
+    setSoundOn(true)
+    engineRef.current?.startPlunge()
+  }, [hasEntered, bootProgress])
+
+  const handleSkip = useCallback(() => {
+    setHasEntered(true)
+    audioRef.current?.setSound(true)
+    setSoundOn(true)
+    engineRef.current?.skipToJourney()
+  }, [])
+
+  const toggleSound = useCallback(() => {
+    if (!audioRef.current) return
+    const next = audioRef.current.toggleSound()
+    setSoundOn(next)
+  }, [])
+
+  const handleStationClick = useCallback((index: number) => {
+    engineRef.current?.goToStation(index)
+  }, [])
+
+  const isIdle = telemetry.mode === 'idle'
+  const isJourney = telemetry.mode === 'journey'
+  const activeStation =
+    telemetry.activeStationIndex >= 0 ? STATIONS[telemetry.activeStationIndex] : null
 
   return (
-    <div className="concept04-world-root">
-      {/* 3D WebGL Three.js Container */}
-      <div ref={containerRef} className="threshold-canvas-container" />
+    <div className={`universe-root ${isIdle ? 'phase-idle' : 'phase-active'}`}>
+      {/* 3D WebGL Canvas Layer */}
+      <div ref={containerRef} className="universe-canvas-mount" />
 
-      {/* Persistent Top Navigation Bar */}
+      {/* Atmospheric Vignette & Film Grain */}
+      <div className="universe-vignette" aria-hidden="true" />
+      <div className="universe-grain" aria-hidden="true" />
+
+      {/* Persistent Minimalist Top Navigation */}
       <header className="c04-topbar">
-        <button
-          id="sound"
-          className="c04-top-btn"
-          onClick={toggleSound}
-          aria-pressed={soundOn}
-        >
-          {soundOn ? 'Sound on · mute' : 'Sound off · play'}
-        </button>
+        <div className="c04-brand">
+          <span className="c04-brand-main">ANKUSH MALOTHIA</span>
+          <span className="c04-brand-sub">
+            SIROSIU <i>//</i> INDEPENDENT SYSTEMS
+          </span>
+        </div>
 
-        <a className="c04-top-btn" href="mailto:sirosiu@gmail.com">
-          Talk to Ankush ↗
-        </a>
+        <div className="c04-topbar-center">
+          <span className="c04-status-dot" />
+          <span className="c04-status-text">
+            WORLD SYSTEMS {isIdle ? 'STANDBY' : 'ONLINE'}
+          </span>
+          {isJourney && (
+            <span className="c04-telemetry-readout">
+              DIST {telemetry.distance.toString().padStart(3, '0')} · VEL{' '}
+              {telemetry.velocity.toFixed(1)}
+            </span>
+          )}
+        </div>
 
-        {mode === 'intro' && (
-          <button id="skipIntro" className="c04-top-btn" onClick={endIntro}>
-            Begin the journey ↗
+        <div className="c04-topbar-actions">
+          <button
+            type="button"
+            className="c04-text-btn"
+            onClick={toggleSound}
+            aria-pressed={soundOn}
+          >
+            {soundOn ? 'Sound on' : 'Sound off'}
           </button>
-        )}
+          <a
+            className="c04-text-btn c04-contact-link"
+            href="mailto:sirosiu@gmail.com"
+          >
+            Talk to Ankush ↗
+          </a>
+        </div>
       </header>
 
-      {/* PHASE 0: PRELOADER OVERLAY (#loader) */}
-      {!isLoaderHidden && (
-        <section
-          id="loader"
-          className={`c04-loader ${isDeparting ? 'departing' : ''}`}
-          aria-label="Preparing Ankush Malothia celestial cosmos"
-        >
-          <div className="c04-loader-badge" aria-hidden="true">
-            <span className="c04-badge-dot" />
-            <span>SECTOR 04 // CARINA NEBULAR COMPLEX · RA 10h 45m 03s · DEC -59° 52′ 04″</span>
+      {/* PHASE 0: PRELOADER OBSERVATION PANEL */}
+      <div className={`c04-preloader-overlay ${isIdle ? 'visible' : 'hidden'}`}>
+        <div ref={introPanelRef} className="c04-glass-panel">
+          <div className="c04-panel-top">
+            <span className="c04-mono-lbl">ANKUSH MALOTHIA // SIROSIU</span>
+            <span className="c04-mono-lbl c04-dim">SYS.04 // SECTOR HORIZON</span>
           </div>
 
-          <div className="c04-loader-art" aria-hidden="true" />
-          <div className="c04-loader-haze" aria-hidden="true" />
-
-          <p className="c04-loader-name">ANKUSH MALOTHIA // SIROSIU</p>
-          <h2 className="c04-loader-title">
+          <h1 className="c04-hero-heading">
             We build at the edge
             <br />
             of the known universe.
-          </h2>
+          </h1>
 
-          <div ref={bottomPanelRef} className="c04-loader-bottom">
-            <div className="c04-loader-number">
-              <span id="percent">{loadPercent}</span>
-              <small>%</small>
-            </div>
-
-            <div
-              id="loadMeter"
-              className="c04-loader-track"
-              role="progressbar"
-              aria-valuenow={loadPercent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <i
-                id="loadFill"
-                className="c04-loader-fill"
-                style={{ width: `${loadPercent}%` }}
+          <div className="c04-progress-row">
+            <div className="c04-track-bar">
+              <div
+                className="c04-track-fill"
+                style={{ width: `${bootProgress}%` }}
               />
             </div>
-
-            <p id="loadStatus" className="c04-loader-status" role="status">
-              {loadStatus}
-            </p>
-
-            <button
-              id="enter"
-              className="c04-enter-btn"
-              disabled={!isReady}
-              onClick={handleStartIntro}
-            >
-              Enter Ankush's Universe <span>↗</span>
-            </button>
-
-            <a className="c04-loader-contact" href="mailto:sirosiu@gmail.com">
-              Talk to Ankush ↗
-            </a>
-
-            <p className="c04-loader-small">
-              Enter with sound. You can turn it off anytime.
-            </p>
+            <div className="c04-track-pct">{bootProgress}%</div>
           </div>
-        </section>
-      )}
 
-      {/* PHASE 1 & 2: INTRO FLY-THROUGH NARRATIVE (#intro) */}
-      <section
-        id="intro"
-        className={`c04-intro-overlay ${mode !== 'intro' ? 'hidden' : ''}`}
-      >
-        <p
-          id="introLine"
-          className="c04-intro-line"
-          style={{
-            opacity: introLineOpacity,
-            filter: `blur(${(1 - introLineOpacity) * 6}px)`,
-          }}
-        >
-          {introLine}
-        </p>
-      </section>
-
-      {/* PHASE 3: THE CLOUD MIST VEIL (#worldVeil) */}
-      <div id="worldVeil" className={`c04-world-veil ${veilClass}`} aria-hidden="true">
-        <i />
-        <i />
-        <span />
+          <div className="c04-action-row">
+            <button
+              type="button"
+              id="enter"
+              className={`c04-enter-cta ${bootProgress >= 100 ? 'ready' : ''}`}
+              disabled={bootProgress < 100}
+              onClick={handleEnter}
+            >
+              Enter Ankush’s Universe ↗
+            </button>
+            <button
+              type="button"
+              className="c04-skip-btn"
+              onClick={handleSkip}
+            >
+              Skip intro
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* PHASE 4: JOURNEY MODE SCROLL CUE */}
-      <button
-        id="scrollCue"
-        className={`c04-scroll-cue ${showScrollCue && mode === 'journey' ? 'is-visible' : ''}`}
-        onClick={handleCueClick}
-        aria-label="Scroll down to move forward"
+      {/* PHASE 1 & 2: NARRATIVE BEAT OVERLAY */}
+      <div
+        className={`c04-narrative-beat ${telemetry.activeBeat ? 'visible' : ''}`}
+        aria-live="polite"
       >
-        <div className="c04-scroll-cue-icon">
-          <div className="c04-scroll-cue-trace" />
-          <svg className="c04-scroll-cue-chevron" viewBox="0 0 16 10">
-            <path d="M2 3l6 4 6-4" />
-          </svg>
+        {telemetry.activeBeat}
+      </div>
+
+      {/* PHASE 3: INTERACTIVE JOURNEY HUD */}
+      <div className={`c04-journey-hud ${isJourney ? 'visible' : 'hidden'}`}>
+        {/* Active Station Card on the Left */}
+        <div className={`c04-station-card ${activeStation ? 'visible' : ''}`}>
+          <div className="c04-mono-lbl c04-dim">
+            {activeStation
+              ? `STATION 0${telemetry.activeStationIndex + 1} / 04`
+              : ''}
+          </div>
+          <h2 className="c04-station-title">{activeStation?.title}</h2>
+          <div className="c04-station-subtitle">{activeStation?.subtitle}</div>
+          <p className="c04-station-desc">{activeStation?.description}</p>
         </div>
-        <div className="c04-scroll-cue-label">
-          Scroll down to move forward
-          <span>Traverse Ankush's celestial highway</span>
+
+        {/* Vertical Progress Rail & Station Dots on the Right */}
+        <div className="c04-rail-nav">
+          <div className="c04-rail-track">
+            <div
+              className="c04-rail-fill"
+              style={{ height: `${telemetry.progress}%` }}
+            />
+          </div>
+          <div className="c04-rail-dots">
+            {STATIONS.map((st, i) => (
+              <button
+                key={st.title}
+                type="button"
+                className={`c04-rail-dot ${telemetry.activeStationIndex === i ? 'active' : ''}`}
+                title={`Glide to ${st.title}`}
+                onClick={() => handleStationClick(i)}
+                aria-label={`Glide to Station 0${i + 1}: ${st.title}`}
+              >
+                <span className="c04-dot-tooltip">{st.title}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </button>
 
-      {/* JOURNEY CONTINUOUS CHAPTER STAGES */}
-      {mode === 'journey' && (
-        <main className="c04-journey-chapters">
-          {/* Chapter 01 */}
-          <article className="c04-chapter-card">
-            <div className="c04-card-inner">
-              <span className="c04-card-folio">ORBITAL STATION 01 // HYPERION</span>
-              <h2 className="c04-card-title">Sub-millisecond latency across planetary clusters.</h2>
-              <p className="c04-card-body">
-                Zero-copy RingBuffer streaming, lock-free concurrency, and deterministic throughput
-                engineered by Ankush Malothia to handle millions of real-time transactions with sub-millisecond p99.
-              </p>
-              <a href="mailto:sirosiu@gmail.com" className="c04-card-action">
-                Inspect Hyperion Engine ↗
-              </a>
-            </div>
-          </article>
+        {/* Scroll Cue Indicator at Bottom Center */}
+        <div
+          className={`c04-scroll-cue ${telemetry.u > 0.14 ? 'fade-out' : ''}`}
+        >
+          <span className="c04-mono-lbl">Scroll to explore</span>
+          <i className="c04-cue-line" />
+        </div>
 
-          {/* Chapter 02 */}
-          <article className="c04-chapter-card">
-            <div className="c04-card-inner">
-              <span className="c04-card-folio">ORBITAL STATION 02 // ARGON</span>
-              <h2 className="c04-card-title">Autonomous intelligence with deterministic precision.</h2>
-              <p className="c04-card-body">
-                Multi-agent orchestration engines designed by Ankush Malothia, self-calibrating across
-                high-dimensional tool pipelines and sandboxed execution runtimes.
-              </p>
-              <a href="https://github.com/sirosiu" target="_blank" rel="noreferrer" className="c04-card-action">
-                Explore Argon Architecture ↗
-              </a>
-            </div>
-          </article>
-
-          {/* Chapter 03 */}
-          <article className="c04-chapter-card">
-            <div className="c04-card-inner">
-              <span className="c04-card-folio">ORBITAL STATION 03 // AETHER</span>
-              <h2 className="c04-card-title">Raymarched spatial shaders & zero-latency WebGPU.</h2>
-              <p className="c04-card-body">
-                Volumetric relativistic simulations, real-time physics, and mathematically grounded graphics
-                that push browser hardware to its physical limits.
-              </p>
-              <a href="#explore" className="c04-card-action" onClick={(e) => { e.preventDefault(); handleCueClick(); }}>
-                Continue down the ribbon ↗
-              </a>
-            </div>
-          </article>
-
-          {/* Chapter 04 */}
-          <article className="c04-chapter-card">
-            <div className="c04-card-inner">
-              <span className="c04-card-folio">ORBITAL STATION 04 // CHRONOS</span>
-              <h2 className="c04-card-title">Ready to build something extraordinary?</h2>
-              <p className="c04-card-body">
-                You don’t need an exhaustive plan to begin. Tell Ankush Malothia what you want to build or elevate,
-                and we will carve the path together.
-              </p>
-              <a href="mailto:sirosiu@gmail.com" className="c04-card-action">
-                Start a Conversation ↗
-              </a>
-            </div>
-          </article>
-        </main>
-      )}
+        {/* End of Line Contact Card */}
+        <div className={`c04-contact-card ${telemetry.isAtEnd ? 'visible' : ''}`}>
+          <div className="c04-mono-lbl c04-dim">TERMINUS REACHED</div>
+          <h3 className="c04-contact-title">Let’s build something vast.</h3>
+          <div className="c04-contact-links">
+            <a href="mailto:sirosiu@gmail.com">Email ↗</a>
+            <a
+              href="https://github.com/Sirosiu"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub ↗
+            </a>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              LinkedIn ↗
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

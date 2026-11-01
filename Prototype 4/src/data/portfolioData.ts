@@ -470,9 +470,9 @@ export const CONCEPT_META = {
     id: 'celestial-cosmos',
     number: '04',
     name: "Ankush's Cosmos",
-    personality: 'Kerr Relativistic Black Hole, Crystalline Starlight Ribbon Highway, Orbital Stations, Ankush Malothia Systems',
-    aesthetic: 'Void Obsidian (#020308) • Accretion Amber (#ff9922) • Electric Cyan (#00f0ff) • Starlight Violet (#8b5cf6)',
-    palette: ['#020308', '#060919', '#00f0ff', '#8b5cf6', '#ff9922'],
+    personality: 'Unified Starlight Spline, Minimalist Kerr Core, 4 Architectural Stations, Cinematic Audio Drone',
+    aesthetic: 'Void Obsidian (#020408) • Ice Platinum (#e2e8f0) • Muted Slate (#070a10) • Titan Cyan (#38bdf8)',
+    palette: ['#020408', '#070a10', '#94a3b8', '#e2e8f0', '#38bdf8'],
   },
   5: {
     id: 'quantum-terminal',

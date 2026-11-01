@@ -7,3 +7,7 @@ dist-ssr
 
 # Ignore local review subrepos
 *sirosiu-public-review*
+
+# Prototype 6 (local development only)
+Prototype 6/
+Prototype 6
