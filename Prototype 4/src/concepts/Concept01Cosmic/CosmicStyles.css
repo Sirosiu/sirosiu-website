@@ -1,0 +1,740 @@
+/* ==========================================================================
+   CONCEPT 01: COSMIC HORIZON (PROTOTYPE 4)
+   Scroll-Driven Gravitational Parallax & Celestial Scrollytelling
+   ========================================================================== */
+
+:root {
+  --cosmic-bg: #030307;
+  --cosmic-surface: rgba(14, 14, 26, 0.72);
+  --cosmic-border: rgba(255, 255, 255, 0.08);
+  --cosmic-border-glow: rgba(245, 158, 11, 0.35);
+  --cosmic-text: #f8fafc;
+  --cosmic-text-muted: #94a3b8;
+  --cosmic-gold: #f59e0b;
+  --cosmic-gold-glow: rgba(245, 158, 11, 0.2);
+  --cosmic-blue: #38bdf8;
+  --cosmic-font-display: 'Syne', sans-serif;
+  --cosmic-font-body: 'Inter', sans-serif;
+  --cosmic-font-mono: 'JetBrains Mono', monospace;
+}
+
+.cosmic-root {
+  background-color: var(--cosmic-bg);
+  color: var(--cosmic-text);
+  font-family: var(--cosmic-font-body);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: clip;
+  width: 100%;
+}
+
+/* Background Celestial Canvas */
+.cosmic-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cosmic-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Floating Celestial Telemetry HUD */
+.cosmic-hud-fixed {
+  position: fixed;
+  top: 3.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1320px, 94vw);
+  background: rgba(9, 9, 18, 0.75);
+  border: 1px solid var(--cosmic-border);
+  backdrop-filter: blur(16px);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.4rem;
+  z-index: 20;
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.72rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+.cosmic-hud-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cosmic-hud-label {
+  font-size: 0.6rem;
+  color: var(--cosmic-text-muted);
+  letter-spacing: 0.08em;
+}
+
+.cosmic-mono-gold {
+  color: var(--cosmic-gold);
+}
+
+.cosmic-mono-blue {
+  color: var(--cosmic-blue);
+}
+
+.cosmic-audio-btn {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--cosmic-gold);
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.68rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cosmic-audio-btn:hover,
+.cosmic-audio-btn.is-active {
+  background: var(--cosmic-gold);
+  color: #030307;
+  font-weight: 600;
+  box-shadow: 0 0 16px var(--cosmic-gold-glow);
+}
+
+/* Hero Section */
+.cosmic-hero-section {
+  position: relative;
+  z-index: 5;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rem 2rem 4rem;
+  text-align: center;
+}
+
+.cosmic-hero-container {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.cosmic-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.75rem;
+  color: var(--cosmic-gold);
+  letter-spacing: 0.14em;
+  padding: 6px 16px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 999px;
+}
+
+.cosmic-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--cosmic-gold);
+  box-shadow: 0 0 10px var(--cosmic-gold);
+  animation: cosmic-pulse 2s infinite ease-in-out;
+}
+
+@keyframes cosmic-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.5; }
+}
+
+.cosmic-hero-title {
+  font-family: var(--cosmic-font-display);
+  font-size: clamp(2.8rem, 7.5vw, 6.2rem);
+  font-weight: 800;
+  line-height: 1.02;
+  text-transform: uppercase;
+  transition: transform 0.1s linear, opacity 0.1s linear;
+}
+
+.cosmic-text-gradient {
+  background: linear-gradient(135deg, #fef08a, #f59e0b 60%, #b45309);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cosmic-hero-lead {
+  max-width: 720px;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.65;
+  color: #cbd5e1;
+  font-weight: 300;
+}
+
+.cosmic-scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.cosmic-scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--cosmic-gold), transparent);
+  animation: cosmic-drop 2s infinite ease-in-out;
+}
+
+@keyframes cosmic-drop {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  50.1% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+.cosmic-scroll-text {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.65rem;
+  color: var(--cosmic-text-muted);
+  letter-spacing: 0.16em;
+}
+
+/* Sections General */
+.cosmic-section {
+  position: relative;
+  z-index: 5;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+}
+
+.cosmic-section-header {
+  margin-bottom: 3.5rem;
+  max-width: 720px;
+}
+
+.cosmic-eyebrow {
+  display: inline-block;
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.72rem;
+  color: var(--cosmic-gold);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.65rem;
+}
+
+.cosmic-section-header h2 {
+  font-family: var(--cosmic-font-display);
+  font-size: clamp(2.2rem, 4.8vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.cosmic-section-header h2 span {
+  color: var(--cosmic-gold);
+}
+
+.cosmic-section-header p {
+  color: var(--cosmic-text-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+/* Mission Dossiers Grid */
+.cosmic-missions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 2rem;
+}
+
+.cosmic-mission-card {
+  background: var(--cosmic-surface);
+  border: 1px solid var(--cosmic-border);
+  backdrop-filter: blur(14px);
+  border-radius: 16px;
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.cosmic-mission-card:hover,
+.cosmic-mission-card.is-focused {
+  border-color: var(--cosmic-border-glow);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 24px var(--cosmic-gold-glow);
+}
+
+.cosmic-card-orbit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cosmic-orbit-idx {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.68rem;
+  color: var(--cosmic-text-muted);
+  letter-spacing: 0.12em;
+}
+
+.cosmic-domain-pill {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.65rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--cosmic-blue);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.cosmic-mission-title {
+  font-family: var(--cosmic-font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.cosmic-mission-tagline {
+  font-size: 0.92rem;
+  color: var(--cosmic-text-muted);
+  line-height: 1.5;
+}
+
+.cosmic-metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--cosmic-border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.cosmic-metric-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cosmic-metric-label {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.6rem;
+  color: var(--cosmic-text-muted);
+}
+
+.cosmic-metric-value {
+  font-family: var(--cosmic-font-mono);
+  font-size: 1.05rem;
+  color: var(--cosmic-gold);
+}
+
+.cosmic-mission-summary {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+  flex: 1;
+}
+
+.cosmic-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--cosmic-border);
+}
+
+.cosmic-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.cosmic-tag-chip {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  color: var(--cosmic-text-muted);
+}
+
+.cosmic-inspect-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.72rem;
+  color: var(--cosmic-gold);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.cosmic-inspect-btn:hover {
+  transform: translateX(3px);
+}
+
+/* Gravitational Lens Lab Section */
+.cosmic-glass-slab {
+  background: var(--cosmic-surface);
+  border: 1px solid var(--cosmic-border-glow);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+}
+
+.cosmic-lab-header {
+  max-width: 680px;
+  margin-bottom: 2.5rem;
+}
+
+.cosmic-lab-header h2 {
+  font-family: var(--cosmic-font-display);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cosmic-lab-header h2 span {
+  color: var(--cosmic-gold);
+}
+
+.cosmic-lab-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.cosmic-slider-group label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.8rem;
+  color: var(--cosmic-text-muted);
+}
+
+.cosmic-slider-group input[type='range'] {
+  width: 100%;
+  accent-color: var(--cosmic-gold);
+  cursor: pointer;
+}
+
+.cosmic-lab-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--cosmic-border);
+  border-radius: 12px;
+}
+
+.cosmic-lab-metrics div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cosmic-lab-metrics span {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.65rem;
+  color: var(--cosmic-text-muted);
+}
+
+.cosmic-lab-metrics strong {
+  font-family: var(--cosmic-font-mono);
+  font-size: 1.25rem;
+}
+
+/* Capabilities Grid */
+.cosmic-capabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.cosmic-capability-card {
+  background: var(--cosmic-surface);
+  border: 1px solid var(--cosmic-border);
+  border-radius: 14px;
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.cosmic-cap-num {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.7rem;
+  color: var(--cosmic-gold);
+}
+
+.cosmic-capability-card h4 {
+  font-family: var(--cosmic-font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.cosmic-capability-card p {
+  font-size: 0.85rem;
+  color: var(--cosmic-text-muted);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.cosmic-cap-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.cosmic-skill-pill {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+}
+
+/* Footer */
+.cosmic-footer {
+  border-top: 1px solid var(--cosmic-border);
+  background: #020205;
+  padding: 5rem 2rem;
+  position: relative;
+  z-index: 5;
+}
+
+.cosmic-footer-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+.cosmic-footer-left h2 {
+  font-family: var(--cosmic-font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0.5rem 0 1rem;
+}
+
+.cosmic-footer-left p {
+  color: var(--cosmic-text-muted);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.cosmic-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.cosmic-btn-gold {
+  background: var(--cosmic-gold);
+  color: #030307;
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cosmic-btn-gold:hover {
+  background: #fbbf24;
+  box-shadow: 0 0 20px var(--cosmic-gold-glow);
+}
+
+.cosmic-btn-outline {
+  background: transparent;
+  border: 1px solid var(--cosmic-border);
+  color: #fff;
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.78rem;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cosmic-btn-outline:hover {
+  border-color: #fff;
+}
+
+.cosmic-stamp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.7rem;
+  color: var(--cosmic-text-muted);
+}
+
+/* Modal */
+.cosmic-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 3, 7, 0.85);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.cosmic-modal-card {
+  background: #090914;
+  border: 1px solid var(--cosmic-border-glow);
+  border-radius: 18px;
+  width: min(840px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9);
+}
+
+.cosmic-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.cosmic-modal-header h3 {
+  font-family: var(--cosmic-font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-top: 0.35rem;
+}
+
+.cosmic-modal-close {
+  background: transparent;
+  border: 1px solid var(--cosmic-border);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cosmic-modal-section h4 {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.75rem;
+  color: var(--cosmic-gold);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+
+.cosmic-modal-section p {
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.cosmic-modal-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+.cosmic-modal-stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--cosmic-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cosmic-modal-stat span {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.62rem;
+  color: var(--cosmic-text-muted);
+}
+
+.cosmic-modal-stat strong {
+  font-family: var(--cosmic-font-mono);
+  font-size: 1.1rem;
+  color: var(--cosmic-gold);
+}
+
+.cosmic-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--cosmic-border);
+  padding-top: 1.25rem;
+}
+
+.cosmic-modal-hint {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.7rem;
+  color: var(--cosmic-text-muted);
+}
+
+.cosmic-modal-link {
+  font-family: var(--cosmic-font-mono);
+  font-size: 0.75rem;
+  color: var(--cosmic-gold);
+  text-decoration: none;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 860px) {
+  .cosmic-hud-fixed {
+    top: 3.2rem;
+    font-size: 0.62rem;
+    padding: 0.4rem 0.8rem;
+  }
+  .cosmic-hud-cell:nth-child(2),
+  .cosmic-hud-cell:nth-child(4) {
+    display: none;
+  }
+  .cosmic-missions-grid {
+    grid-template-columns: 1fr;
+  }
+  .cosmic-glass-slab {
+    padding: 2rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cosmic-hero-section {
+    padding-top: 7rem;
+  }
+  .cosmic-hud-fixed {
+    display: none;
+  }
+}

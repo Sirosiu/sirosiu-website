@@ -1,0 +1,746 @@
+/* ==========================================================================
+   CONCEPT 05: LASER BLUEPRINT (PROTOTYPE 4)
+   High-Precision Silicon CAD, Lithography Laser Toolpaths & Vector Reticles
+   ========================================================================== */
+
+:root {
+  --laser-bg: #0b0d10;
+  --laser-surface: rgba(18, 22, 28, 0.75);
+  --laser-border: rgba(255, 255, 255, 0.08);
+  --laser-border-glow: rgba(34, 197, 94, 0.35);
+  --laser-text: #f8fafc;
+  --laser-text-muted: #94a3b8;
+  --laser-green: #22c55e;
+  --laser-green-glow: rgba(34, 197, 94, 0.25);
+  --laser-cyan: #38bdf8;
+  --laser-font-display: 'Syne', sans-serif;
+  --laser-font-body: 'Inter', sans-serif;
+  --laser-font-mono: 'JetBrains Mono', monospace;
+}
+
+.laser-root {
+  background-color: var(--laser-bg);
+  color: var(--laser-text);
+  font-family: var(--laser-font-body);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: clip;
+  width: 100%;
+}
+
+/* Background Laser Canvas */
+.laser-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.laser-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Fixed Silicon Telemetry HUD */
+.laser-hud-fixed {
+  position: fixed;
+  top: 3.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1320px, 94vw);
+  background: rgba(12, 14, 20, 0.85);
+  border: 1px solid var(--laser-border);
+  backdrop-filter: blur(16px);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.4rem;
+  z-index: 20;
+  font-family: var(--laser-font-mono);
+  font-size: 0.72rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+.laser-hud-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.laser-hud-label {
+  font-size: 0.6rem;
+  color: var(--laser-text-muted);
+  letter-spacing: 0.08em;
+}
+
+.laser-mono-green {
+  color: var(--laser-green);
+}
+
+.laser-mono-cyan {
+  color: var(--laser-cyan);
+}
+
+.laser-audio-btn {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: var(--laser-green);
+  font-family: var(--laser-font-mono);
+  font-size: 0.68rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.laser-audio-btn:hover,
+.laser-audio-btn.is-active {
+  background: var(--laser-green);
+  color: #0b0d10;
+  font-weight: 600;
+  box-shadow: 0 0 16px var(--laser-green-glow);
+}
+
+/* Hero Section */
+.laser-hero-section {
+  position: relative;
+  z-index: 5;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rem 2rem 4rem;
+  text-align: center;
+}
+
+.laser-hero-container {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.laser-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--laser-font-mono);
+  font-size: 0.75rem;
+  color: var(--laser-green);
+  letter-spacing: 0.14em;
+  padding: 6px 16px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 999px;
+}
+
+.laser-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--laser-green);
+  box-shadow: 0 0 10px var(--laser-green);
+  animation: laser-pulse 2s infinite ease-in-out;
+}
+
+@keyframes laser-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.5; }
+}
+
+.laser-hero-title {
+  font-family: var(--laser-font-display);
+  font-size: clamp(2.8rem, 7.5vw, 6.2rem);
+  font-weight: 800;
+  line-height: 1.02;
+  text-transform: uppercase;
+  transition: transform 0.1s linear, opacity 0.1s linear;
+}
+
+.laser-text-gradient {
+  background: linear-gradient(135deg, #86efac, #22c55e 60%, #15803d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.laser-hero-lead {
+  max-width: 720px;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.65;
+  color: #cbd5e1;
+  font-weight: 300;
+}
+
+.laser-scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.laser-scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--laser-green), transparent);
+  animation: laser-drop 2s infinite ease-in-out;
+}
+
+@keyframes laser-drop {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  50.1% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+.laser-scroll-text {
+  font-family: var(--laser-font-mono);
+  font-size: 0.65rem;
+  color: var(--laser-text-muted);
+  letter-spacing: 0.16em;
+}
+
+/* Sections General */
+.laser-section {
+  position: relative;
+  z-index: 5;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+}
+
+.laser-section-header {
+  margin-bottom: 3.5rem;
+  max-width: 720px;
+}
+
+.laser-eyebrow {
+  display: inline-block;
+  font-family: var(--laser-font-mono);
+  font-size: 0.72rem;
+  color: var(--laser-green);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.65rem;
+}
+
+.laser-section-header h2 {
+  font-family: var(--laser-font-display);
+  font-size: clamp(2.2rem, 4.8vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.laser-section-header h2 span {
+  color: var(--laser-green);
+}
+
+.laser-section-header p {
+  color: var(--laser-text-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+/* Projects Grid */
+.laser-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 2rem;
+}
+
+.laser-project-card {
+  background: var(--laser-surface);
+  border: 1px solid var(--laser-border);
+  backdrop-filter: blur(14px);
+  border-radius: 16px;
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.laser-project-card:hover,
+.laser-project-card.is-focused {
+  border-color: var(--laser-border-glow);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 24px var(--laser-green-glow);
+}
+
+.laser-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.laser-die-num {
+  font-family: var(--laser-font-mono);
+  font-size: 0.68rem;
+  color: var(--laser-text-muted);
+  letter-spacing: 0.12em;
+}
+
+.laser-domain-pill {
+  font-family: var(--laser-font-mono);
+  font-size: 0.65rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--laser-green);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.laser-project-title {
+  font-family: var(--laser-font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.laser-project-tagline {
+  font-size: 0.92rem;
+  color: var(--laser-text-muted);
+  line-height: 1.5;
+}
+
+.laser-metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--laser-border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.laser-metric-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.laser-metric-label {
+  font-family: var(--laser-font-mono);
+  font-size: 0.6rem;
+  color: var(--laser-text-muted);
+}
+
+.laser-metric-value {
+  font-family: var(--laser-font-mono);
+  font-size: 1.05rem;
+  color: var(--laser-green);
+}
+
+.laser-project-summary {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+  flex: 1;
+}
+
+.laser-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--laser-border);
+}
+
+.laser-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.laser-tag-chip {
+  font-family: var(--laser-font-mono);
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  color: var(--laser-text-muted);
+}
+
+.laser-inspect-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--laser-font-mono);
+  font-size: 0.72rem;
+  color: var(--laser-green);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.laser-inspect-btn:hover {
+  transform: translateX(3px);
+}
+
+/* Photolithography Lab Section */
+.laser-glass-slab {
+  background: var(--laser-surface);
+  border: 1px solid var(--laser-border-glow);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+}
+
+.laser-lab-header {
+  max-width: 680px;
+  margin-bottom: 2.5rem;
+}
+
+.laser-lab-header h2 {
+  font-family: var(--laser-font-display);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.laser-lab-header h2 span {
+  color: var(--laser-green);
+}
+
+.laser-lab-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.laser-sliders-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.laser-sliders-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-family: var(--laser-font-mono);
+  font-size: 0.8rem;
+  color: var(--laser-text-muted);
+}
+
+.laser-sliders-row input[type='range'] {
+  width: 100%;
+  accent-color: var(--laser-green);
+  cursor: pointer;
+}
+
+.laser-lab-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--laser-border);
+  border-radius: 12px;
+}
+
+.laser-lab-metrics div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.laser-lab-metrics span {
+  font-family: var(--laser-font-mono);
+  font-size: 0.65rem;
+  color: var(--laser-text-muted);
+}
+
+.laser-lab-metrics strong {
+  font-family: var(--laser-font-mono);
+  font-size: 1.25rem;
+}
+
+/* Capabilities Grid */
+.laser-capabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.laser-capability-card {
+  background: var(--laser-surface);
+  border: 1px solid var(--laser-border);
+  border-radius: 14px;
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.laser-cap-num {
+  font-family: var(--laser-font-mono);
+  font-size: 0.7rem;
+  color: var(--laser-green);
+}
+
+.laser-capability-card h4 {
+  font-family: var(--laser-font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.laser-capability-card p {
+  font-size: 0.85rem;
+  color: var(--laser-text-muted);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.laser-cap-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.laser-skill-pill {
+  font-family: var(--laser-font-mono);
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+}
+
+/* Footer */
+.laser-footer {
+  border-top: 1px solid var(--laser-border);
+  background: #080a0d;
+  padding: 5rem 2rem;
+  position: relative;
+  z-index: 5;
+}
+
+.laser-footer-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+.laser-footer-left h2 {
+  font-family: var(--laser-font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0.5rem 0 1rem;
+}
+
+.laser-footer-left p {
+  color: var(--laser-text-muted);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.laser-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.laser-btn-green {
+  background: var(--laser-green);
+  color: #0b0d10;
+  font-family: var(--laser-font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.laser-btn-green:hover {
+  background: #4ade80;
+  box-shadow: 0 0 20px var(--laser-green-glow);
+}
+
+.laser-btn-outline {
+  background: transparent;
+  border: 1px solid var(--laser-border);
+  color: #fff;
+  font-family: var(--laser-font-mono);
+  font-size: 0.78rem;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.laser-btn-outline:hover {
+  border-color: #fff;
+}
+
+.laser-stamp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-family: var(--laser-font-mono);
+  font-size: 0.7rem;
+  color: var(--laser-text-muted);
+}
+
+/* Modal */
+.laser-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 13, 16, 0.85);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.laser-modal-card {
+  background: #0f131a;
+  border: 1px solid var(--laser-border-glow);
+  border-radius: 18px;
+  width: min(840px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9);
+}
+
+.laser-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.laser-modal-header h3 {
+  font-family: var(--laser-font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-top: 0.35rem;
+}
+
+.laser-modal-close {
+  background: transparent;
+  border: 1px solid var(--laser-border);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.laser-modal-section h4 {
+  font-family: var(--laser-font-mono);
+  font-size: 0.75rem;
+  color: var(--laser-green);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+
+.laser-modal-section p {
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.laser-modal-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+.laser-modal-stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--laser-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.laser-modal-stat span {
+  font-family: var(--laser-font-mono);
+  font-size: 0.62rem;
+  color: var(--laser-text-muted);
+}
+
+.laser-modal-stat strong {
+  font-family: var(--laser-font-mono);
+  font-size: 1.1rem;
+  color: var(--laser-green);
+}
+
+.laser-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--laser-border);
+  padding-top: 1.25rem;
+}
+
+.laser-modal-hint {
+  font-family: var(--laser-font-mono);
+  font-size: 0.7rem;
+  color: var(--laser-text-muted);
+}
+
+.laser-modal-link {
+  font-family: var(--laser-font-mono);
+  font-size: 0.75rem;
+  color: var(--laser-green);
+  text-decoration: none;
+}
+
+/* Responsiveness */
+@media (max-width: 860px) {
+  .laser-hud-fixed {
+    top: 3.2rem;
+    font-size: 0.62rem;
+    padding: 0.4rem 0.8rem;
+  }
+  .laser-hud-cell:nth-child(3),
+  .laser-hud-cell:nth-child(4) {
+    display: none;
+  }
+  .laser-projects-grid {
+    grid-template-columns: 1fr;
+  }
+  .laser-glass-slab {
+    padding: 2rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .laser-hero-section {
+    padding-top: 7rem;
+  }
+  .laser-hud-fixed {
+    display: none;
+  }
+}
